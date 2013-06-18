@@ -14,20 +14,6 @@ function on(g, f) {
 	};
 }
 
-//pretty prints expressions!
-function pprint(exp) {
-	//console.log(exp);
-	//if (exp.func && exp.func
-	if (exp.func && exp.p)
-		return "(" + pprint(exp.func) + " " + pprint(exp.p) + ")";
-		//return pprint(exp.func);
-	else if (exp.exprType === "Name")
-		return exp.val;
-	else
-		return exp.val;
-}
-
 module.exports = {compose : compose,
 				  not	  : not,
-				  on	  : on,
-				  pprint  : pprint}
+				  on	  : on}
