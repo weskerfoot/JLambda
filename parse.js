@@ -298,7 +298,10 @@ function computeApp(tokens) {
 	}
 }
 
-//Parses infix expressions by precedence climbing
+/*Parses infix expressions by precedence climbing
+  See this for more info and an implementation in python
+  http://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing/
+*/
 function parseInfix(tokens, minPrec, lhs) {
 	if (!lhs) {
 		var lhs = parse(tokens);
