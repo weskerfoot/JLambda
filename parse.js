@@ -164,6 +164,7 @@ function parseMany(exprType, valid, tokens) {
 	//do the same validity check as before and in the loop
 	if (valid(fst(tokens)[0]))
 		results.push(parse(tokens));
+  //console.log(tokens);
 	return results;
 }
 
@@ -252,6 +253,10 @@ function parse(tokens) {
 		return checkParse(parseIf(tokens));
 	else if (toktype === "left_paren")
 		return computeApp(tokens);
+  else {
+    console.log("Unexpected token: " + toktype);
+    process.exit(code=1);
+  }
 }
 
 function checkParse(p) {
@@ -265,7 +270,8 @@ function checkParse(p) {
 
 //Parses function application (either infix or prefix)
 function computeApp(tokens) {
-	var lhs = parse(tokens);
+  var lhs = parse(tokens);
+  //console.log(lhs);
 	if (fst(tokens))
 		var next = fst(tokens);
 	else {
@@ -281,18 +287,21 @@ function computeApp(tokens) {
 		}
 		else {
 			//return the result
+      tokens.pop();
 			return result;
 		}
 	}
 	else {
 		//it's a prefix application
 		var parameters = parseMany(validArgTypes, validArgument, tokens);
+    //console.log(parameters);
 		if (fst(tokens)[0] !== "right_paren") {
 			console.log("Error: mismatched parentheses");
 			process.exit(code=1);
 		}
 		else {
 			//return the result
+      tokens.pop();
 			return typ.makeApp(lhs, parameters);
 		}
 	}
@@ -317,7 +326,7 @@ function parseInfix(tokens, minPrec, lhs) {
 		if (!opinfo || opinfo[0] < minPrec)
 			break;
 
-		var op = cur[1];
+		var op = new typ.Name(cur[1]);
 		var prec = opinfo[0];
 		var assoc = opinfo[1];
 		var nextMinPrec = assoc === "Left" ? prec + 1 : prec;
@@ -331,10 +340,39 @@ function parseInfix(tokens, minPrec, lhs) {
 	return lhs;
 }
 
+function pprintName(ident) {
+  return pprint(ident.val);
+}
+
+function pprintFunc(func) {
+  return "lambda " + pprint(func.p) + " -> " + pprint(func.body);
+}
+
+function pprintApp(app) {
+  if (!app.p || app.p === undefined)
+    return "((" + pprint(app.func) + "))";
+  return "((" + pprint(app.func) + ") " + pprint(app.p) + ")";
+}
+
+function pprint(expr) {
+  if (expr.exprType === "Name")
+    return expr.val;
+  else if (expr.exprType === "Bool")
+    return expr.val;
+  else if (expr.exprType === "Integer")
+    return expr.val;
+  else if (expr.exprType === "Float")
+    return expr.val;
+  else if (expr.exprType === "String")
+    return expr.val;
+  else if (expr.exprType === "Name")
+    return expr.val;
+  else if (expr.exprType === "Application")
+    return pprintApp(expr);
+}
 
 var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
-var wat = tokenize(input).reverse();
-//console.log(tool.pprint(parse(wat)));
-console.log(parse(wat));
-//console.log(wat);
-//parse(wat);
+var tokenized = tokenize(input).reverse();
+
+console.log(pprint(parse(tokenized)));
+//console.log(tokenized);
