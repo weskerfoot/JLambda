@@ -18,7 +18,7 @@ var comma = /^,/;
 var truelit = /^true/;
 var falselit = /^false/;
 
-var stringlit = /^\"[^\"]*\"/;	
+var stringlit = /^\"[^\"]*\"/;
 
 var number = /^(\+|-)?\d+(\.\d+)?/;
 
@@ -345,20 +345,38 @@ function pprintName(ident) {
 }
 
 function pprintFunc(func) {
-  return "lambda " + pprint(func.p) + " -> " + pprint(func.body);
+  if (func.p.exprType === "Name")
+    return "\\ " + pprint(func.p) + " -> " + pprint(func.body);
+  else
+    return "\\ " + func.p.map(pprint).join(" ") + " -> " + pprint(func.body);
+
 }
 
 function pprintApp(app) {
   if (!app.p || app.p === undefined)
-    return "((" + pprint(app.func) + "))";
+    return "(" + pprint(app.func) + ")";
   return "((" + pprint(app.func) + ") " + pprint(app.p) + ")";
+}
+
+function pprintDef(def) {
+  return "let " + pprint(def.ident) + " = " + pprint(def.val);
+}
+
+function pprintIf(ifexp) {
+  if (ifexp.elseexp)
+    return "if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + " else " + pprint(ifexp.elseexp);
+  else
+    return "if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp);
 }
 
 function pprint(expr) {
   if (expr.exprType === "Name")
     return expr.val;
   else if (expr.exprType === "Bool")
-    return expr.val;
+    if (expr.val)
+      return "True";
+    else
+      return "False";
   else if (expr.exprType === "Integer")
     return expr.val;
   else if (expr.exprType === "Float")
@@ -369,10 +387,18 @@ function pprint(expr) {
     return expr.val;
   else if (expr.exprType === "Application")
     return pprintApp(expr);
+  else if (expr.exprType === "Definition")
+    return pprintDef(expr);
+  else if (expr.exprType === "If")
+    return pprintIf(expr);
+  else if (expr.exprType === "Function")
+    return pprintFunc(expr);
 }
 
 var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
 var tokenized = tokenize(input).reverse();
 
+//parse(tokenized);
+//console.log(parse(tokenized))
 console.log(pprint(parse(tokenized)));
 //console.log(tokenized);

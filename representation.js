@@ -118,6 +118,7 @@ function If(condition, thenexp, elseexp) {
 	return this;
 }
 
+
 //convenience function to construct binary operators
 //assumes that the identifier refers to the name of a primitive
 //operation
@@ -140,11 +141,13 @@ function makeApp(name, parameters) {
 
 OPTable = {"+" : makeBin("+")};
 
-OPInfo = {"+" : [1, "Left"],
-		  "-" : [1, "Left"],
-		  "*" : [2, "Left"],
-		  "/" : [2, "Left"],
-		  "^" : [3, "Right"]}
+OPInfo = {"+" : [2, "Left"],
+		  "-" : [2, "Left"],
+		  "*" : [3, "Left"],
+		  "/" : [3, "Left"],
+		  "^" : [4, "Right"],
+      "++" : [2, "Left"],
+      "==" : [1, "Left"]}
 
 module.exports =
    { IntT   : IntT,
