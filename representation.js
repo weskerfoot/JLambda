@@ -58,7 +58,7 @@ BoolT.prototype = Expression;
 function ListT(x, xs) {
 	this.x = x;
 	this.rest = xs;
-	this.val = [x,xs];
+	this.val = xs;
 	this.exprType = "List";
 	return this;
 }
@@ -112,7 +112,7 @@ function Def(ident, exp) {
 function If(condition, thenexp, elseexp) {
 	this.condition = condition;
 	this.thenexp = thenexp;
-	if (elseexp)
+if (elseexp)
 		this.elseexp = elseexp;
 	this.exprType = "If";
 	return this;
@@ -138,8 +138,6 @@ function makeApp(name, parameters) {
 	}
 
 }
-
-OPTable = {"+" : makeBin("+")};
 
 OPInfo = {"+" : [2, "Left"],
 		  "-" : [2, "Left"],

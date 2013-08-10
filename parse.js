@@ -1,3 +1,5 @@
+#! /usr/bin/node
+
 var typ = require("./representation.js");
 var tool = require("./tools.js");
 
@@ -174,7 +176,12 @@ function parseDef(tokens) {
 		return undefined;
 	}
 	else {
-		return new typ.Def(parse(tokens), parse(tokens));
+    var identifier = parse(tokens);
+    if (!notFollowedBy(tokens, ["def", "comma", "left_paren", "arrow", "right_brace", "right_square"])) {
+      console.log("Error: def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
+      return;
+    }
+		return new typ.Def(identifier, parse(tokens));
 	}
  }
 
@@ -251,8 +258,16 @@ function parse(tokens) {
 		return checkParse(parseDef(tokens));
 	else if (toktype === "ifexp")
 		return checkParse(parseIf(tokens));
-	else if (toktype === "left_paren")
-		return computeApp(tokens);
+	else if (toktype === "left_paren") {
+		if (fst(tokens)[0] === "lambda") {
+      tokens.pop();
+      var parsed = checkParse(parseLambda(tokens));
+      tokens.pop();
+      return parsed;
+    }
+    else
+      return computeApp(tokens);
+  }
   else {
     console.log("Unexpected token: " + toktype);
     process.exit(code=1);
@@ -334,8 +349,6 @@ function parseInfix(tokens, minPrec, lhs) {
 		//remove the operator token
 		var rhs = parseInfix(tokens, nextMinPrec);
 		lhs = typ.makeApp(op, [lhs, rhs]);
-
-
 	}
 	return lhs;
 }
