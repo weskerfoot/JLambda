@@ -2,6 +2,7 @@
 
 var typ = require("./representation.js");
 var tool = require("./tools.js");
+var fs = require("fs");
 
 // Tokenization
 
@@ -408,10 +409,13 @@ function pprint(expr) {
     return pprintFunc(expr);
 }
 
-var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
+
+
+var input = fs.readFileSync('/dev/stdin').toString();
+//var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
 var tokenized = tokenize(input).reverse();
 
-//parse(tokenized);
+console.log(tokenized);
 //console.log(parse(tokenized))
-console.log(pprint(parse(tokenized)));
+//console.log(pprint(parse(tokenized)));
 //console.log(tokenized);

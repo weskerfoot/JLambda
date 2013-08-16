@@ -1,115 +1,139 @@
 #!  /usr/bin/node
 
-// Tokenization, with no regular expressions, ala Rob Pike :)
+var fs = require("fs");
 
 function isDigit(a) {
   if (!a)
     return false;
   var code = a.charCodeAt();
-  if (46 < code && code < 58 || code < 58 && code > 46)
+  return (46 < code && code < 58 || code < 58 && code > 46);
+}
+
+function isWhitespace(a) {
+  if (!a)
     return true;
-  return false;
+
+  var code = a.charCodeAt();
+  return (code === 9 || code === 32 || code === 10 || code === 13 || code === 11);
 }
 
-var TokenStream = {
-  lookahead :
-    function(n) {
-      return this.tokstream[this.tokstream.length-n];
-    },
-  next :
-    function() {
-      return this.lookahead(2);
-    },
-  empty :
-    function() {
-      return this.tokstream.length === 0;
-    },
-  current :
-    function() {
-      return this.tokstream[this.tokstream.length-1];
-    },
-  pop :
-    function() {
-      this.tokstream.pop();
-    }
-}
-
-function MakeTokStream(tokens) {
-  this.tokstream = tokens;
-}
-MakeTokStream.prototype = TokenStream;
-
-function tokenizeNum(tokstream) {
+function tokenizeNum() {
   var number = [];
-  tokstream.pop();
-  while (isDigit(tokstream.current()) && !tokstream.empty()) {
-    number.push(tokstream.current());
-    tokstream.pop();
+  var code = tokstream[0].charCodeAt();
+  var isFloat = false;
+  // + -
+
+  if (code === 43 || code === 45) {
+    number.push(tokstream[0]);
+    tokstream = tokstream.substr(1);
   }
-  if (tokstream.current() === '.' && isDigit(tokstream.next())) {
+  else if (code === 46) {
+    tokstream = tokstream.substr(1);
+    number.push('0');
     number.push('.');
-    number.push(tokstream.next());
-    tokstream.pop();
-    tokstream.pop();
-    while (isDigit(tokstream.current()) && !tokstream.empty()) {
-      number.push(tokstream.current());
-      tokstream.pop();
+    isFloat = true;
+  }
+
+  while (isDigit(tokstream[0]) && tokstream.length !== 0) {
+    number.push(tokstream[0]);
+    tokstream = tokstream.substr(1);
+  }
+  if (tokstream[0] === '.' && isDigit(tokstream[1])) {
+    number.push('.');
+    number.push(tokstream[1]);
+    tokstream = tokstream.substr(2);
+    while (isDigit(tokstream[0]) && tokstream.length !== 0) {
+      number.push(tokstream[0]);
+      tokstream = tokstream.substr(1);
     }
     return ["Float", parseFloat(number.join(''), 10)];
   }
-  return ["Integer", parseInt(number.join(''), 10)];
+  if (!isFloat)
+    return ["Integer", parseInt(number.join(''), 10)];
+  else
+    return ["Float", parseFloat(number.join(''), 10)];
 }
 
-function tokenize(tokstream) {
+function tokenizeIdent() {
+  var identifier = [];
+  while (!isWhitespace(tokstream[0])) {
+    identifier.push(tokstream[0]);
+    tokstream = tokstream.substr(1);
+  }
+  return ["identifier", identifier.join('')];
+}
+
+function tokenize() {
   var tokens = [];
 
-  while (!tokstream.empty()) {
-    switch (tokstream.current()) {
-      case '(':
+  while (tokstream) {
+    switch (tokstream[0].charCodeAt()) {
+      case 9: // '\t'
+        tokens.push(["whitespace", '\t']);
+        tokstream = tokstream.substr(1);
+        break;
+      case 32: // ' '
+        tokens.push(["whitespace", ' ']);
+        tokstream = tokstream.substr(1);
+        break;
+      case 10: // '\n'
+        tokens.push(["whitespace", '\n']);
+        tokstream = tokstream.substr(1);
+        break;
+      case 40: // '('
         tokens.push(["left_paren", '(']);
+        tokstream = tokstream.substr(1);
         break;
-      case ')':
+      case 41: // ')'
         tokens.push(["right_paren", ')']);
+        tokstream = tokstream.substr(1);
         break;
-      case '{':
+      case 123: // '{'
         tokens.push(["left_brace", '{']);
+        tokstream = tokstream.substr(1);
         break;
-      case '}':
+      case 125: // '}'
         tokens.push(["right_brace", '}']);
+        tokstream = tokstream.substr(1);
         break;
-      case '[':
+      case 91: // '['
         tokens.push(["left_square", '[']);
+        tokstream = tokstream.substr(1);
         break;
-      case ']':
+      case 93: // ']'
         tokens.push(["right_square", ']']);
+        tokstream = tokstream.substr(1);
         break;
-      case '+':
-        var num = tokenizeNum(tokstream);
+      case 43: // '+'
+        var num = tokenizeNum();
         if (num !== NaN)
           tokens.push(num);
         break;
-      case '-':
-        var num = tokenizeNum(tokstream);
+      case 45: // '-'
+        var num = tokenizeNum();
         if (num !== NaN)
           tokens.push(num);
         break;
-      case '.':
-        var num = tokenizeNum(tokstream);
+      case 46: // '.'
+        var num = tokenizeNum();
         if (num !== NaN)
           tokens.push(num);
         break;
       default:
-        tokens.push(["identifier", tokstream.current()]);
-        tokstream.pop();
+        if (isDigit(tokstream[0])) {
+          var num = tokenizeNum();
+          if (num !== NaN)
+            tokens.push(num);
+            break;
+        }
+        var ident = tokenizeIdent();
+        tokens.push(ident);
     }
   }
   return tokens;
 }
 
-var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "").trim().split('').reverse();
+//var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "").trim();
+var tokstream = fs.readFileSync("/dev/stdin").toString();
 
-var test = new MakeTokStream(input);
-
-console.log(tokenize(test));
-//console.log(isDigit('0'));
-
+console.log(tokenize());
