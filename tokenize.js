@@ -167,7 +167,7 @@ function tokenize(tokstream) {
         break;
       case 46: // '.'
         var result = tokenizeNum(tokstream);
-        var num = result[1];
+       var num = result[1];
         var i = result[0];
         if (num[1] !== NaN)
           tokens.push(num);
@@ -176,8 +176,7 @@ function tokenize(tokstream) {
       case 116: // 't'
         var result = tokenizeT(tokstream);
         if (result) {
-          var token = result[1];
-          tokens.push(token);
+          tokens.push(result);
           tokstream = tokstream.substr(4); // 4 = length of either token
           break;
         }
@@ -203,6 +202,6 @@ function tokenize(tokstream) {
 
 var tokstream = fs.readFileSync("/dev/stdin").toString();
 
-//console.log(tokenize(tokstream));
-tokenize(tokstream);
+console.log(tokenize(tokstream));
+//tokenize(tokstream);
 
