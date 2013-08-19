@@ -88,6 +88,18 @@ function tokenizeStr(tokstream) {
 
 }
 
+function tokenizeT(tokstream) {
+  if (tokstream.length < 4)
+    return false;
+  var next4 = tokstream.substr(0,4);
+  if (next4 === "then")
+    return ["then-exp", "then"];
+  else if (next4 === "true")
+    return ["bool", "true"];
+  else
+    return false;
+}
+
 function tokenize(tokstream) {
   var tokens = [];
 
@@ -161,6 +173,14 @@ function tokenize(tokstream) {
           tokens.push(num);
         tokstream = tokstream.substr(i);
         break;
+      case 116: // 't'
+        var result = tokenizeT(tokstream);
+        if (result) {
+          var token = result[1];
+          tokens.push(token);
+          tokstream = tokstream.substr(4); // 4 = length of either token
+          break;
+        }
       default:
         if (isDigit(tokstream[0])) {
           var result = tokenizeNum(tokstream);
