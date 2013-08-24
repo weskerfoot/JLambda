@@ -2,110 +2,8 @@
 
 var typ = require("./representation.js");
 var tool = require("./tools.js");
+var tokenizer = require("./tokenize.js");
 var fs = require("fs");
-
-// Tokenization
-
-var left_paren = /^\(/;
-var right_paren = /^\)/;
-
-var left_brace = /^\{/;
-var right_brace = /^\}/;
-
-var def = /^def/;
-
-var left_square = /^\[/;
-var right_square = /^\]/;
-var comma = /^,/;
-
-var truelit = /^true/;
-var falselit = /^false/;
-
-var stringlit = /^\"[^\"]*\"/;
-
-var number = /^(\+|-)?\d+(\.\d+)?/;
-
-var ifexp = /^if/;
-var thenexp = /^then/;
-var elsexp = /^else/;
-
-var identifier = /^[^\s\.\(\)\{\}\[\]\""]+/;
-
-var lambda = /^lambda/;
-
-var arrow = /^->/;
-
-function tokmatch(t) {
-	var ttype;
-	var m;
-	if (m = t.match(left_paren))
-		ttype = "left_paren";
-	else if (m = t.match(right_paren))
-		ttype = "right_paren";
-	else if (m = t.match(left_brace))
-		ttype = "left_brace";
-	else if (m = t.match(right_brace))
-		ttype = "right_brace";
-	else if (m = t.match(left_square))
-		ttype = "left_square";
-	else if (m = t.match(right_square))
-		ttype = "right_square";
-	else if (m = t.match(def))
-		ttype = "def";
-	else if (m = t.match(lambda))
-		ttype = "lambda";
-	else if (m = t.match(arrow))
-		ttype = "arrow";
-	else if (m = t.match(comma))
-		ttype = "comma";
-	else if (m = t.match(truelit))
-		ttype = "truelit";
-	else if (m = t.match(falselit))
-		ttype = "falselit";
-	else if (m = t.match(stringlit))
-		ttype = "stringlit";
-	else if (m = t.match(number))
-		if (m[0].indexOf(".") !== -1) {
-			ttype = "float";
-			return [[ttype, m[0]], m.input.slice(m[0].length)];
-		}
-		else {
-			ttype = "integer";
-			return [[ttype, m[0]], m.input.slice(m[0].length)];
-		}
-	else if (m = t.match(ifexp))
-		ttype = "ifexp";
-	else if (m = t.match(thenexp))
-		ttype = "thenexp";
-	else if (m = t.match(elsexp))
-		ttype = "elsexp";
-	else if (m = t.match(identifier))
-		ttype = "identifier";
-	else {
-		console.log("Error: unmatched string: " + t);
-		return;
-	}
-	return [[ttype, m[0]], m.input.slice(m[0].length)];
-}
-
-function tokenize(exp) {
-	var current, next;
-	var tokens = [];
-	while (exp != '') {
-		if (exp[0].match(/\s/)) {
-			exp = exp.slice(1);
-			// skip whitespace
-		}
-		else {
-			current = tokmatch(exp);
-			if (!current)
-				break;
-			exp = current[1];
-			tokens.push(current[0]);
-		}
-	}
-	return tokens;
-}
 
 function fst(ts) {
 	return ts[ts.length-1];
@@ -413,9 +311,9 @@ function pprint(expr) {
 
 var input = fs.readFileSync('/dev/stdin').toString();
 //var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
-var tokenized = tokenize(input).reverse();
-
+var tokenized = tokenizer.tokenize(input).reverse();
 console.log(tokenized);
-//console.log(parse(tokenized))
+//console.log(tokenized);
+console.log(parse(tokenized))
 //console.log(pprint(parse(tokenized)));
 //console.log(tokenized);
