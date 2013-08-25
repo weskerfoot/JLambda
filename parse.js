@@ -136,7 +136,7 @@ function parse(tokens) {
 	if (fst(tokens))
 		var toktype = fst(tokens)[0];
 	else {
-		console.log("Unexpected end of source")
+		//console.log("Unexpected end of source")
 		process.exit(code=1);
 	}
 	var token = fst(tokens)[1];
@@ -271,7 +271,7 @@ function pprintApp(app) {
 }
 
 function pprintDef(def) {
-  return "let " + pprint(def.ident) + " = " + pprint(def.val);
+  return pprint(def.ident) + " = " + pprint(def.val);
 }
 
 function pprintIf(ifexp) {
@@ -310,4 +310,9 @@ function pprint(expr) {
 var input = fs.readFileSync('/dev/stdin').toString();
 var tokenized = tokenizer.tokenize(input).reverse().filter(function(x) { return x[0] !== "whitespace";});
 //console.log(tokenized);
-console.log(pprint(parse(tokenized)));
+
+while (tokenized !== []) {
+  console.log(pprint(parse(tokenized)));
+  if (!tokenized)
+    break;
+}
