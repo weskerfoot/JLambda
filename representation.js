@@ -139,13 +139,16 @@ function makeApp(name, parameters) {
 
 }
 
-OPInfo = {"+" : [2, "Left"],
-		  "-" : [2, "Left"],
-		  "*" : [3, "Left"],
-		  "/" : [3, "Left"],
-		  "^" : [4, "Right"],
-      "++" : [2, "Left"],
-      "==" : [1, "Left"]}
+OPInfo = {"+" : [3, "Left"],
+		  "-" : [3, "Left"],
+		  "*" : [4, "Left"],
+		  "/" : [4, "Left"],
+		  "^" : [5, "Right"],
+      "++" : [3, "Left"],
+      "==" : [2, "Left"],
+      ">" : [2, "Left"],
+      "<" : [2, "Left"],
+      "$" : [1, "Left"]}
 
 module.exports =
    { IntT   : IntT,

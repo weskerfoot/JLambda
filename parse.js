@@ -258,9 +258,9 @@ function pprintName(ident) {
 
 function pprintFunc(func) {
   if (func.p.exprType === "Name")
-    return "\\ " + pprint(func.p) + " -> " + pprint(func.body);
+    return "(\\ " + pprint(func.p) + " -> " + pprint(func.body) + ")";
   else
-    return "\\ " + func.p.map(pprint).join(" ") + " -> " + pprint(func.body);
+    return "(\\ " + func.p.map(pprint).join(" ") + " -> " + pprint(func.body) + ")";
 
 }
 
@@ -294,7 +294,7 @@ function pprint(expr) {
   else if (expr.exprType === "Float")
     return expr.val;
   else if (expr.exprType === "String")
-    return expr.val;
+    return '"'+expr.val+'"';
   else if (expr.exprType === "Name")
     return expr.val;
   else if (expr.exprType === "Application")
@@ -307,13 +307,7 @@ function pprint(expr) {
     return pprintFunc(expr);
 }
 
-
-
 var input = fs.readFileSync('/dev/stdin').toString();
-//var input = process.argv.slice(2).reduce(function(acc, x) {return acc + " " + x}, "");
-var tokenized = tokenizer.tokenize(input).reverse();
-console.log(tokenized);
+var tokenized = tokenizer.tokenize(input).reverse().filter(function(x) { return x[0] !== "whitespace";});
 //console.log(tokenized);
-console.log(parse(tokenized))
-//console.log(pprint(parse(tokenized)));
-//console.log(tokenized);
+console.log(pprint(parse(tokenized)));

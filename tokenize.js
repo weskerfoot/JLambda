@@ -56,18 +56,18 @@ function tokenizeNum(tokstream) {
       tokstream = tokstream.substr(1);
       n++;
     }
-    return [n, ["Float", parseFloat(number.join(''), 10)]];
+    return [n, ["float", parseFloat(number.join(''), 10)]];
   }
   if (!isFloat)
-    return [n, ["Integer", parseInt(number.join(''), 10)]];
+    return [n, ["integer", parseInt(number.join(''), 10)]];
   else
-    return [n, ["Float", parseFloat(number.join(''), 10)]];
+    return [n, ["float", parseFloat(number.join(''), 10)]];
 }
 
 function tokenizeIdent(tokstream) {
   var identifier = [];
   var n = 0;
-  while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0])) {
+  while ((!isWhitespace(tokstream[0])) && (!isDigit(tokstream[0])) && isIdentifier(tokstream[0])) {
     identifier.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
@@ -164,13 +164,15 @@ function tokenize(tokstream) {
         break;
 
       case 43: // '+'
-        var result = tokenizeNum(tokstream);
-        var num = result[1];
-        var i = result[0];
-        if (num[1] !== NaN)
-          tokens.push(num);
-        tokstream = tokstream.substr(i);
-        break;
+        if (isDigit(tokstream[1])) {
+          var result = tokenizeNum(tokstream);
+          var num = result[1];
+          var i = result[0];
+          if (num[1] !== NaN)
+            tokens.push(num);
+          tokstream = tokstream.substr(i);
+          break;
+        }
       case 45: // '-'
         var lambda = peek(tokstream, "arrow", "->");
         if (lambda) {
@@ -178,21 +180,25 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(2);
           break;
         }
-        var result = tokenizeNum(tokstream);
-        var num = result[1];
-        var i = result[0];
-        if (num[1] !== NaN)
-          tokens.push(num);
-        tokstream = tokstream.substr(i);
-        break;
+        if (isDigit(tokstream[1])) {
+          var result = tokenizeNum(tokstream);
+          var num = result[1];
+          var i = result[0];
+          if (num[1] !== NaN)
+            tokens.push(num);
+          tokstream = tokstream.substr(i);
+          break;
+        }
       case 46: // '.'
-        var result = tokenizeNum(tokstream);
-        var num = result[1];
-        var i = result[0];
-        if (num[1] !== NaN)
-          tokens.push(num);
-        tokstream = tokstream.substr(i);
-        break;
+        if (isDigit(tokstream[1])) {
+          var result = tokenizeNum(tokstream);
+          var num = result[1];
+          var i = result[0];
+          if (num[1] !== NaN)
+            tokens.push(num);
+          tokstream = tokstream.substr(i);
+          break;
+        }
       case 116: // 't'
         var result = tokenizeT(tokstream);
         if (result) {
