@@ -1,4 +1,4 @@
-#! /usr/bin/nodejs
+#! /usr/bin/node
 
 var typ = require("./representation.js");
 var tool = require("./tools.js");
@@ -16,9 +16,7 @@ function snd(ts) {
 //Checks if the next token is not followed by any of ``checks''
 function notFollowedBy(tokens, checks) {
 	var nextT = fst(tokens)[0];
-	if (!snd(tokens))
-		console.log("Error: "+ fst(tokens)[0] +" must be followed by something");
-	else if (checks.some(function (x) {return x === nextT;}))
+	if (checks.some(function (x) {return x === nextT;}))
 		return false;
 	else
 		return true;
@@ -69,7 +67,63 @@ function parseMany(exprType, valid, tokens) {
 	return results;
 }
 
+/* Tries to parse exprType separated by the token between
+ * e.g. <identifier>,<identifier>,...
+ */
+function parseBetween(exprType, between, tokens) {
+  var first = parse(tokens);
+  if (!exprType(first)) {
+    console.log("Error, unexpected token:"+fst(tokens)[0]);
+    return;
+  }
+  var items = [first];
+  var parsed;
+  if (tokens.length > 1 && fst(tokens)[0] === between) {
+    while (fst(tokens)[0] === between) {
+      tokens.pop();
+      parsed = parse(tokens);
+      items.push(parsed);
+    }
+    return items;
+  }
+  return items;
+}
+
+function parseList(tokens) {
+  var xs = parseBetween(function (x) { return true; }, "comma", tokens);
+  if (fst(tokens)[0] !== "right_square") {
+    console.log("Error, list must be terminated by ]");
+    return undefined;
+  }
+  tokens.pop();
+  return new typ.ListT(xs);
+}
+
+
+function parseDefFunction(tokens) {
+	var fname = parse(tokens);
+  if (!fname.exprType === "identifier") {
+    console.log("Error, expected an identifier in function definition");
+    return undefined;
+  }
+  var parameters = parseMany(validName, validFormPar, tokens);
+  if ((fst(tokens)[0]) !== "right_paren") {
+    console.log("Error, formal parameters must be followed by )");
+    return undefined;
+  }
+  tokens.pop();
+  var body = parse(tokens);
+  return new typ.DefFunc(fname, parameters, body);
+}
+
+
+
 function parseDef(tokens) {
+  if (fst(tokens)[0] === "left_paren") {
+    // It's a function definition
+    tokens.pop();
+    return parseDefFunction(tokens);
+  }
 	if (notFollowedBy(tokens, ["identifier"])) {
 		console.log("Error: def must be followed by identifier, not "+fst(tokens)[0]);
 		return undefined;
@@ -131,47 +185,6 @@ var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_br
 var validArgument = tool.compose(tool.not, makeChecker(invalidArguments));
 var validArgTypes = tool.compose(tool.not, makeChecker(["Definition"]));
 var validOperator = makeChecker(["identifier"]);
-
-function parse(tokens) {
-	if (fst(tokens))
-		var toktype = fst(tokens)[0];
-	else {
-		//console.log("Unexpected end of source")
-		process.exit(code=1);
-	}
-	var token = fst(tokens)[1];
-	tokens.pop();
-	if (toktype === "stringlit")
-		return new typ.StrT(token);
-	else if (toktype === "lambda")
-		return checkParse(parseLambda(tokens));
-	else if (toktype === "integer")
-		return new typ.IntT(token);
-	else if (toktype === "float")
-		return new typ.FloatT(token);
-	else if (toktype === "identifier")
-		return new typ.Name(token);
-	else if (toktype === "truelit" || toktype === "falselit")
-		return new typ.BoolT(token);
-	else if (toktype === "def")
-		return checkParse(parseDef(tokens));
-	else if (toktype === "ifexp")
-		return checkParse(parseIf(tokens));
-	else if (toktype === "left_paren") {
-		if (fst(tokens)[0] === "lambda") {
-      tokens.pop();
-      var parsed = checkParse(parseLambda(tokens));
-      tokens.pop();
-      return parsed;
-    }
-    else
-      return computeApp(tokens);
-  }
-  else {
-    console.log("Unexpected token: " + toktype);
-    process.exit(code=1);
-  }
-}
 
 function checkParse(p) {
 	if (p === undefined) {
@@ -252,6 +265,49 @@ function parseInfix(tokens, minPrec, lhs) {
 	return lhs;
 }
 
+function parse(tokens) {
+	if (fst(tokens))
+		var toktype = fst(tokens)[0];
+	else {
+		//console.log("Unexpected end of source")
+		process.exit(code=1);
+	}
+	var token = fst(tokens)[1];
+	tokens.pop();
+	if (toktype === "stringlit")
+		return new typ.StrT(token);
+  else if (toktype === "left_square")
+    return parseList(tokens);
+	else if (toktype === "lambda")
+		return checkParse(parseLambda(tokens));
+	else if (toktype === "integer")
+		return new typ.IntT(token);
+	else if (toktype === "float")
+		return new typ.FloatT(token);
+	else if (toktype === "identifier")
+		return new typ.Name(token);
+	else if (toktype === "truelit" || toktype === "falselit")
+		return new typ.BoolT(token);
+	else if (toktype === "def")
+		return checkParse(parseDef(tokens));
+	else if (toktype === "ifexp")
+		return checkParse(parseIf(tokens));
+	else if (toktype === "left_paren") {
+		if (fst(tokens)[0] === "lambda") {
+      tokens.pop();
+      var parsed = checkParse(parseLambda(tokens));
+      tokens.pop();
+      return parsed;
+    }
+    else
+      return computeApp(tokens);
+  }
+  else {
+    console.log("Unexpected token: " + toktype);
+    process.exit(code=1);
+  }
+}
+
 function pprintName(ident) {
   return pprint(ident.val);
 }
@@ -310,9 +366,8 @@ function pprint(expr) {
 var input = fs.readFileSync('/dev/stdin').toString();
 var tokenized = tokenizer.tokenize(input).reverse().filter(function(x) { return x[0] !== "whitespace";});
 //console.log(tokenized);
-
 while (tokenized !== []) {
-  console.log(pprint(parse(tokenized)));
+  console.log(parse(tokenized));
   if (!tokenized)
     break;
 }

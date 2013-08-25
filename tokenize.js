@@ -273,5 +273,4 @@ module.exports = {tokenize : tokenize};
 //var tokstream = fs.readFileSync("/dev/stdin").toString();
 //console.log(isIdentifier(')'));
 //console.log(tokenize(tokstream));
-//tokenize(tokstream);
 

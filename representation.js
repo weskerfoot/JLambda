@@ -55,9 +55,8 @@ function BoolT(b) {
 
 BoolT.prototype = Expression;
 
-function ListT(x, xs) {
-	this.x = x;
-	this.rest = xs;
+function ListT(xs) {
+	this.xs = xs;
 	this.val = xs;
 	this.exprType = "List";
 	return this;
@@ -107,6 +106,15 @@ function Def(ident, exp) {
 	this.val = exp;
 	this.exprType = "Definition";
 	return this;
+}
+
+function DefFunc(ident, params, body) {
+  this.ident = ident;
+  this.val = this.ident;
+  this.params = params;
+  this.body = body;
+  this.exprType = "FunctionDefinition";
+  return this;
 }
 
 function If(condition, thenexp, elseexp) {
@@ -163,4 +171,5 @@ module.exports =
 	 OpT 	: OpT,
 	 OPInfo : OPInfo,
 	 makeApp : makeApp,
-	 If      : If}
+	 If      : If,
+   DefFunc : DefFunc}

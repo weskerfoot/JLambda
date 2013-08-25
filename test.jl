@@ -16,4 +16,16 @@ def fact
     else
       (n * (fact (n - 1))))
 
-def main (print (fact 15))
+def fib
+  (lambda n ->
+    if (n == 0)
+      then 0
+    else
+      if (n == 1)
+        then 1
+    else
+      (+
+        (fib (n - 1))
+        (fib (n - 2))))
+
+def main (print (fib 15))
