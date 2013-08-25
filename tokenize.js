@@ -131,6 +131,10 @@ function tokenize(tokstream) {
         tokens.push(["whitespace", '\n']);
         tokstream = tokstream.substr(1);
         break;
+      case 44: // ','
+        tokens.push(["comma", ","]);
+        tokstream = tokstream.substr(1);
+        break;
       case 40: // '('
         tokens.push(["left_paren", '(']);
         tokstream = tokstream.substr(1);
@@ -266,8 +270,8 @@ function tokenize(tokstream) {
 
 module.exports = {tokenize : tokenize};
 
-//var tokstream = fs.readFileSync("/dev/stdin").toString();
+var tokstream = fs.readFileSync("/dev/stdin").toString();
 //console.log(isIdentifier(')'));
-//console.log(tokenize(tokstream));
+console.log(tokenize(tokstream));
 //tokenize(tokstream);
 
