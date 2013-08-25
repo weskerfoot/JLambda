@@ -1,4 +1,4 @@
-#! /usr/bin/node
+#! /usr/bin/nodejs
 
 var typ = require("./representation.js");
 var tool = require("./tools.js");
@@ -76,7 +76,7 @@ function parseDef(tokens) {
 	}
 	else {
     var identifier = parse(tokens);
-    if (!notFollowedBy(tokens, ["def", "comma", "left_paren", "arrow", "right_brace", "right_square"])) {
+    if (!notFollowedBy(tokens, ["def", "comma", "arrow", "right_brace", "right_square"])) {
       console.log("Error: def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
       return;
     }
