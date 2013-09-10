@@ -1,6 +1,11 @@
 #!  /usr/bin/node
 
 var fs = require("fs");
+var rep = require("./representation.js");
+var tools = require("./tools.js");
+var operators = Object.keys(rep.OPInfo);
+
+hasOp = tools.hasOperator(operators);
 
 function isDigit(a) {
   if (!a)
@@ -64,6 +69,12 @@ function tokenizeNum(tokstream) {
     return [n, ["float", parseFloat(number.join(''), 10)]];
 }
 
+/* Split up the tokenized identifier if an operator appears in it
+ * prefer longer identifiers that start with the same character(s) as shorter ones
+ * e.g. ++ over +
+ * Everything after the operator goes back on to the token stream
+ */
+
 function tokenizeIdent(tokstream) {
   var identifier = [];
   var n = 0;
@@ -72,7 +83,15 @@ function tokenizeIdent(tokstream) {
     tokstream = tokstream.substr(1);
     n++;
   }
-  return [n, ["identifier", identifier.join('')]];
+  identifier = identifier.join('');
+  var op = hasOp(identifier);
+  if (op) {
+    var splitted = identifier.split(op);
+    var newIdent = splitted[0];
+    tokstream = splitted[1]+tokstream;
+    return [[n-(tools.len(op)), ["identifier", newIdent]], [tools.len(op), ["identifier", op]]];
+  }
+  return [[n, ["identifier", identifier]]];
 }
 
 function tokenizeStr(tokstream) {
@@ -273,4 +292,6 @@ module.exports = {tokenize : tokenize};
 //var tokstream = fs.readFileSync("/dev/stdin").toString();
 //console.log(isIdentifier(')'));
 //console.log(tokenize(tokstream));
+//console.log(tools.maxBy(tools.len, operators.filter(function (x) { return "#".indexOf(x) != -1;})));
+console.log(tokenizeIdent("abc%%3"));
 
