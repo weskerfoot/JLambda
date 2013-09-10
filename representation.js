@@ -62,6 +62,12 @@ function ListT(xs) {
 	return this;
 }
 
+function Nil() {
+  this.exprType = "Nil";
+  return this;
+}
+Nil.prototype = Expression;
+
 ListT.prototype = Expression;
 
 function FuncT(p, body) {
@@ -120,7 +126,7 @@ function DefFunc(ident, params, body) {
 function If(condition, thenexp, elseexp) {
 	this.condition = condition;
 	this.thenexp = thenexp;
-if (elseexp)
+  if (elseexp)
 		this.elseexp = elseexp;
 	this.exprType = "If";
 	return this;
@@ -156,6 +162,7 @@ OPInfo = {"+" : [3, "Left"],
       "==" : [2, "Left"],
       ">" : [2, "Left"],
       "<" : [2, "Left"],
+      ":" : [2, "Left"],
       "$" : [1, "Left"]}
 
 module.exports =
@@ -172,4 +179,5 @@ module.exports =
 	 OPInfo : OPInfo,
 	 makeApp : makeApp,
 	 If      : If,
-   DefFunc : DefFunc}
+   DefFunc : DefFunc,
+   Nil : Nil}

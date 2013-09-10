@@ -3,6 +3,7 @@
 var typ = require("./representation.js");
 var tool = require("./tools.js");
 var tokenizer = require("./tokenize.js");
+var desugarer = require("./desugar.js");
 var fs = require("fs");
 
 function fst(ts) {
@@ -322,7 +323,7 @@ function pprintFunc(func) {
 
 function pprintApp(app) {
   if (!app.p || app.p === undefined)
-    return "(" + pprint(app.func) + ")";
+    return pprint(app.func);
   return "((" + pprint(app.func) + ") " + pprint(app.p) + ")";
 }
 
@@ -361,13 +362,15 @@ function pprint(expr) {
     return pprintIf(expr);
   else if (expr.exprType === "Function")
     return pprintFunc(expr);
+  else if (expr.exprType === "Nil")
+    return "[]";
 }
 
 var input = fs.readFileSync('/dev/stdin').toString();
 var tokenized = tokenizer.tokenize(input).reverse().filter(function(x) { return x[0] !== "whitespace";});
 //console.log(tokenized);
 while (tokenized !== []) {
-  console.log(parse(tokenized));
+  console.log(pprint(desugarer.desugar(parse(tokenized))));
   if (!tokenized)
     break;
 }

@@ -1,31 +1,24 @@
-def square
-  (lambda a -> (a * a))
+def (f a b)
+  (a ++ b)
 
-def pow
-  (lambda base exp ->
-    (base ^ exp))
+def (add a b)
+  (a + b)
 
-def powed (pow (2 + 3 * 5) 2)
+def (catstrs strs)
+  (foldr f (head strs) (tail strs))
 
-def squared (square powed)
+def strs ["aa", "bb"]
 
-def fact
-  (lambda n ->
-    if (n == 0)
-      then 1
-    else
-      (n * (fact (n - 1))))
+def (mymap f xs)
+  if ((length xs) == 0)
+    then
+      xs
+  else
+    (: (f (head xs))
+     (mymap f (tail xs)))
 
-def fib
-  (lambda n ->
-    if (n == 0)
-      then 0
-    else
-      if (n == 1)
-        then 1
-    else
-      (+
-        (fib (n - 1))
-        (fib (n - 2))))
-
-def main (print (fib 15))
+def main
+  if (2 < 3)
+    then
+    (print (mymap add [1,2,3,4 , 5]))
+    else (print "")

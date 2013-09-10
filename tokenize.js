@@ -67,7 +67,7 @@ function tokenizeNum(tokstream) {
 function tokenizeIdent(tokstream) {
   var identifier = [];
   var n = 0;
-  while ((!isWhitespace(tokstream[0])) && (!isDigit(tokstream[0])) && isIdentifier(tokstream[0])) {
+  while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0])) {
     identifier.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
