@@ -32,7 +32,7 @@ function len(xs) {
 
 function takeWhile(f, xs) {
   var result = [];
-  for (i = 0; i < xs.length; i++) {
+  for (var i = 0; i < xs.length; i++) {
     if (f(xs[i]))
       result.push(xs[i]);
     else
@@ -89,23 +89,34 @@ function buildTrie(prefix, operators) {
     })];
 }
 
-function matchStr(n, str, trie) {
-  if (trie[0][0].length > 1 && str.length <= 1)
-    return false;
-  else if (trie[0].every(function(x){return x[0][0] !== str[0];})) {
-    return false;
+function find(f, haystack) {
+  for(var i = 0; i < haystack.length; i++) {
+    if (f(haystack[i]))
+      return i;
   }
-  else if (trie[0].length === 1) {
-    if (trie[0][0] !== str.slice(n, trie[0][0].length))
-      return false;
-    return trie[0][0].length + n;
-  }
-  else {
-    return matchStr(n+1, str.slice(1), trie[0][1])
-  }
+  return false;
 }
 
-console.log(matchStr(0, "**^*$4545", buildTrie("", ["**", "**^"])[1]));
+function matchNext(c, trie) {
+  var next = find(function(path) {
+    if (path.length === 1) {
+      return path[0][0] === c;
+    }
+    return path[0] === c;
+  }, trie);
+  return trie[next];
+}
+
+
+var trie = buildTrie("", ["**a","**%*^", "$$"])[1];
+
+console.log(find(function(x) { return x === "a";}, "tybabb"));
+console.log(matchNext("%", matchNext("*", matchNext('*',trie)[1])[1]));
+//console.log(trie);
+//function matchStr(n, str, trie) {
+//}
+
+//console.log(matchStr(0, "**^*$4545", buildTrie("", ["**", "**^"])[1]));
 
 module.exports = {compose : compose,
 				  not	  : not,
