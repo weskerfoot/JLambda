@@ -289,10 +289,17 @@ function tokenize(tokstream) {
   return tokens;
 }
 
-module.exports = {tokenize : tokenize};
+function tokenizeFull(input) {
+  return tokenize(input).reverse().filter(function(x) {
+    return x[0] !== "whitespace";
+  });
+}
 
-var tokstream = fs.readFileSync("/dev/stdin").toString();
-console.log(tokenize(tokstream));
+
+module.exports = {tokenize : tokenizeFull};
+
+//var tokstream = fs.readFileSync("/dev/stdin").toString();
+//console.log(tokenize(tokstream));
 //console.log(tools.buildTrie('', operators)[1][6]);
 //console.log(isIdentifier(')'));
 //console.log(tools.maxBy(tools.len, operators.filter(function (x) { return "#".indexOf(x) != -1;})));

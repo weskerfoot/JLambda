@@ -167,7 +167,8 @@ OPInfo = {"+" : [3, "Left"],
       ":" : [2, "Left"],
       "$" : [1, "Left"],
       ">>" : [1, "Left"],
-      ">>=" : [1, "Left"]}
+      ">>=" : [1, "Left"],
+      "<$>" : [1, "Left"]}
 
 module.exports =
    { IntT   : IntT,
