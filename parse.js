@@ -44,6 +44,7 @@ function parseMany(exprType, valid, tokens) {
 	}
 	else {
 		console.log("Error: unexpected token "+fst(tokens));
+    console.log("in parseMany," + ", " + tokens);
 		return;
 	}
 	results.push(parsed);
@@ -91,7 +92,14 @@ function parseBetween(exprType, between, tokens) {
 }
 
 function parseList(tokens) {
-  var xs = parseBetween(function (x) { return true; }, "comma", tokens);
+  if (fst(tokens)[0] === "right_square")
+      var xs = [];
+  else if (fst(tokens)[0] === "comma") {
+    tokens.pop();
+    var xs = [];
+  }
+  else
+    var xs = parseBetween(function (x) { return true; }, "comma", tokens);
   if (fst(tokens)[0] !== "right_square") {
     console.log("Error, list must be terminated by ]");
     return undefined;
@@ -107,7 +115,12 @@ function parseDefFunction(tokens) {
     console.log("Error, expected an identifier in function definition");
     return undefined;
   }
-  var parameters = parseMany(validName, validFormPar, tokens);
+  if (fst(tokens)[0] === "right_paren") {
+    var parameters = [];
+  }
+  else {
+    var parameters = parseMany(validName, validFormPar, tokens);
+  }
   if ((fst(tokens)[0]) !== "right_paren") {
     console.log("Error, formal parameters must be followed by )");
     return undefined;
@@ -333,9 +346,9 @@ function pprintDef(def) {
 
 function pprintIf(ifexp) {
   if (ifexp.elseexp)
-    return "if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + " else " + pprint(ifexp.elseexp);
+    return "(if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + " else " + pprint(ifexp.elseexp) + ")";
   else
-    return "if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp);
+    return "(if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + ")";
 }
 
 function pprint(expr) {

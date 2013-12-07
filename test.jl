@@ -17,8 +17,13 @@ def (mymap f xs)
     (: (f (head xs))
      (mymap f (tail xs)))
 
+def empty []
+
+def getFile
+  (readFile "./parse.js")
+
 def main
-  if (2 < 3)
+  if False
     then
-    (print (mymap add [1,2,3,4 , 5]))
-    else (print "")
+      undefined
+    else getFile
