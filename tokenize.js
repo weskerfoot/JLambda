@@ -5,6 +5,8 @@ var rep = require("./representation.js");
 var tools = require("./tools.js");
 var operators = Object.keys(rep.OPInfo);
 
+var matchop = tools.opMatch(operators);
+
 function isDigit(a) {
   if (!a)
     return false;
@@ -76,23 +78,13 @@ function tokenizeNum(tokstream) {
 function tokenizeIdent(tokstream) {
   var identifier = [];
   var n = 0;
-  while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0])) {
+  while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0]) && !matchop(tokstream)) {
     identifier.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
   }
   identifier = identifier.join('');
-/*  var op = hasOp(identifier);
-  if (op) {
-    if (identifier === op)
-      return [[tools.len(op), ["identifier", op]]];
-    var splitted = identifier.split(op);
-    console.log(splitted);
-    var newIdent = splitted[0];
-    tokstream = splitted[1]+tokstream;
-    return [[n-(tools.len(op)), ["identifier", newIdent]], [tools.len(op), ["identifier", op]]];
-  }
-*/
+
   return [[n, ["identifier", identifier]]];
 }
 
@@ -279,11 +271,19 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(i);
           break;
         }
-        var result = tokenizeIdent(tokstream);
-        result.map(function(x) {
-          tokens.push(x[1]);
-          tokstream = tokstream.substr(x[0]);
-        });
+        var op = matchop(tokstream);
+        if (op) {
+          var l = op.length;
+          tokstream = tokstream.substr(l);
+          tokens.push(["identifier", op]);
+        }
+        else {
+          var result = tokenizeIdent(tokstream);
+          result.map(function(x) {
+            tokens.push(x[1]);
+            tokstream = tokstream.substr(x[0]);
+          });
+        }
     }
   }
   return tokens;
@@ -291,9 +291,9 @@ function tokenize(tokstream) {
 
 module.exports = {tokenize : tokenize};
 
-//var tokstream = fs.readFileSync("/dev/stdin").toString();
-//console.log(tokenize(tokstream));
-console.log(tools.buildTrie('', operators)[1][6]);
+var tokstream = fs.readFileSync("/dev/stdin").toString();
+console.log(tokenize(tokstream));
+//console.log(tools.buildTrie('', operators)[1][6]);
 //console.log(isIdentifier(')'));
 //console.log(tools.maxBy(tools.len, operators.filter(function (x) { return "#".indexOf(x) != -1;})));
 //console.log(tokenizeIdent("abc%%3"));
