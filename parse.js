@@ -1,11 +1,11 @@
 #! /usr/bin/node
 
+var fs = require("fs");
 var typ = require("./representation.js");
 var tool = require("./tools.js");
 var tokenizer = require("./tokenize.js");
 var desugarer = require("./desugar.js");
-var fs = require("fs");
-var pprint = require("./pprint.js").pprint;
+var pprint = require("./pprint.js");
 
 var print = console.log;
 
@@ -37,7 +37,7 @@ function makeChecker(props) {
 /*Tries to parse until the prediction ``valid'' fails or the wrong type is parsed
   Collects the results into an array and returns it*/
 function parseMany(exprType, valid, tokens) {
-	var current = fst(tokens)[0];
+  var current = fst(tokens)[0];
 	var results = [];
 	var parsed;
 
@@ -50,13 +50,15 @@ function parseMany(exprType, valid, tokens) {
     console.log("in parseMany," + ", " + tokens);
 		return;
 	}
-	results.push(parsed);
+  results.push(parsed);
 
 	//make sure there are at least 2 tokens to parse
 	if (tokens.length > 1 && valid(fst(tokens)[0])) {
 		while (valid(snd(tokens)[0])) {
-			results.push(parse(tokens));
-			//console.log(results);
+			if (!(valid(fst(tokens)[0])))
+        break;
+      //print(valid(fst(tokens)[0]), tokens);
+      results.push(parse(tokens));
 			if (!exprType(fst(results).exprType))
 				break;
 			//console.log(results);
@@ -68,9 +70,9 @@ function parseMany(exprType, valid, tokens) {
 	//do the same validity check as before and in the loop
 	if (valid(fst(tokens)[0]))
 		results.push(parse(tokens));
-  //console.log(tokens);
 	return results;
 }
+
 
 /* Tries to parse exprType separated by the token between
  * e.g. <identifier>,<identifier>,...
@@ -95,14 +97,16 @@ function parseBetween(exprType, between, tokens) {
 }
 
 function parseList(tokens) {
-  if (fst(tokens)[0] === "right_square")
+  if (fst(tokens)[0] === "right_square") {
       var xs = [];
+  }
   else if (fst(tokens)[0] === "comma") {
     tokens.pop();
     var xs = [];
   }
-  else
+  else {
     var xs = parseBetween(function (x) { return true; }, "comma", tokens);
+  }
   if (fst(tokens)[0] !== "right_square") {
     console.log("Error, list must be terminated by ]");
     return undefined;
@@ -237,6 +241,7 @@ function computeApp(tokens) {
 	}
 	else {
 		//it's a prefix application
+
 		var parameters = parseMany(validArgTypes, validArgument, tokens);
     //console.log(parameters);
 		if (fst(tokens)[0] !== "right_paren") {
@@ -325,7 +330,7 @@ function parse(tokens) {
   }
 }
 
-//var tokenized = tokenizer.tokenize(fs.readFileSync('/dev/stdin').toString());
+var istr = fs.readFileSync('/dev/stdin').toString();
 function parseFull(tokenized) {
   var ast = new Array();
   while (tokenized.length > 0) {
@@ -334,5 +339,6 @@ function parseFull(tokenized) {
   }
   return ast;
 }
+console.log(parseFull(tokenizer.tokenize(istr))[0].func.p.p.val);
 
-module.exports = {parse : tool.compose(parseFull, tokenizer.tokenize) };
+//module.exports = {parse : tool.compose(parseFull, tokenizer.tokenize) };

@@ -1,6 +1,5 @@
 #!  /usr/bin/node
 
-var fs = require("fs");
 var rep = require("./representation.js");
 var tools = require("./tools.js");
 var operators = Object.keys(rep.OPInfo);
