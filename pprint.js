@@ -36,9 +36,9 @@ function pprint(expr) {
     else
       return "False";
   else if (expr.exprType === "Integer")
-    return expr.val;
+    return "("+expr.val+")";
   else if (expr.exprType === "Float")
-    return expr.val;
+    return "("+expr.val+")";
   else if (expr.exprType === "String")
     return '"'+expr.val+'"';
   else if (expr.exprType === "Name")

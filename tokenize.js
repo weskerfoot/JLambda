@@ -121,8 +121,9 @@ function peek(tokstream, toktype, word) {
   if (tokstream.length < n)
     return false;
   var nextN = tokstream.substr(0, n);
-  if (nextN == word)
+  if (nextN == word) {
     return [toktype, word];
+  }
   return false;
 }
 
@@ -179,7 +180,7 @@ function tokenize(tokstream) {
         tokstream = tokstream.substr(i);
         break;
 
-      case 43: // '+'
+/*      case 43: // '+'
         if (isDigit(tokstream[1])) {
           var result = tokenizeNum(tokstream);
           var num = result[1];
@@ -189,6 +190,7 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(i);
           break;
         }
+*/
       case 45: // '-'
         var lambda = peek(tokstream, "arrow", "->");
         if (lambda) {
@@ -196,7 +198,12 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(2);
           break;
         }
-        if (isDigit(tokstream[1])) {
+        else {
+          tokens.push(["identifier", "-"]);
+          tokstream = tokstream.substr(1);
+          break;
+        }
+/*        if (isDigit(tokstream[1])) {
           var result = tokenizeNum(tokstream);
           var num = result[1];
           var i = result[0];
@@ -205,6 +212,7 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(i);
           break;
         }
+*/
       case 46: // '.'
         if (isDigit(tokstream[1])) {
           var result = tokenizeNum(tokstream);

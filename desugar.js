@@ -40,7 +40,7 @@ function desugar(stx) {
       return stx;
     case "Application":
       if (stx.p)
-        return new typ.App(stx.func, desugar(stx.p));
+        return new typ.App(desugar(stx.func), desugar(stx.p));
       return new typ.App(stx.func);
     case "Function":
       return new typ.FuncT(stx.p, desugar(stx.body));
