@@ -342,5 +342,6 @@ function parseFull(tokenized) {
 console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
 
 //console.log(tokenizer.tokenize(istr));
+//console.log(parseFull(tokenizer.tokenize(istr)));
 
 //module.exports = {parse : tool.compose(parseFull, tokenizer.tokenize) };
