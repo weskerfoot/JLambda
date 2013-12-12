@@ -53,6 +53,8 @@ function pprint(expr) {
     return pprintFunc(expr);
   else if (expr.exprType === "Nil")
     return "[]";
+  else if (expr.exprType === "Unary")
+    return "("+expr.op.ident+" "+pprint(expr.val)+")";
 }
 
 module.exports = {pprint : pprint};

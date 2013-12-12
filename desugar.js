@@ -39,6 +39,11 @@ function desugar(stx) {
     case "Name":
       return stx;
     case "Application":
+      if ((stx.func.ident === "-" ||
+          stx.func.ident === "+") &&
+          stx.p) {
+            return new typ.UnaryOp(desugar(stx.func), desugar(stx.p));
+          }
       if (stx.p)
         return new typ.App(desugar(stx.func), desugar(stx.p));
       return new typ.App(stx.func);

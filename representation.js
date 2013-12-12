@@ -18,6 +18,12 @@ var Expression = {
 		}
 };
 
+function UnaryOp(op, v) {
+  this.exprType = "Unary";
+  this.val = v;
+  this.op = op;
+  return this;
+}
 
 function IntT(v) {
 	this.exprType = "Integer";
@@ -186,4 +192,5 @@ module.exports =
 	 makeApp : makeApp,
 	 If      : If,
    DefFunc : DefFunc,
-   Nil : Nil}
+   UnaryOp : UnaryOp,
+   Nil : Nil }
