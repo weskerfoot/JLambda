@@ -1,3 +1,5 @@
+var tool = require("./tools.js");
+
 var Expression = {
 	display :
 		function() {
@@ -17,6 +19,17 @@ var Expression = {
 			}
 		}
 };
+
+function LetExp(pairs) {
+  if (!pairs.every(function(x) {
+    return x.exprType === "Name";
+  })) {
+    throw "let can only be used to bind things to names";
+  }
+  this.exprType = "Let";
+  this.val = tool.dict(pairs);
+  return this;
+}
 
 function UnaryOp(op, v) {
   this.exprType = "Unary";
@@ -170,6 +183,8 @@ OPInfo = {"+" : [3, "Left"],
       ">=" : [2, "Left"],
       "<" : [2, "Left"],
       "<=" : [2, "Left"],
+      "&&" : [2, "Left"],
+      "||" : [2, "Left"],
       ":" : [2, "Left"],
       "$" : [1, "Left"],
       ">>" : [1, "Left"],
@@ -194,4 +209,5 @@ module.exports =
 	 If      : If,
    DefFunc : DefFunc,
    UnaryOp : UnaryOp,
-   Nil : Nil }
+   Nil : Nil,
+   LetExp : LetExp}

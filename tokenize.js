@@ -96,8 +96,7 @@ function tokenizeStr(tokstream) {
     tokstream = tokstream.substr(1);
     n++;
     if (tokstream.length < 1) {
-      console.log("Error: missing quotation mark");
-      process.exit(code=1);
+      throw "Error: missing quotation mark";
     }
   }
   n++;
@@ -232,9 +231,15 @@ function tokenize(tokstream) {
         }
 
       case 105: // 'i'
-        var result = peek(tokstream, "ifexp", "if");
-        if (result) {
-          tokens.push(result);
+        var ifexp = peek(tokstream, "ifexp", "if");
+        if (ifexp) {
+          tokens.push(ifexp);
+          tokstream = tokstream.substr(2);
+          break;
+        }
+        var inkeyword = peek(tokstream, "in", "in");
+        if (inkeyword) {
+          tokens.push(inkeyword);
           tokstream = tokstream.substr(2);
           break;
         }
@@ -261,10 +266,16 @@ function tokenize(tokstream) {
           break;
         }
       case 108: // l
-        var result = peek(tokstream, "lambda", "lambda");
-        if (result) {
-          tokens.push(result);
+        var lambda = peek(tokstream, "lambda", "lambda");
+        if (lambda) {
+          tokens.push(lambda);
           tokstream = tokstream.substr(6);
+          break;
+        }
+        var letexp = peek(tokstream, "let", "let");
+        if (letexp) {
+          tokens.push(letexp);
+          tokstream = tokstream.substr(3);
           break;
         }
 

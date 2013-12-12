@@ -114,6 +114,14 @@ function find(f, haystack) {
   return false;
 }
 
+function dict(pairs) {
+  var o = new Object();
+  pairs.map(function(p) {
+    o[p[0]] = p[1];
+  });
+  return o;
+}
+
 
 /*
  * Problem:
@@ -154,4 +162,5 @@ module.exports = {compose : compose,
           maxBy : maxBy,
           len   : len,
           groupOps : groupOps,
-          opMatch : operatorMatch}
+          opMatch : operatorMatch,
+          dict: dict}
