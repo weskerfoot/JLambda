@@ -308,9 +308,15 @@ function tokenize(tokstream) {
 }
 
 function tokenizeFull(input) {
-  return tokenize(input).reverse().filter(function(x) {
-    return x[0] !== "whitespace";
-  });
+  try {
+    return tokenize(input).reverse().filter(function(x) {
+      return x[0] !== "whitespace";
+    });
+  } catch (e) {
+    console.log("An error occured during tokenization");
+    console.log(e);
+    process.exit(1);
+  }
 }
 
 

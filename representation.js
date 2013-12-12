@@ -30,6 +30,7 @@ function LetExp(pairs) {
   this.val = tool.dict(pairs);
   return this;
 }
+LetExp.prototype = Expression;
 
 function UnaryOp(op, v) {
   this.exprType = "Unary";
@@ -37,6 +38,7 @@ function UnaryOp(op, v) {
   this.op = op;
   return this;
 }
+UnaryOp.prototype = Expression;
 
 function IntT(v) {
 	this.exprType = "Integer";

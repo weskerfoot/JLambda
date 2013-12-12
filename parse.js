@@ -192,6 +192,9 @@ function parseLambda(tokens) {
 	return new typ.FuncT(parameters, body);
 }
 
+//function parseLet(tokens) {
+
+
 var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_brace", "left_brace", "right_brace"];
 var validArgument = tool.compose(tool.not, makeChecker(invalidArguments));
 var validArgTypes = tool.compose(tool.not, makeChecker(["Definition"]));
@@ -298,9 +301,9 @@ function parse(tokens) {
     else
       return computeApp(tokens);
   }
-  /*else if (toktype === "let") {
-    return parseLet(tokens);
-  }*/
+//  else if (toktype === "let") {
+//    return parseLet(tokens);
+//  }
   else {
     throw "Error: Unexpected token: " + toktype;
   }
@@ -309,11 +312,17 @@ function parse(tokens) {
 var istr = fs.readFileSync('/dev/stdin').toString();
 function parseFull(tokenized) {
   var ast = new Array();
-  while (tokenized.length > 0) {
-    var parsed = desugarer.desugar(parse(tokenized));
-    ast.push(parsed);
+  try {
+    while (tokenized.length > 0) {
+      var parsed = desugarer.desugar(parse(tokenized));
+      ast.push(parsed);
+    }
+    return ast;
+  } catch (e) {
+    print("An exception occured, could not finish parsing");
+    print(e);
+    process.exit(1);
   }
-  return ast;
 }
 console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
 
