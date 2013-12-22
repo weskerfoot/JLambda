@@ -26,20 +26,21 @@ function isIdentifier(a) {
   return code !== 41 && code !== 40 && code && 125 && code && 123 && code !== 93 && code !== 91 && code !== 44;
 }
 
-function tokenizeNum(tokstream) {
+function tokenizeNum(tokstream, charnum, linenum) {
   var number = [];
   var code = tokstream[0].charCodeAt();
   var isFloat = false;
   var n = 0;
   // + -
-  if (code === 43 || code === 45) {
+  if (code === 43 || code === 45) { // + or -
     number.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
   }
-  else if (code === 46) {
+  else if (code === 46) { // .
     tokstream = tokstream.substr(1);
     n++;
+    charnum++;
     number.push('0');
     number.push('.');
     isFloat = true;
@@ -48,24 +49,27 @@ function tokenizeNum(tokstream) {
   while (isDigit(tokstream[0]) && tokstream.length !== 0) {
     number.push(tokstream[0]);
     tokstream = tokstream.substr(1);
+    charnum++;
     n++;
   }
   if (tokstream[0] === '.' && isDigit(tokstream[1])) {
     number.push('.');
     number.push(tokstream[1]);
     tokstream = tokstream.substr(2);
+    charnum++; charnum++;
     n++; n++;
     while (isDigit(tokstream[0]) && tokstream.length !== 0) {
       number.push(tokstream[0]);
       tokstream = tokstream.substr(1);
       n++;
+      charnum++;
     }
-    return [n, ["float", parseFloat(number.join(''), 10)]];
+    return [n, ["float", parseFloat(number.join(''), 10), charnum, linenum]];
   }
   if (!isFloat)
-    return [n, ["integer", parseInt(number.join(''), 10)]];
+    return [n, ["integer", parseInt(number.join(''), 10), charnum, linenum]];
   else
-    return [n, ["float", parseFloat(number.join(''), 10)]];
+    return [n, ["float", parseFloat(number.join(''), 10), charnum, linenum]];
 }
 
 /* Split up the tokenized identifier if an operator appears in it
@@ -74,20 +78,21 @@ function tokenizeNum(tokstream) {
  * Everything after the operator goes back on to the token stream
  */
 
-function tokenizeIdent(tokstream) {
+function tokenizeIdent(tokstream, charnum, linenum) {
   var identifier = [];
   var n = 0;
   while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0]) && !matchop(tokstream)) {
     identifier.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
+    charnum++;
   }
   identifier = identifier.join('');
 
-  return [[n, ["identifier", identifier]]];
+  return [[n, ["identifier", identifier, charnum, linenum]]];
 }
 
-function tokenizeStr(tokstream) {
+function tokenizeStr(tokstream, charnum, linenum) {
   var stringlit = [];
   var n = 1;
   tokstream = tokstream.substr(1);
@@ -95,16 +100,17 @@ function tokenizeStr(tokstream) {
     stringlit.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
+    charnum++;
     if (tokstream.length < 1) {
       throw "Error: missing quotation mark";
     }
   }
   n++;
-  return [n, ["stringlit", stringlit.join('')]];
+  return [n, ["stringlit", stringlit.join(''), charnum, linenum]];
 
 }
 
-function tokenizeT(tokstream) {
+function tokenizeT(tokstreami, charnum, linenum) {
   if (tokstream.length < 4)
     return false;
   var next4 = tokstream.substr(0,4);
@@ -115,7 +121,7 @@ function tokenizeT(tokstream) {
   return false;
 }
 
-function peek(tokstream, toktype, word) {
+function peek(tokstream, toktype, word, charnum, linenum) {
   var n = word.length;
   if (tokstream.length < n)
     return false;
@@ -128,68 +134,70 @@ function peek(tokstream, toktype, word) {
 
 function tokenize(tokstream) {
   var tokens = [];
+  var charnum = 1;
+  var linenum = 1;
 
   while (tokstream) {
     switch (tokstream[0].charCodeAt()) {
       case 9: // '\t'
-        tokens.push(["whitespace", '\t']);
+        charnum++;
+        tokens.push(["whitespace", '\t', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 32: // ' '
-        tokens.push(["whitespace", ' ']);
+        charnum++;
+        tokens.push(["whitespace", ' ', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 10: // '\n'
-        tokens.push(["whitespace", '\n']);
+        linenum++;
+        charnum = 1;
+        tokens.push(["whitespace", '\n', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 44: // ','
-        tokens.push(["comma", ","]);
+        charnum++;
+        tokens.push(["comma", ",", charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 40: // '('
-        tokens.push(["left_paren", '(']);
+        charnum++;
+        tokens.push(["left_paren", '(', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 41: // ')'
-        tokens.push(["right_paren", ')']);
+        charnum++;
+        tokens.push(["right_paren", ')', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 123: // '{'
-        tokens.push(["left_brace", '{']);
+        charnum++;
+        tokens.push(["left_brace", '{', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 125: // '}'
-        tokens.push(["right_brace", '}']);
+        charnum++;
+        tokens.push(["right_brace", '}', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 91: // '['
-        tokens.push(["left_square", '[']);
+        charnum++;
+        tokens.push(["left_square", '[', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 93: // ']'
-        tokens.push(["right_square", ']']);
+        charnum++;
+        tokens.push(["right_square", ']', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
       case 34: // '"'
-        var result = tokenizeStr(tokstream);
+        var result = tokenizeStr(tokstream, charnum, linenum);
         var str = result[1];
         var i = result[0];
         tokens.push(str);
         tokstream = tokstream.substr(i);
         break;
 
-/*      case 43: // '+'
-        if (isDigit(tokstream[1])) {
-          var result = tokenizeNum(tokstream);
-          var num = result[1];
-          var i = result[0];
-          if (num[1] !== NaN)
-            tokens.push(num);
-          tokstream = tokstream.substr(i);
-          break;
-        }
-*/
       case 45: // '-'
         var lambda = peek(tokstream, "arrow", "->");
         if (lambda) {
@@ -198,23 +206,15 @@ function tokenize(tokstream) {
           break;
         }
         else {
-          tokens.push(["identifier", "-"]);
+          tokens.push(["identifier", "-", charnum, linenum]);
+          charnum++;
           tokstream = tokstream.substr(1);
           break;
         }
-/*        if (isDigit(tokstream[1])) {
-          var result = tokenizeNum(tokstream);
-          var num = result[1];
-          var i = result[0];
-          if (num[1] !== NaN)
-            tokens.push(num);
-          tokstream = tokstream.substr(i);
-          break;
-        }
-*/
+
       case 46: // '.'
         if (isDigit(tokstream[1])) {
-          var result = tokenizeNum(tokstream);
+          var result = tokenizeNum(tokstream, charnum, linenum);
           var num = result[1];
           var i = result[0];
           if (num[1] !== NaN)
@@ -281,7 +281,7 @@ function tokenize(tokstream) {
 
       default:
         if (isDigit(tokstream[0])) {
-          var result = tokenizeNum(tokstream);
+          var result = tokenizeNum(tokstream, charnum, linenum);
           var num = result[1];
           var i = result[0];
           if (num[1] !== NaN)
@@ -292,12 +292,14 @@ function tokenize(tokstream) {
         var op = matchop(tokstream);
         if (op) {
           var l = op.length;
+          charnum = charnum + l;
           tokstream = tokstream.substr(l);
-          tokens.push(["identifier", op]);
+          tokens.push(["identifier", op, charnum, linenum]);
         }
         else {
-          var result = tokenizeIdent(tokstream);
+          var result = tokenizeIdent(tokstream, charnum, linenum);
           result.map(function(x) {
+            charnum++;
             tokens.push(x[1]);
             tokstream = tokstream.substr(x[0]);
           });
@@ -319,14 +321,4 @@ function tokenizeFull(input) {
   }
 }
 
-
 module.exports = {tokenize : tokenizeFull};
-
-//var tokstream = fs.readFileSync("/dev/stdin").toString();
-//console.log(tokenize(tokstream));
-//console.log(tools.buildTrie('', operators)[1][6]);
-//console.log(isIdentifier(')'));
-//console.log(tools.maxBy(tools.len, operators.filter(function (x) { return "#".indexOf(x) != -1;})));
-//console.log(tokenizeIdent("abc%%3"));
-
-
