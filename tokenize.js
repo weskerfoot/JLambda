@@ -2,6 +2,7 @@
 
 var rep = require("./representation.js");
 var tools = require("./tools.js");
+var error = require("./errors.js");
 var operators = Object.keys(rep.OPInfo);
 
 var matchop = tools.opMatch(operators);
@@ -103,7 +104,7 @@ function tokenizeStr(tokstream, charnum, linenum) {
     n++;
     charnum++;
     if (tokstream.length < 1) {
-      throw "Error: missing quotation mark";
+      throw error.JSyntaxError(linenum, charnum, "Error: missing quotation mark");
     }
   }
   n++;
@@ -316,8 +317,7 @@ function tokenizeFull(input) {
       return x[0] !== "whitespace";
     });
   } catch (e) {
-    console.log("An error occured during tokenization");
-    console.log(e);
+    console.log(e.stxerror());
     process.exit(1);
   }
 }

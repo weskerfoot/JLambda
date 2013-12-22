@@ -19,17 +19,28 @@ var JLException = {
     }
 }
 
-function SyntaxError(linenum, charnum, message) {
+function JSyntaxError(linenum, charnum, message) {
   this.linenum = linenum;
   this.charnum = charnum;
   this.errormessage = message;
+  this.stxerror = function() {
+  console.log("Syntax Error\n",
+                "Line #", this.linenum,"\n",
+                "Character #", this.charnum, "\n",
+                this.errormessage);
+  };
   return this;
 }
 
-function TypeError(linenum, charnum, token, message) {
+function JTypeError(linenum, charnum, token, message) {
   this.linenum = linenum;
   this.charnum = charnum;
   this.errormessage = message;
   this.token = token;
   return this;
 }
+TypeError.prototype = JLException;
+
+module.exports =
+  {JSyntaxError : JSyntaxError,
+   JTypeError : JTypeError};

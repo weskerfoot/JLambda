@@ -6,6 +6,7 @@ var tool = require("./tools.js");
 var tokenizer = require("./tokenize.js");
 var desugarer = require("./desugar.js");
 var pprint = require("./pprint.js");
+var error = require("./errors.js");
 
 var print = console.log;
 
@@ -45,7 +46,7 @@ function parseMany(exprType, valid, tokens) {
 		parsed = parse(tokens);
 	}
 	else {
-		throw "Error: unexpected token "+fst(tokens)[0]+" in parseMany";
+		throw error.JSyntaxError(fst(tokens)[2], fst(tokens)[3], "Error: unexpected token "+fst(tokens)[0]+" in parseMany");
 	}
   results.push(parsed);
 
@@ -105,7 +106,7 @@ function parseList(tokens) {
     var xs = parseBetween(function (x) { return true; }, "comma", tokens);
   }
   if (fst(tokens)[0] !== "right_square") {
-    throw "Error, list must be terminated by ]";
+    throw error.JSyntaxError(fst(tokens)[3], fst(tokens)[2], "Error, list must be terminated by ]");
   }
   tokens.pop();
   return new typ.ListT(xs);
@@ -114,8 +115,8 @@ function parseList(tokens) {
 
 function parseDefFunction(tokens) {
 	var fname = parse(tokens);
-  if (!fname.exprType === "identifier") {
-    throw "Error, expected an identifier in function definition";
+  if (fname.exprType != "Name") {
+    throw error.JSyntaxError(fst(tokens)[3], fst(tokens)[2], "Error, expected an identifier in function definition");
   }
   if (fst(tokens)[0] === "right_paren") {
     var parameters = [];
@@ -319,9 +320,8 @@ function parseFull(tokenized) {
     }
     return ast;
   } catch (e) {
-    print("An exception occured, could not finish parsing");
-    print(e);
-    process.exit(1);
+      e.stxerror();
+      process.exit(1);
   }
 }
 console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
