@@ -32,6 +32,7 @@ function tokenizeNum(tokstream, charnum, linenum) {
   var isFloat = false;
   var n = 0;
   // + -
+  // might want to remove this since it probably won't ever get run?
   if (code === 43 || code === 45) { // + or -
     number.push(tokstream[0]);
     tokstream = tokstream.substr(1);
