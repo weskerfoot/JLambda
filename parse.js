@@ -125,7 +125,7 @@ function parseDefFunction(tokens) {
     var parameters = parseMany(validName, validFormPar, tokens);
   }
   if ((fst(tokens)[0]) !== "right_paren") {
-    throw "Formal parameters must be followed by )";
+    throw error.JSyntaxError(fst(tokens)[3], fst(tokens)[2],"Formal parameters must be followed by )");
   }
   tokens.pop();
   var body = parse(tokens);
