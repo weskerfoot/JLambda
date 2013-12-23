@@ -46,7 +46,7 @@ function parseMany(exprType, valid, tokens) {
 		parsed = parse(tokens);
 	}
 	else {
-		throw error.JSyntaxError(fst(tokens)[2], fst(tokens)[3], "Error: unexpected token "+fst(tokens)[0]+" in parseMany");
+		throw error.JSyntaxError(fst(tokens)[2], fst(tokens)[3], "unexpected token "+fst(tokens)[0]+" in parseMany");
 	}
   results.push(parsed);
 
@@ -66,7 +66,7 @@ function parseMany(exprType, valid, tokens) {
 	}
 	//do the same validity check as before and in the loop
   if (!fst(tokens))
-    throw "Error: unexpected end of source";
+    throw "unexpected end of source";
 	if (valid(fst(tokens)[0]))
 		results.push(parse(tokens));
 	return results;
@@ -79,7 +79,7 @@ function parseMany(exprType, valid, tokens) {
 function parseBetween(exprType, between, tokens) {
   var first = parse(tokens);
   if (!exprType(first)) {
-    throw "Error, unexpected token:"+fst(tokens)[0];
+    throw "unexpected token:"+fst(tokens)[0];
   }
   var items = [first];
   var parsed;
@@ -106,7 +106,7 @@ function parseList(tokens) {
     var xs = parseBetween(function (x) { return true; }, "comma", tokens);
   }
   if (fst(tokens)[0] !== "right_square") {
-    throw error.JSyntaxError(fst(tokens)[3], fst(tokens)[2], "Error, list must be terminated by ]");
+    throw error.JSyntaxError(fst(tokens)[3], fst(tokens)[2], "list must be terminated by ]");
   }
   tokens.pop();
   return new typ.ListT(xs);
