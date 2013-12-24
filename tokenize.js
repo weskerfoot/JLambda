@@ -112,7 +112,7 @@ function tokenizeStr(tokstream, charnum, linenum) {
 
 }
 
-function tokenizeT(tokstreami, charnum, linenum) {
+function tokenizeT(tokstream, charnum, linenum) {
   if (tokstream.length < 4)
     return false;
   var next4 = tokstream.substr(0,4);
@@ -249,7 +249,7 @@ function tokenize(tokstream) {
       case 100: // 'd'
         var result = peek(tokstream, "def", "def");
         if (result) {
-          tokens.push(result);
+          tokens.push(["def", "def", charnum, linenum]);
           tokstream = tokstream.substr(3);
           break;
         }

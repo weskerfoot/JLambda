@@ -5,20 +5,6 @@
  * not thought about how that will work much
  */
 
-var JLException = {
-  stxerror :
-    function () {
-      console.log("There was an error\n",
-                  "Line #",this.linenum,"\n",
-                  "Character #", this.charnum,"\n",
-                  this.errormessage);
-    },
-  type_error :
-    function () {
-      return;
-    }
-}
-
 function JSyntaxError(linenum, charnum, message) {
   this.linenum = linenum;
   this.charnum = charnum;
@@ -26,7 +12,7 @@ function JSyntaxError(linenum, charnum, message) {
   this.stxerror = function() {
   console.log("Syntax Error\n",
                 "Line #", this.linenum,"\n",
-                "Character #", this.charnum, "\n",
+                "Near character #", this.charnum, "\n",
                 this.errormessage);
   };
   return this;
@@ -39,7 +25,6 @@ function JTypeError(linenum, charnum, token, message) {
   this.token = token;
   return this;
 }
-TypeError.prototype = JLException;
 
 module.exports =
   {JSyntaxError : JSyntaxError,
