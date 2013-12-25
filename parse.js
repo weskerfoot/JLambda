@@ -20,7 +20,10 @@ function snd(ts) {
 
 //Checks if the next token is not followed by any of ``checks''
 function notFollowedBy(tokens, checks) {
-	var nextT = fst(tokens)[0];
+	if (!fst(tokens)) {
+    throw error.JSyntaxError(0,0,"unexpected end of source")
+  }
+  var nextT = fst(tokens)[0];
 	if (checks.some(function (x) {return x === nextT;}))
 		return false;
 	else
@@ -38,6 +41,9 @@ function makeChecker(props) {
 /*Tries to parse until the prediction ``valid'' fails or the wrong type is parsed
   Collects the results into an array and returns it*/
 function parseMany(exprType, valid, tokens, charnum, linenum) {
+  if (!fst(tokens)) {
+    throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
+  }
   var current = fst(tokens)[0];
 	var results = [];
 	var parsed;
@@ -48,12 +54,12 @@ function parseMany(exprType, valid, tokens, charnum, linenum) {
 	else {
 		throw error.JSyntaxError(linenum,
                              charnum,
-                             "unexpected token "+fst(tokens)[0]+" in parseMany");
+                             "Unexpected token ``"+fst(tokens)[0]+"''");
 	}
   results.push(parsed);
 
 	//make sure there are at least 2 tokens to parse
-	if (tokens.length > 1 && valid(fst(tokens)[0])) {
+	if (tokens.length > 1 && fst(tokens) && valid(fst(tokens)[0])) {
 		while (valid(snd(tokens)[0])) {
 			if (!(valid(fst(tokens)[0])))
         break;
@@ -61,7 +67,10 @@ function parseMany(exprType, valid, tokens, charnum, linenum) {
       results.push(parse(tokens));
 			if (!exprType(fst(results).exprType))
 				break;
-			current = fst(tokens)[0]
+			if (fst(tokens))
+        current = fst(tokens)[0]
+      else
+        throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
 			if (tokens.length <= 1)
 				break;
 		}
@@ -113,7 +122,7 @@ function parseList(tokens) {
   else {
     var xs = parseBetween(function (x) { return true; }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
   }
-  if (fst(tokens)[0] !== "right_square") {
+  if (!fst(tokens) || fst(tokens)[0] !== "right_square") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "list must be terminated by ]");
@@ -145,8 +154,6 @@ function parseDefFunction(tokens) {
   var body = parse(tokens);
   return new typ.DefFunc(fname, parameters, body);
 }
-
-
 
 function parseDef(tokens) {
   if (fst(tokens)[0] === "left_paren") {
@@ -234,8 +241,10 @@ function computeApp(tokens, charnum, linenum) {
 	if (typ.OPInfo[next[1]]) {
 		//it's an infix expression
 		var result = parseInfix(tokens, 1, lhs);
-		if (fst(tokens)[0] !== "right_paren") {
-			throw "mismatched parentheses";
+		if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
+			throw error.JSyntaxError(linenum,
+                               charnum,
+                               "Mismatched parentheses or missing parenthesis on right-hand side");
 		}
 		else {
 			//return the result
@@ -246,8 +255,8 @@ function computeApp(tokens, charnum, linenum) {
 	else {
 		//it's a prefix application
 
-		var parameters = parseMany(validArgTypes, validArgument, tokens, fst(tokens)[2], fst(tokens)[3]);
-		if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
+		var parameters = parseMany(validArgTypes, validArgument, tokens, charnum, linenum);
+		if ((!fst(tokens)) || fst(tokens)[0] !== "right_paren") {
 			throw error.JSyntaxError(linenum,
                                charnum,
                                "Mismatched parentheses or missing parenthesis on right-hand side");
@@ -333,7 +342,7 @@ function parse(tokens) {
 //    return parseLet(tokens);
 //  }
   else {
-    throw "Unexpected token: " + toktype;
+    throw error.JSyntaxError(linenum, charnum, "Unexpected token: " + toktype);
   }
 }
 
