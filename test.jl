@@ -24,6 +24,10 @@ def empty []
 def getFile
   (readFile "./parse.js")
 
+def fileLines
+  (getFile >>=
+   ((mapM_ putStrLn) . lines))
+
 def (testUnary n)
   ((-n) + n)
 
@@ -45,7 +49,7 @@ def main
   if False
     then
       undefined
-    else (getFile >>= print)
+    else fileLines
     >>
     (print
-      (splitxs "abcdefghijk")))
+      (splitxs [12,3,4,56])))
