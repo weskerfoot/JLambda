@@ -42,7 +42,9 @@ function makeChecker(props) {
   Collects the results into an array and returns it*/
 function parseMany(exprType, valid, tokens, charnum, linenum) {
   if (!fst(tokens)) {
-    throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
+    throw error.JSyntaxError(charnum,
+                             linenum,
+                             "Unexpected end of source");
   }
   var current = fst(tokens)[0];
 	var results = [];
@@ -54,7 +56,7 @@ function parseMany(exprType, valid, tokens, charnum, linenum) {
 	else {
 		throw error.JSyntaxError(linenum,
                              charnum,
-                             "Unexpected token ``"+fst(tokens)[0]+"''");
+                             "Unexpected token: ``"+fst(tokens)[0]+"''");
 	}
   results.push(parsed);
 
@@ -92,7 +94,7 @@ function parseMany(exprType, valid, tokens, charnum, linenum) {
 function parseBetween(exprType, between, tokens, charnum, linenum) {
   var first = parse(tokens);
   if (!exprType(first)) {
-    throw "unexpected token:"+fst(tokens)[0];
+    throw error.JSyntaxError(charnum, linenum, "Unexpected token: ``"+fst(tokens)[0]+"''");
   }
   var items = [first];
   var parsed;
@@ -156,18 +158,26 @@ function parseDefFunction(tokens) {
 }
 
 function parseDef(tokens) {
+  if (tokens.length < 2)
+    throw error.JSyntaxError(0,0,"Unexpected end of source");
+  var charnum = fst(tokens)[2];
+  var linenum = fst(tokens)[3];
   if (fst(tokens)[0] === "left_paren") {
     // It's a function definition
     tokens.pop();
     return parseDefFunction(tokens);
   }
 	if (notFollowedBy(tokens, ["identifier"])) {
-		throw "def must be followed by identifier, not "+fst(tokens)[0];
+		throw error.JSyntaxError(linenum,
+                             charnum,
+                             "def must be followed by identifier, not "+fst(tokens)[0]);
 	}
 	else {
     var identifier = parse(tokens);
     if (!notFollowedBy(tokens, ["def", "comma", "arrow", "right_brace", "right_square"])) {
-      throw "def " + identifier.val + " must not be followed by " + fst(tokens)[0];
+      throw error.JSyntaxError(linenum,
+                               charnum,
+                               "def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
     }
 		return new typ.Def(identifier, parse(tokens));
 	}
@@ -240,7 +250,7 @@ function computeApp(tokens, charnum, linenum) {
 	}
 	if (typ.OPInfo[next[1]]) {
 		//it's an infix expression
-		var result = parseInfix(tokens, 1, lhs);
+		var result = parseInfix(tokens, 1, lhs, linenum, charnum);
 		if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
 			throw error.JSyntaxError(linenum,
                                charnum,
@@ -273,14 +283,16 @@ function computeApp(tokens, charnum, linenum) {
   See this for more info and an implementation in python
   http://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing/
 */
-function parseInfix(tokens, minPrec, lhs) {
+function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
 	if (!lhs) {
 		var lhs = parse(tokens);
 	}
 	while (true) {
 		var cur = fst(tokens);
 		if (!cur) {
-			throw "Unexpected end of source";
+			throw error.JSyntaxError(linenum,
+                               charnum,
+                               "Unexpected end of source");
 		}
 		var opinfo = typ.OPInfo[cur[1]];
 
@@ -342,7 +354,9 @@ function parse(tokens) {
 //    return parseLet(tokens);
 //  }
   else {
-    throw error.JSyntaxError(linenum, charnum, "Unexpected token: " + toktype);
+    throw error.JSyntaxError(fst(tokens)[3],
+                             fst(tokens)[2],
+                             "Unexpected token: ``" + toktype+"''");
   }
 }
 
