@@ -168,6 +168,13 @@ function parseDef(tokens, linenum, charnum) {
     tokens.pop();
     return parseDefFunction(tokens);
   }
+
+  if (fst(tokens)[0] === "left_brace") {
+    /* It's a let/def form */
+    tokens.pop();
+    return parseLetForm(tokens);
+  }
+
 	if (notFollowedBy(tokens, ["identifier"], linenum, charnum)) {
 		throw error.JSyntaxError(linenum,
                              charnum,
@@ -349,7 +356,8 @@ function parse(tokens) {
 		return new typ.Name(token);
 	else if (toktype === "truelit" || toktype === "falselit")
 		return new typ.BoolT(token);
-	else if (toktype === "def")
+	else if (toktype === "def" ||
+           toktype === "let")
 		return parseDef(tokens, fst(tokens)[3], fst(tokens)[2]);
 	else if (toktype === "ifexp")
 		return parseIf(tokens);
@@ -363,9 +371,6 @@ function parse(tokens) {
     else
       return computeApp(tokens, charnum, linenum);
   }
-//  else if (toktype === "let") {
-//    return parseLet(tokens);
-//  }
   else {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
