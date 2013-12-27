@@ -20,14 +20,17 @@ var Expression = {
 		}
 };
 
-function LetExp(pairs) {
+function LetExp(pairs, body) {
   if (!pairs.every(function(x) {
-    return x.exprType === "Name";
+    return (x.exprType === "Definition" ||
+            x.exprType === "FunctionDefinition");
   })) {
-    throw "let can only be used to bind things to names";
+    throw "let can only be used to bind things to names or functions";
   }
   this.exprType = "Let";
-  this.val = tool.dict(pairs);
+  this.val = [pairs, body];
+  this.pairs = pairs;
+  this.body = body;
   return this;
 }
 LetExp.prototype = Expression;
