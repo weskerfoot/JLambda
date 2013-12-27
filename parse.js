@@ -188,7 +188,14 @@ function parseLetForm(tokens, linenum, charnum) {
                              charnum,
                              "Unexpected end of source");
   }
+  linenum = fst(tokens)[2];
+  charnum = fst(tokens)[3];
   tokens.pop();
+  if (tokens.length <= 0) {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "let/def form must have a body");
+  }
   var body = parse(tokens);
   return new typ.LetExp(pairs, body);
 
@@ -281,7 +288,9 @@ function parseDef(tokens, linenum, charnum) {
   if (fst(tokens)[0] === "left_brace") {
     /* It's a let/def form */
     tokens.pop();
-    return parseLetForm(tokens);
+    return parseLetForm(tokens,
+                        fst(tokens)[2],
+                        fst(tokens)[3]);
   }
 
 	if (notFollowedBy(tokens, ["identifier"], linenum, charnum)) {
