@@ -4,7 +4,7 @@ def (f a b)
 def (add a b)
   (a + b)
 
-def (catstrs strs)
+def  (catstrs strs)
   (foldr f
          (head strs)
          (tail strs))

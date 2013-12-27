@@ -18,20 +18,22 @@ function snd(ts) {
 	return ts[ts.length-2];
 }
 
-//Checks if the next token is not followed by any of ``checks''
-function notFollowedBy(tokens, checks) {
+/*Checks if the next token is not followed by any of ``checks'' */
+function notFollowedBy(tokens, checks, linenum, charnum) {
 	if (!fst(tokens)) {
     throw error.JSyntaxError(0,0,"unexpected end of source")
   }
   var nextT = fst(tokens)[0];
-	if (checks.some(function (x) {return x === nextT;}))
+	if (checks.some(function (x) {
+    return x === nextT;
+  }))
 		return false;
 	else
 		return true;
 }
 
-//returns a function that takes a parameter and
-//checks if it is in the array ``props''
+/* returns a function that takes a parameter and
+   checks if it is in the array ``props''*/
 function makeChecker(props) {
 	return function(x) {
 		return x && props.some(function (y) {return y === x;});
@@ -65,7 +67,6 @@ function parseMany(exprType, valid, tokens, charnum, linenum) {
 		while (valid(snd(tokens)[0])) {
 			if (!(valid(fst(tokens)[0])))
         break;
-      //print(valid(fst(tokens)[0]), tokens);
       results.push(parse(tokens));
 			if (!exprType(fst(results).exprType))
 				break;
@@ -157,24 +158,33 @@ function parseDefFunction(tokens) {
   return new typ.DefFunc(fname, parameters, body);
 }
 
-function parseDef(tokens) {
+function parseDef(tokens, linenum, charnum) {
   if (tokens.length < 2)
-    throw error.JSyntaxError(0,0,"Unexpected end of source");
-  var charnum = fst(tokens)[2];
-  var linenum = fst(tokens)[3];
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "Unexpected end of source");
   if (fst(tokens)[0] === "left_paren") {
-    // It's a function definition
+    /* It's a function definition */
     tokens.pop();
     return parseDefFunction(tokens);
   }
-	if (notFollowedBy(tokens, ["identifier"])) {
+	if (notFollowedBy(tokens, ["identifier"], linenum, charnum)) {
 		throw error.JSyntaxError(linenum,
                              charnum,
                              "def must be followed by identifier, not "+fst(tokens)[0]);
 	}
 	else {
     var identifier = parse(tokens);
-    if (!notFollowedBy(tokens, ["def", "comma", "arrow", "right_brace", "right_square"])) {
+    if (!fst(tokens))
+      throw error.JSyntaxError(linenum,
+                               charnum,
+                               "Unexpected end of source");
+    linenum = fst(tokens)[3];
+    charnum = fst(tokens)[2];
+    if (!notFollowedBy(tokens,
+                       ["def", "comma", "arrow", "right_brace", "right_square"],
+                       linenum,
+                       charnum)) {
       throw error.JSyntaxError(linenum,
                                charnum,
                                "def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
@@ -185,9 +195,14 @@ function parseDef(tokens) {
 
 
 function parseIf(tokens) {
-	if (!notFollowedBy(tokens, ["def","comma","lambda"])) {
-		throw error.JSyntaxError(fst(tokens)[3],
-                             fst(tokens)[2],
+  var linenum = fst(tokens)[3];
+  var charnum = fst(tokens)[2];
+	if (!notFollowedBy(tokens,
+                     ["def","comma","lambda"],
+                     linenum,
+                     charnum)) {
+		throw error.JSyntaxError(linenum,
+                             charnum,
                              "``if'' cannot be followed by "+fst(tokens)[0]) ;
 	}
 	else {
@@ -238,7 +253,7 @@ var validArgument = tool.compose(tool.not, makeChecker(invalidArguments));
 var validArgTypes = tool.compose(tool.not, makeChecker(["Definition"]));
 var validOperator = makeChecker(["identifier"]);
 
-//Parses function application (either infix or prefix)
+/* Parses function application (either infix or prefix) */
 function computeApp(tokens, charnum, linenum) {
   var lhs = parse(tokens);
 	if (fst(tokens))
@@ -249,7 +264,7 @@ function computeApp(tokens, charnum, linenum) {
                              "Unexpected end of source");
 	}
 	if (typ.OPInfo[next[1]]) {
-		//it's an infix expression
+		/* it's an infix expression */
 		var result = parseInfix(tokens, 1, lhs, linenum, charnum);
 		if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
 			throw error.JSyntaxError(linenum,
@@ -257,13 +272,12 @@ function computeApp(tokens, charnum, linenum) {
                                "Mismatched parentheses or missing parenthesis on right-hand side");
 		}
 		else {
-			//return the result
       tokens.pop();
 			return result;
 		}
 	}
 	else {
-		//it's a prefix application
+		/* it's a prefix application */
 
 		var parameters = parseMany(validArgTypes, validArgument, tokens, charnum, linenum);
 		if ((!fst(tokens)) || fst(tokens)[0] !== "right_paren") {
@@ -272,7 +286,6 @@ function computeApp(tokens, charnum, linenum) {
                                "Mismatched parentheses or missing parenthesis on right-hand side");
 		}
 		else {
-			//return the result
       tokens.pop();
 			return typ.makeApp(lhs, parameters);
 		}
@@ -304,7 +317,7 @@ function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
 		var assoc = opinfo[1];
 		var nextMinPrec = assoc === "Left" ? prec + 1 : prec;
 		tokens.pop();
-		//remove the operator token
+		/*remove the operator token*/
 		var rhs = parseInfix(tokens, nextMinPrec);
 		lhs = typ.makeApp(op, [lhs, rhs]);
 	}
@@ -337,7 +350,7 @@ function parse(tokens) {
 	else if (toktype === "truelit" || toktype === "falselit")
 		return new typ.BoolT(token);
 	else if (toktype === "def")
-		return parseDef(tokens);
+		return parseDef(tokens, fst(tokens)[3], fst(tokens)[2]);
 	else if (toktype === "ifexp")
 		return parseIf(tokens);
 	else if (toktype === "left_paren") {
