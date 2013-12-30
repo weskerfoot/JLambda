@@ -188,8 +188,8 @@ function parseLetForm(tokens, linenum, charnum) {
                              charnum,
                              "Unexpected end of source");
   }
-  linenum = fst(tokens)[2];
-  charnum = fst(tokens)[3];
+  linenum = fst(tokens)[3];
+  charnum = fst(tokens)[2];
   tokens.pop();
   if (tokens.length <= 0) {
     throw error.JSyntaxError(linenum,
@@ -197,6 +197,12 @@ function parseLetForm(tokens, linenum, charnum) {
                              "let/def form must have a body");
   }
   var body = parse(tokens);
+  if (body.exprType === "Definition" ||
+      body.exprType === "FunctionDefinition") {
+        throw error.JSyntaxError(linenum,
+                                 charnum,
+                                 "Body of a let/def expression cannot be a definition");
+      }
   return new typ.LetExp(pairs, body);
 
 }
@@ -250,14 +256,21 @@ function parseLetBinding(tokens, linenum, charnum) {
   }
   tokens.pop();
   if (!notFollowedBy(tokens,
-                       ["def", "comma", "arrow", "right_brace", "right_square"],
+                       ["comma", "arrow", "right_brace", "right_square"],
                        linenum,
                        charnum)) {
       throw error.JSyntaxError(linenum,
                                charnum,
                                "The binding of " + identifier.val + " must not be followed by " + fst(tokens)[0]);
                        }
-	return new typ.Def(name, parse(tokens));
+  var bound = parse(tokens);
+  if (bound.exprType === "Definition" ||
+      bound.exprType === "FunctionDefinition") {
+        throw error.JSyntaxError(linenum,
+                                 charnum,
+                                 "A definition cannot be the value of a binding");
+      }
+	return new typ.Def(name, bound);
 }
 
 function parseLetItem(tokens) {
@@ -289,8 +302,8 @@ function parseDef(tokens, linenum, charnum) {
     /* It's a let/def form */
     tokens.pop();
     return parseLetForm(tokens,
-                        fst(tokens)[2],
-                        fst(tokens)[3]);
+                        fst(tokens)[3],
+                        fst(tokens)[2]);
   }
 
 	if (notFollowedBy(tokens, ["identifier"], linenum, charnum)) {
@@ -307,14 +320,21 @@ function parseDef(tokens, linenum, charnum) {
     linenum = fst(tokens)[3];
     charnum = fst(tokens)[2];
     if (!notFollowedBy(tokens,
-                       ["def", "comma", "arrow", "right_brace", "right_square"],
+                       ["comma", "arrow", "right_brace", "right_square"],
                        linenum,
                        charnum)) {
       throw error.JSyntaxError(linenum,
                                charnum,
                                "def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
     }
-		return new typ.Def(identifier, parse(tokens));
+    var bound = parse(tokens);
+    if (bound.exprType === "Definition" ||
+      bound.exprType === "FunctionDefinition") {
+        throw error.JSyntaxError(linenum,
+                                 charnum,
+                                 "A definition cannot be the value of a binding");
+      }
+		return new typ.Def(identifier, bound);
 	}
  }
 
@@ -517,9 +537,9 @@ function parseFull(tokenized) {
       process.exit(1);
   }
 }
-//console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
 
 //console.log(tokenizer.tokenize(istr));
-console.log(parseFull(tokenizer.tokenize(istr)));
+//console.log(parseFull(tokenizer.tokenize(istr)));
 
 //module.exports = {parse : tool.compose(parseFull, tokenizer.tokenize) };

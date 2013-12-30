@@ -44,12 +44,22 @@ def (splitHelp acc xs ys)
 def (splitxs xs)
   (splitHelp [] xs xs)
 
+def r def
+  {
+    a = 4
+  }
+    a
+
 def main
-  ((print (testUnary 6)) >>
-  if False
-    then
-      undefined
-    else fileLines
-    >>
-    (print
-      (splitxs [12,3,4,56])))
+  let {
+    unary = (print (testUnary 6))
+    splitted = def {
+                xs = (fst (splitxs [12,3,4,56]))
+                } (xs ++ [0,9])
+    }
+      if False
+        then undefined
+      else
+        (unary >>
+         fileLines >>
+         (print splitted))

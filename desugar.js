@@ -20,11 +20,16 @@ function desugarList(lst) {
 }
 
 function desugarDefFunc(def) {
-  return new typ.Def(def.ident, new typ.FuncT(desugar(def.params), desugar(def.body)));
+  return new typ.Def(def.ident,
+                     new typ.FuncT(desugar(def.params),
+                                   desugar(def.body)));
 }
 
-//function desugarString(str) {
 
+function desugarLet(stx) {
+  var values = stx.pairs.map(desugar);
+  return new typ.LetExp(values, desugar(stx.body));
+}
 
 function desugar(stx) {
   switch (stx.exprType) {
@@ -59,6 +64,8 @@ function desugar(stx) {
       return stx;
     case "Integer":
       return stx;
+    case "Let":
+      return desugarLet(stx);
     default:
       return stx;
   }

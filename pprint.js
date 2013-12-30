@@ -55,6 +55,11 @@ function pprint(expr) {
     return "[]";
   else if (expr.exprType === "Unary")
     return "("+expr.op.ident+" "+pprint(expr.val)+")";
+  else if (expr.exprType === "Let")
+    return "let {" + expr.pairs.map(
+          function (v) {
+            return pprint(v)
+          }).join(" ; ") + "} in " + pprint(expr.body);
 }
 
 module.exports = {pprint : pprint};

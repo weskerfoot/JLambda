@@ -215,4 +215,5 @@ module.exports =
    DefFunc : DefFunc,
    UnaryOp : UnaryOp,
    Nil : Nil,
-   LetExp : LetExp}
+   LetExp : LetExp
+   }
