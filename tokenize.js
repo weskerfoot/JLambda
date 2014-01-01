@@ -247,8 +247,13 @@ function tokenize(tokstream) {
         }
 
       case 100: // 'd'
-        var result = peek(tokstream, "def", "def");
-        if (result) {
+        var defop = peek(tokstream, "defop", "defop");
+        if (defop) {
+          tokens.push(["defop", "defop", charnum, linenum]);
+          tokstream = tokstream.substr(5);
+        }
+        var def = peek(tokstream, "def", "def");
+        if (def) {
           tokens.push(["def", "def", charnum, linenum]);
           tokstream = tokstream.substr(3);
           break;
