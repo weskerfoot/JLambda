@@ -338,6 +338,51 @@ function parseDef(tokens, linenum, charnum) {
 	}
  }
 
+function parseDefOp(tokens, linenum, charnum) {
+  if (fst(tokens)[0] !== "integer" ||
+      fst(tokens)[1] < 1) {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "defop must be followed by integer precedence >= 1");
+      }
+  tokens.pop();
+
+  if (false) {
+         throw error.JSyntaxError(linenum,
+                                  charnum,
+                                  "defop must be followed by precedence and then either Left or Right");
+       }
+  tokens.pop();
+  if (fst(tokens)[0] !== "left_paren") {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "defop arguments must start with (");
+  }
+  tokens.pop();
+  if (!(tokens.slice(tokens.length-3,
+                    tokens.length).every(function(x) {
+                      return x[0] === "identifier";
+                    }))) {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "defop must be surrounded by exactly 3 identifier");
+    }
+  var pattern = tokens.slice(tokens.length-3,
+                             tokens.length);
+  tokens.pop(); tokens.pop(); tokens.pop();
+  if (fst(tokens)[0] !== "right_paren") {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "defop pattern must be terminated with )");
+  }
+  tokens.pop();
+  return new typ.DefFunc(new typ.Name(pattern[1][1]),
+                         [new typ.Name(pattern[0][1]),
+                          new typ.Name(pattern[2][1])],
+                         parse(tokens));
+}
+
+
 
 function parseIf(tokens) {
   var linenum = fst(tokens)[3];
@@ -498,12 +543,14 @@ function parse(tokens) {
 	else if (toktype === "float")
 		return new typ.FloatT(token);
 	else if (toktype === "identifier")
-		return new typ.Name(token);
+    return new typ.Name(token);
 	else if (toktype === "truelit" || toktype === "falselit")
 		return new typ.BoolT(token);
 	else if (toktype === "def" ||
            toktype === "let")
 		return parseDef(tokens, fst(tokens)[3], fst(tokens)[2]);
+  else if (toktype === "defop")
+    return parseDefOp(tokens, fst(tokens)[3], fst(tokens)[2]);
 	else if (toktype === "ifexp")
 		return parseIf(tokens);
 	else if (toktype === "left_paren") {

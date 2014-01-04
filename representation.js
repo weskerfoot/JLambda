@@ -156,6 +156,24 @@ function If(condition, thenexp, elseexp) {
 	return this;
 }
 
+function TypeVar(name) {
+  this.name = name;
+  return this;
+}
+
+function TypeOp(name, params, body) {
+  this.name = name;
+  this.params = params;
+  this.body = body;
+  return this;
+}
+
+function TypeBinding(name, type) {
+  this.name = name;
+  this.type = type;
+  return this;
+}
+
 
 //convenience function to construct binary operators
 //assumes that the identifier refers to the name of a primitive
@@ -178,25 +196,26 @@ function makeApp(name, parameters) {
 }
 
 OPInfo = {"+" : [3, "Left"],
-		  "-" : [3, "Left"],
-		  "*" : [4, "Left"],
-		  "/" : [4, "Left"],
-		  "^" : [5, "Right"],
-      "++" : [3, "Left"],
-      "==" : [2, "Left"],
-      ">" : [2, "Left"],
-      ">=" : [2, "Left"],
-      "<" : [2, "Left"],
-      "<=" : [2, "Left"],
-      "&&" : [2, "Left"],
-      "||" : [2, "Left"],
-      ":" : [2, "Left"],
-      "$" : [1, "Left"],
-      ">>" : [1, "Left"],
-      ">>=" : [1, "Left"],
-      "<$>" : [1, "Left"],
-      "." : [1, "Left"],
-      "," : [1, "Left"]}
+		      "-" :  [3, "Left"],
+		      "*" :  [4, "Left"],
+		      "/" :  [4, "Left"],
+		      "^" :  [5, "Right"],
+          "++" : [3, "Left"],
+          "==" : [2, "Left"],
+          ">" :  [2, "Left"],
+          ">=" : [2, "Left"],
+          "<" :  [2, "Left"],
+          "<=" : [2, "Left"],
+          "&&" : [2, "Left"],
+          "||" : [2, "Left"],
+          "::" : [2, "Left"],
+          ":" : [1, "Left"],
+          "$" : [1, "Left"],
+          ">>" : [1, "Left"],
+          ">>=" : [1, "Left"],
+          "<$>" : [1, "Left"],
+          "." : [1, "Left"],
+          "," : [1, "Left"]}
 
 module.exports =
    { IntT   : IntT,

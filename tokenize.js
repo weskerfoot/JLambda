@@ -5,8 +5,6 @@ var tools = require("./tools.js");
 var error = require("./errors.js");
 var operators = Object.keys(rep.OPInfo);
 
-var matchop = tools.opMatch(operators);
-
 function isDigit(a) {
   if (!a)
     return false;
@@ -80,7 +78,7 @@ function tokenizeNum(tokstream, charnum, linenum) {
  * Everything after the operator goes back on to the token stream
  */
 
-function tokenizeIdent(tokstream, charnum, linenum) {
+function tokenizeIdent(tokstream, matchop, charnum, linenum) {
   var identifier = [];
   var n = 0;
   while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0]) && !matchop(tokstream)) {
@@ -134,7 +132,7 @@ function peek(tokstream, toktype, word, charnum, linenum) {
   return false;
 }
 
-function tokenize(tokstream) {
+function tokenize(tokstream, matchop) {
   var tokens = [];
   var charnum = 1;
   var linenum = 1;
@@ -239,10 +237,10 @@ function tokenize(tokstream) {
           tokstream = tokstream.substr(2);
           break;
         }
-        var inkeyword = peek(tokstream, "in", "in");
+        var inkeyword = peek(tokstream, "in", "in ");
         if (inkeyword) {
           tokens.push(inkeyword);
-          tokstream = tokstream.substr(2);
+          tokstream = tokstream.substr(3);
           break;
         }
 
@@ -251,6 +249,7 @@ function tokenize(tokstream) {
         if (defop) {
           tokens.push(["defop", "defop", charnum, linenum]);
           tokstream = tokstream.substr(5);
+          break;
         }
         var def = peek(tokstream, "def", "def");
         if (def) {
@@ -304,21 +303,21 @@ function tokenize(tokstream) {
           tokens.push(["identifier", op, charnum, linenum]);
         }
         else {
-          var result = tokenizeIdent(tokstream, charnum, linenum);
+          var result = tokenizeIdent(tokstream, matchop, charnum, linenum);
           result.map(function(x) {
             charnum++;
             tokens.push(x[1]);
             tokstream = tokstream.substr(x[0]);
           });
         }
-    }
+     }
   }
   return tokens;
 }
 
-function tokenizeFull(input) {
+function tokenizeHelp(input, matchop) {
   try {
-    return tokenize(input).reverse().filter(function(x) {
+    return tokenize(input, matchop).reverse().filter(function(x) {
       return x[0] !== "whitespace";
     });
   } catch (e) {
@@ -326,5 +325,23 @@ function tokenizeFull(input) {
     process.exit(1);
   }
 }
+
+function tokenizeFull(input) {
+  var matchop = tools.opMatch(operators);
+  var initialPass = tokenizeHelp(input, matchop).reverse();;
+  for (var i = 0; i < initialPass.length; i++) {
+    if (initialPass.slice(i, i+7).map(function(x) { return x[0]; }) ===
+        ["defop", "integer", "identifier", "Left", "Right",
+         "left_paren", "identifier", "identifier", "identifier",
+         "right_paren"])
+      rep.OPInfo[initialPass[i+5][1]] = [parseInt(initialPass[i+1][1], 10),
+                                         initialPass[i+2][1]];
+
+  }
+  operators = Object.keys(rep.OPInfo);
+  matchop = tools.opMatch(operators);
+  return tokenizeHelp(input, matchop);
+}
+
 
 module.exports = {tokenize : tokenizeFull};
