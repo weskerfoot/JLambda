@@ -1,5 +1,8 @@
 /* Takes an AST and converts all of the functions into closures.
- * A closure is a pair of two things: an environment and a function
+ * A closure is a triple of:
+ *  a mapping from names to expressions
+ *  a mapping from names to type expressions
+ *  a function (which includes the formal parameters and the body)
  * The closure has the property that all of the free variables of the function
  * are in the environment, or an exception is raised because the variable is not bound
  * in the current environment.
@@ -15,3 +18,8 @@
  * For the purposes of type checking it does not matter how the function gets called, the environment
  * is only used for looking up the types of names. Formal parameters are given type variables.
  */
+
+var rep = require("./representation.js");
+var env = require("./environments.js");
+
+function convert
