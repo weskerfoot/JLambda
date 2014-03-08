@@ -106,6 +106,10 @@ function groupOps(ops) {
   return groupBy(eq, ops.sort());
 }
 
+function unique(ops) {
+  return groupOps(ops).map(function(x) { return x[0]; });
+}
+
 function find(f, haystack) {
   for(var i = 0; i < haystack.length; i++) {
     if (f(haystack[i]))
@@ -163,4 +167,5 @@ module.exports = {compose : compose,
           len   : len,
           groupOps : groupOps,
           opMatch : operatorMatch,
-          dict: dict}
+          dict: dict,
+          unique : unique};

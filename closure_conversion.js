@@ -21,5 +21,79 @@
 
 var rep = require("./representation.js");
 var env = require("./environments.js");
+var errors = require("./errors.js");
+var parser = require("./parse.js");
+var pprint = require("./pprint.js");
+var tool = require("./tools.js");
 
-function convert
+/*function convert(stx, cur_types, cur_exprs) {
+  switch (stx.exprType) {
+    case "If":
+    case "Definition":
+    case "Name":
+    case "Application":
+    case "Function":
+    case "Let":
+    default:
+      return stx;
+  }
+}*/
+
+function fvs(stx) {
+  /*if (stx.exprType !== "Function" &&
+      stx.exprType !== "Let") {
+    throw errors.JInternalError(
+           ["Tried to calculate the free variables of",
+           "something that was not a function or let.\n",
+           "That something was a: " + stx.exprType +"\n"].reduce(
+                function (a,b) {
+                  return a+" "+b
+                }, ""));
+  }*/
+
+  switch (stx.exprType) {
+    case "Integer":
+      return [];
+    case "Float":
+      return [];
+    case "String":
+      return [];
+    case "Function":
+      return [];
+    case "Nil":
+      return [];
+    case "List":
+      return [];
+    case "Bool":
+      return [];
+    case "FunctionDefinition":
+      return [];
+    case "Let":
+      return stx.pairs.map(fvs);
+    case "Unary":
+      return fvs(stx.val);
+    case "Definition":
+      return [fvs(stx.val)];
+    case "Application":
+      var vs = fvs(stx.p);
+      var f_fvs = fvs(stx.func);
+      return [].concat.apply([], [vs, f_fvs]);
+    case "If":
+      if (stx.elseexp) {
+        var cond_fvs = fvs(stx.condition);
+        var then_fvs = fvs(stx.thenexp);
+        var else_fvs = fvs(stx.elseexp);
+        return [cond_fvs, then_fvs, else_fvs];
+      }
+      else {
+        return [fvs(stx.condition)] + [fvs(stx.thenexp)];
+      }
+    case "Name":
+      return stx.ident;
+  }
+}
+
+var ast = parser.parse("(^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rt))")[0];
+console.log(pprint.pprint(ast));
+console.log(tool.unique(fvs(ast)));
+//console.log(ast);
