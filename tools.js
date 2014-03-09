@@ -123,7 +123,7 @@ function find(f, haystack) {
 }
 
 function dict(pairs) {
-  var o = new Object();
+  var o = {};
   pairs.map(function(p) {
     o[p[0]] = p[1];
   });
@@ -188,8 +188,8 @@ print(matcher(">="));
 */
 
 module.exports = {compose : compose,
-				  not	  : not,
-				  on	  : on,
+          not  : not,
+          on  : on,
           maxBy : maxBy,
           len   : len,
           groupOps : groupOps,
@@ -200,4 +200,4 @@ module.exports = {compose : compose,
           eq: eq,
           extend : extend,
           flatten : flatten,
-          difference : difference}
+          difference : difference};

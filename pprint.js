@@ -58,7 +58,7 @@ function pprint(expr) {
   else if (expr.exprType === "Let")
     return "let {" + expr.pairs.map(
           function (v) {
-            return pprint(v)
+            return pprint(v);
           }).join(" ; ") + "} in " + pprint(expr.body);
 }
 

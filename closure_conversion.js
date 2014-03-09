@@ -62,6 +62,7 @@ function fvs_helper(stx) {
       else {
         return $.flatten([fvs_helper(stx.condition), fvs_helper(stx.thenexp)]);
       }
+      break;
     case "Name":
       return stx.ident;
   }

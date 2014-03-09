@@ -8,7 +8,7 @@
 
 var cexp = {
   type : "cexp"
-}
+};
 
 function record(values_accesspaths,
                 w,
@@ -78,7 +78,7 @@ function accessPath(offp, selp) {
 var primoptype = {
   type : "primop",
   equal : function(pOp) {
-    return this.name === pOp.name
+    return this.name === pOp.name;
   }
 };
 
@@ -86,7 +86,7 @@ function Primop(name) {
   function ptype() {
     this.name = name;
     return this;
-  };
+  }
   ptype.prototype = primoptype;
   return new ptype();
 }
@@ -113,7 +113,7 @@ var makeref = Primop("makeref");
 var makerefunboxed = Primop("makerefunboxed");
 var alength = Primop("alength");
 var slength = Primop("slength");
-var gethdlr = Primop("gethdlr")
+var gethdlr = Primop("gethdlr");
 var sethdlr = Primop("sethdlr");
 var boxed = Primop("boxed");
 var fadd = Primop("fadd");
