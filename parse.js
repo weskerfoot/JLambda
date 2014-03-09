@@ -21,7 +21,7 @@ function snd(ts) {
 /*Checks if the next token is not followed by any of ``checks'' */
 function notFollowedBy(tokens, checks, linenum, charnum) {
 	if (!fst(tokens)) {
-    throw error.JSyntaxError(0,0,"unexpected end of source")
+    throw error.JSyntaxError(0,0,"unexpected end of source");
   }
   var nextT = fst(tokens)[0];
 	if (checks.some(function (x) {
@@ -71,7 +71,7 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
 			if (!exprType(fst(results).exprType))
 				break;
 			if (fst(tokens))
-        current = fst(tokens)[0]
+        current = fst(tokens)[0];
       else
         throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
 			if (tokens.length <= 1)
@@ -115,15 +115,16 @@ function parseBetween(exprType, between, tokens, charnum, linenum) {
 }
 
 function parseList(tokens) {
+  var xs;
   if (fst(tokens)[0] === "right_square") {
-      var xs = [];
+      xs = [];
   }
   else if (fst(tokens)[0] === "comma") {
     tokens.pop();
-    var xs = [];
+    xs = [];
   }
   else {
-    var xs = parseBetween(function (x) { return true; }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
+    xs = parseBetween(function (x) { return true; }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
   }
   if (!fst(tokens) || fst(tokens)[0] !== "right_square") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -137,16 +138,17 @@ function parseList(tokens) {
 
 function parseDefFunction(tokens) {
 	var fname = parse(tokens);
+  var parameters;
   if (fname.exprType != "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "Expected an identifier in function definition");
   }
   if (fst(tokens)[0] === "right_paren") {
-    var parameters = [];
+    parameters = [];
   }
   else {
-    var parameters = parseMany(parse,
+    parameters = parseMany(parse,
                                validName,
                                validFormPar,
                                tokens,
@@ -209,6 +211,7 @@ function parseLetForm(tokens, linenum, charnum) {
 
 function parseLetFunction(tokens, linenum, charnum) {
   var fname = parse(tokens);
+  var parameters;
 
   if (fname.exprType != "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -216,10 +219,10 @@ function parseLetFunction(tokens, linenum, charnum) {
                              "Expected an identifier in function definition");
   }
   if (fst(tokens)[0] === "right_paren") {
-    var parameters = [];
+    parameters = [];
   }
   else {
-    var parameters = parseMany(parse,
+    parameters = parseMany(parse,
                                validName,
                                validFormPar,
                                tokens,
@@ -235,7 +238,7 @@ function parseLetFunction(tokens, linenum, charnum) {
   if (fst(tokens)[0] !== "arrow") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
-                             "Function parameters in let/def form must be followed by ->")
+                             "Function parameters in let/def form must be followed by ->");
   }
   tokens.pop();
   var body = parse(tokens);
@@ -435,7 +438,7 @@ function parseLambda(tokens) {
                              fst(tokens)[2],
                              "arrow must follow parameters in lambda, not "+fst(tokens)[0]);
 	}
-	tokens.pop()
+	tokens.pop();
 	var body = parse(tokens);
 	return new typ.FuncT(parameters, body);
 }
@@ -448,8 +451,10 @@ var validOperator = makeChecker(["identifier"]);
 /* Parses function application (either infix or prefix) */
 function computeApp(tokens, charnum, linenum) {
   var lhs = parse(tokens);
+  var next;
+  var result;
 	if (fst(tokens))
-		var next = fst(tokens);
+		next = fst(tokens);
 	else {
 		throw error.JSyntaxError(linenum,
                              charnum,
@@ -457,7 +462,7 @@ function computeApp(tokens, charnum, linenum) {
 	}
 	if (typ.OPInfo[next[1]]) {
 		/* it's an infix expression */
-		var result = parseInfix(tokens, 1, lhs, linenum, charnum);
+		result = parseInfix(tokens, 1, lhs, linenum, charnum);
 		if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
 			throw error.JSyntaxError(linenum,
                                charnum,
@@ -495,7 +500,7 @@ function computeApp(tokens, charnum, linenum) {
 */
 function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
 	if (!lhs) {
-		var lhs = parse(tokens);
+		lhs = parse(tokens);
 	}
 	while (true) {
 		var cur = fst(tokens);
@@ -524,8 +529,9 @@ function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
 function parse(tokens) {
   var charnum = fst(tokens)[2];
   var linenum = fst(tokens)[3];
+  var toktype;
 	if (fst(tokens)) {
-		var toktype = fst(tokens)[0];
+		toktype = fst(tokens)[0];
   }
 	else {
 		process.exit(code=1);
@@ -570,9 +576,9 @@ function parse(tokens) {
   }
 }
 
-var istr = fs.readFileSync('/dev/stdin').toString();
+//var istr = fs.readFileSync('/dev/stdin').toString();
 function parseFull(tokenized) {
-  var ast = new Array();
+  var ast = [];
   try {
     while (tokenized.length > 0) {
       var parsed = desugarer.desugar(parse(tokenized));
@@ -584,7 +590,14 @@ function parseFull(tokenized) {
       process.exit(1);
   }
 }
-console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
+
+module.exports = { parse : function(str) {
+                              return parseFull(tokenizer.tokenize(str));
+                            }
+                 };
+
+
+//console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
 
 //console.log(tokenizer.tokenize(istr));
 //console.log(parseFull(tokenizer.tokenize(istr)));

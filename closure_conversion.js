@@ -8,8 +8,8 @@
  * in the current environment.
  * A free variable is simply those that are not in the list of formal parameters.
  * We start with the global environment and traverse the AST. Every time a new function is entered
- * the current environment gets extended with the formal parameters of the function.
- * When a let is encountered the current environment also gets extended.
+ * the current environment gets $.extended with the formal parameters of the function.
+ * When a let is encountered the current environment also gets $.extended.
  * The algorithm continues for any further function definitions in that branch
  * otherwise it just stops for that particular branch and continues with the rest of the AST
  *
@@ -24,33 +24,11 @@ var env = require("./environments.js");
 var errors = require("./errors.js");
 var parser = require("./parse.js");
 var pprint = require("./pprint.js");
-var tool = require("./tools.js");
+var $ = require("./tools.js");
 
-/*function convert(stx, cur_types, cur_exprs) {
-  switch (stx.exprType) {
-    case "If":
-    case "Definition":
-    case "Name":
-    case "Application":
-    case "Function":
-    case "Let":
-    default:
-      return stx;
-  }
-}*/
+var notEmpty = $.compose($.not, $.eq([]));
 
-function fvs(stx) {
-  /*if (stx.exprType !== "Function" &&
-      stx.exprType !== "Let") {
-    throw errors.JInternalError(
-           ["Tried to calculate the free variables of",
-           "something that was not a function or let.\n",
-           "That something was a: " + stx.exprType +"\n"].reduce(
-                function (a,b) {
-                  return a+" "+b
-                }, ""));
-  }*/
-
+function fvs_helper(stx) {
   switch (stx.exprType) {
     case "Integer":
       return [];
@@ -62,38 +40,62 @@ function fvs(stx) {
       return [];
     case "Nil":
       return [];
-    case "List":
-      return [];
     case "Bool":
       return [];
-    case "FunctionDefinition":
-      return [];
     case "Let":
-      return stx.pairs.map(fvs);
+      return [];
     case "Unary":
-      return fvs(stx.val);
+      return $.flatten([stx.op.ident, fvs_helper(stx.val)]);
     case "Definition":
-      return [fvs(stx.val)];
+      return $.flatten(fvs_helper(stx.val));
     case "Application":
-      var vs = fvs(stx.p);
-      var f_fvs = fvs(stx.func);
-      return [].concat.apply([], [vs, f_fvs]);
+      var vs = $.flatten(fvs_helper(stx.p));
+      var f_fvs = $.flatten(fvs_helper(stx.func));
+      return $.flatten([vs, f_fvs]);
     case "If":
       if (stx.elseexp) {
-        var cond_fvs = fvs(stx.condition);
-        var then_fvs = fvs(stx.thenexp);
-        var else_fvs = fvs(stx.elseexp);
-        return [cond_fvs, then_fvs, else_fvs];
+        var cond_fvs = fvs_helper(stx.condition);
+        var then_fvs = fvs_helper(stx.thenexp);
+        var else_fvs = fvs_helper(stx.elseexp);
+        return $.flatten([cond_fvs, then_fvs, else_fvs]);
       }
       else {
-        return [fvs(stx.condition)] + [fvs(stx.thenexp)];
+        return $.flatten([fvs_helper(stx.condition), fvs_helper(stx.thenexp)]);
       }
     case "Name":
       return stx.ident;
   }
 }
 
-var ast = parser.parse("(^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rt))")[0];
-console.log(pprint.pprint(ast));
-console.log(tool.unique(fvs(ast)));
-//console.log(ast);
+function fvs(stx) {
+  if (stx.exprType !== "Function" &&
+      stx.exprType !== "Let") {
+    throw errors.JInternalError(
+           ["Tried to calculate the free variables of",
+           "something that was not a function or let.\n",
+           "That something was a: " + stx.exprType +"\n"].reduce(
+                function (a,b) {
+                  return a+" "+b;
+                }, ""));
+  }
+  var variables;
+  switch (stx.exprType) {
+    case "Let":
+      var bound_vars = stx.pairs.map(
+         function (stx) {
+           return stx.ident.ident;
+         });
+      var let_fvs = stx.pairs.map(fvs_helper);
+      var body_fvs = fvs_helper(stx.body);
+      variables = $.flatten(let_fvs);
+      $.extend(variables, $.flatten(body_fvs));
+  }
+  return $.difference($.unique($.flatten(variables)), bound_vars);
+
+}
+
+//var ast = parser.parse("let { c = trtr a = let {tttt = (rtertret^yyyy) } let { dfsdf = let { asdsd = 3434 } gdfgdfg } (45+(asdddy*uyuy))  q = ((lambda x y -> (x+y)) 4 ui) } (^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rt))")[0];
+//var ast = parser.parse("let { a = let { b = let {dsdfgf = sddd } fdgfg } gggggg } t")[0];
+//console.log(pprint.pprint(ast));
+var ast = parser.parse("let { a = 12 b = (a + t) } (a + b * d)")[0];
+console.log(fvs(ast));

@@ -11,10 +11,15 @@ var rep = require("./representation.js");
 
 
 function extend(env, values) {
-  for (var i = 0; i < values.length; i++) {
-    env[values[i][0].val] = values[i][1];
+  var new_env = {};
+  var env_keys = Object.keys(env);
+  for (var i = 0; i < env_keys.length; i++) {
+    new_env[env_keys[i]] = env[env_keys[i]];
   }
-  return env;
+  for (i = 0; i < values.length; i++) {
+    new_env[values[i][0].val] = values[i][1];
+  }
+  return new_env;
 }
 
 // creates a new environment initialized with the pairs in values
@@ -22,7 +27,7 @@ function makeEnv(name, values) {
   var env = {};
   env.name = name;
   for (var i = 0; i < values.length; i++) {
-    var name = values[i][0].val;
+    name = values[i][0].val;
     var val = values[i][1];
     env[name] = val;
   }

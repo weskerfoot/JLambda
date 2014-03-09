@@ -168,13 +168,6 @@ function TypeOp(name, params, body) {
   return this;
 }
 
-function TypeBinding(name, type) {
-  this.name = name;
-  this.type = type;
-  return this;
-}
-
-
 //convenience function to construct binary operators
 //assumes that the identifier refers to the name of a primitive
 //operation
@@ -195,11 +188,22 @@ function makeApp(name, parameters) {
 
 }
 
+function makeGensym() {
+  var n = 0;
+  return function() {
+    var x = "G"+n;
+    n = n + 1;
+    return x;
+  };
+}
+
+var gensym = makeGensym();
+
 OPInfo = {"+" : [3, "Left"],
-		      "-" :  [3, "Left"],
-		      "*" :  [4, "Left"],
-		      "/" :  [4, "Left"],
-		      "^" :  [5, "Right"],
+  	      "-" :  [3, "Left"],
+  	      "*" :  [4, "Left"],
+  	      "/" :  [4, "Left"],
+  	      "^" :  [5, "Right"],
           "++" : [3, "Left"],
           "==" : [2, "Left"],
           ">" :  [2, "Left"],
@@ -234,5 +238,8 @@ module.exports =
    DefFunc : DefFunc,
    UnaryOp : UnaryOp,
    Nil : Nil,
-   LetExp : LetExp
-   }
+   LetExp : LetExp,
+   gensym : gensym,
+   TypeVar : TypeVar,
+   TypeOp : TypeOp
+   };

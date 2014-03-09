@@ -26,6 +26,14 @@ function JTypeError(linenum, charnum, token, message) {
   return this;
 }
 
+function JInternalError(message) {
+  this.errormessage = message;
+  console.log(message);
+  return this;
+}
+
 module.exports =
   {JSyntaxError : JSyntaxError,
-   JTypeError : JTypeError};
+   JTypeError : JTypeError,
+   JInternalError : JInternalError
+  };

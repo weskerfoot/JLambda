@@ -85,6 +85,10 @@ function eq(a) {
   };
 }
 
+function fst(xs) {
+  return xs[0];
+}
+
 function equal(a) {
   return function(b) {
     return a === b;
@@ -103,11 +107,11 @@ function groupBy(eq, xs) {
 }
 
 function groupOps(ops) {
-  return groupBy(eq, ops.sort());
+  return groupBy(function (x) { return function(y) { return x === y; };}, ops.sort());
 }
 
 function unique(ops) {
-  return groupOps(ops).map(function(x) { return x[0]; });
+  return groupOps(ops).map(fst);
 }
 
 function find(f, haystack) {
@@ -126,13 +130,34 @@ function dict(pairs) {
   return o;
 }
 
+function flatten(xs) {
+  if (!(xs instanceof Array))
+    return xs;
+  if (xs.every(function (x) { return !(x instanceof Array); }))
+    return xs;
+  return [].concat.apply([], xs);
+}
+
+function extend(xs, ys) {
+  xs.push.apply(xs, ys);
+  return xs;
+}
+
+function difference(xs, ys) {
+  var difflist = groupOps(extend(xs, ys));
+  return difflist.filter(function (group) {
+    if (group.length > 1) {
+      return false;
+    }
+    return true;
+  }).map(fst);
+}
 
 /*
  * Problem:
  *  >> > >>^ <- longest one must be matched
  *  regex?
  */
-
 RegExp.escape= function(s) {
       return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
@@ -151,6 +176,8 @@ function operatorMatch(ops) {
       return false;
   };
 }
+
+
 /*
 var print = console.log;
 
@@ -168,4 +195,9 @@ module.exports = {compose : compose,
           groupOps : groupOps,
           opMatch : operatorMatch,
           dict: dict,
-          unique : unique};
+          unique : unique,
+          fst : fst,
+          eq: eq,
+          extend : extend,
+          flatten : flatten,
+          difference : difference}

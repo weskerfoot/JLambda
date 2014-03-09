@@ -40,7 +40,7 @@ function offset(i, v, w, next_cexp) {
 offset.prototype = cexp;
 
 function app(k, vs) {
-  this.k =k;
+  this.k = k;
   this.vs = vs;
   return this;
 }

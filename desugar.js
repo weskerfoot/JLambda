@@ -32,7 +32,7 @@ function desugarLet(stx) {
 }
 
 function desugar(stx) {
-  switch (stx.exprType) {
+ switch (stx.exprType) {
     case "If":
       if (stx.elseexp)
         return new typ.If(desugar(stx.condition), desugar(stx.thenexp), desugar(stx.elseexp));
