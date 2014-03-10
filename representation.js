@@ -20,6 +20,14 @@ var Expression = {
 		}
 };
 
+function Closure(bound_vars, free_vars, body, env) {
+  this.bound_vars = bound_vars;
+  this.free_vars = free_vars;
+  this.body = body;
+  this.env = env;
+  return this;
+}
+
 function LetExp(pairs, body) {
   if (!pairs.every(function(x) {
     return (x.exprType === "Definition" ||
@@ -241,5 +249,6 @@ module.exports =
    LetExp : LetExp,
    gensym : gensym,
    TypeVar : TypeVar,
-   TypeOp : TypeOp
+   TypeOp : TypeOp,
+   Closure : Closure
    };

@@ -5,6 +5,7 @@
  */
 
 var typ = require("./representation.js");
+var $ = require("./tools.js");
 
 // Lists get desugared to nested function calls
 // i.e. (cons (cons (cons ...)))
@@ -21,8 +22,18 @@ function desugarList(lst) {
 
 function desugarDefFunc(def) {
   return new typ.Def(def.ident,
-                     new typ.FuncT(desugar(def.params),
-                                   desugar(def.body)));
+                     curryFunc(def.params,
+                               def.body));
+}
+
+function curryFunc(ps, body) {
+  if ($.empty(ps)) {
+    return desugar(body);
+  }
+  else {
+    return new typ.FuncT(desugar($.fst(ps)),
+                         curryFunc($.rst(ps), body));
+  }
 }
 
 
@@ -53,7 +64,7 @@ function desugar(stx) {
         return new typ.App(desugar(stx.func), desugar(stx.p));
       return new typ.App(stx.func);
     case "Function":
-      return new typ.FuncT(stx.p, desugar(stx.body));
+      return curryFunc(stx.p, stx.body);
     case "List":
       return desugarList(stx);
     case "Bool":

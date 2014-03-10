@@ -1,3 +1,7 @@
+function empty(xs) {
+  return xs.length === 0;
+}
+
 function identity(a) {
   return a;
 }
@@ -87,6 +91,10 @@ function eq(a) {
 
 function fst(xs) {
   return xs[0];
+}
+
+function rst(xs) {
+  return xs.slice(1,xs.length);
 }
 
 function equal(a) {
@@ -197,7 +205,9 @@ module.exports = {compose : compose,
           dict: dict,
           unique : unique,
           fst : fst,
+          rst : rst,
           eq: eq,
           extend : extend,
           flatten : flatten,
-          difference : difference};
+          difference : difference,
+          empty : empty };
