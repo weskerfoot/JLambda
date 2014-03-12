@@ -64,7 +64,7 @@ function fvs_helper(stx) {
       }
       break;
     case "Name":
-      return stx.ident;
+      return [stx.ident];
   }
 }
 
@@ -79,11 +79,11 @@ function fvs(stx) {
                   return a+" "+b;
                 }, ""));
   }
-  var variables, free_variables;
+  var variables, free_variables, bound_vars;
 
   switch (stx.exprType) {
     case "Let":
-      var bound_vars = stx.pairs.map(
+      bound_vars = stx.pairs.map(
          function (stx) {
            return stx.ident.ident;
          });
@@ -91,20 +91,23 @@ function fvs(stx) {
       var body_fvs = fvs_helper(stx.body);
       variables = $.flatten(let_fvs);
       $.extend(variables, $.flatten(body_fvs));
-      free_variables = $.difference($.unique($.flatten(variables)), bound_vars);
       break;
     case "Function":
-
-
+      bound_vars = [stx.p.ident,];
+      variables = fvs_helper(stx.body);
   }
+  free_variables = $.difference($.unique(variables, bound_vars));
+  return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
-//var ast = parser.parse("let { c = trtr a = let {tttt = (rtertret^yyyy) } let { dfsdf = let { asdsd = 3434 } gdfgdfg } (45+(asdddy*uyuy))  q = ((lambda x y -> (x+y)) 4 ui) } (^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rt))")[0];
+//var ast = parser.parse("let { c = trtr a = let {tttt = (rtertret^yyyy) } let { dfsdf = let { asdsd = 3434 } gdfgdfg } (45+(asdddy*uyuy))  q = ((lambda x y -> (x+y)) 4 ui) } (^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rtcccc))")[0];
 //var ast = parser.parse("let { a = let { b = let {dsdfgf = sddd } fdgfg } gggggg } t")[0];
 //console.log(pprint.pprint(ast));
 //var ast = parser.parse("let { a = 12 b = (a + t) } (a + b * d)")[0];
 //console.log(fvs(ast));
 //var ast = parser.parse("((lambda a b c -> (+ a b c)) 2 3.0 4)");
-var ast = parser.parse("def (f a b c) 12")[0];
+//var ast = parser.parse("def (f a b c) 12")[0];
 //console.log(JSON.stringify(ast, null, 4));
-console.log(pprint.pprint(ast));
+//console.log(pprint.pprint(ast));
+var ast = parser.parse("(lambda a -> (pi*e+c-a))")[0];
+console.log(fvs(ast));
