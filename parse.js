@@ -350,7 +350,7 @@ function parseDefOp(tokens, linenum, charnum) {
       }
   tokens.pop();
 
-  if (false) {
+  if (fst(tokens)[1] !== "Left" && fst(tokens)[1] !== "Right") {
          throw error.JSyntaxError(linenum,
                                   charnum,
                                   "defop must be followed by precedence and then either Left or Right");
@@ -368,7 +368,7 @@ function parseDefOp(tokens, linenum, charnum) {
                     }))) {
     throw error.JSyntaxError(linenum,
                              charnum,
-                             "defop must be surrounded by exactly 3 identifier");
+                             "defop must be surrounded by exactly 3 identifiers");
     }
   var pattern = tokens.slice(tokens.length-3,
                              tokens.length);
@@ -576,7 +576,7 @@ function parse(tokens) {
   }
 }
 
-//var istr = fs.readFileSync('/dev/stdin').toString();
+var istr = fs.readFileSync('/dev/stdin').toString();
 function parseFull(tokenized) {
   var ast = [];
   try {
@@ -597,7 +597,7 @@ module.exports = { parse : function(str) {
                  };
 
 
-//console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
 
 //console.log(tokenizer.tokenize(istr));
 //console.log(parseFull(tokenizer.tokenize(istr)));

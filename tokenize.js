@@ -347,17 +347,21 @@ function tokenizeHelp(input, matchop) {
     process.exit(1);
   }
 }
+var defop_pattern = ["defop", "integer", "identifier",
+                     "left_paren", "identifier",
+                     "identifier", "identifier", "right_paren"];
 
 function tokenizeFull(input) {
   var matchop = tools.opMatch(operators);
   var initialPass = tokenizeHelp(input, matchop).reverse();
   for (var i = 0; i < initialPass.length; i++) {
-    if (initialPass.slice(i, i+7).map(tools.fst) ===
-        ["defop", "integer", "identifier", "Left", "Right",
-         "left_paren", "identifier", "identifier", "identifier",
-         "right_paren"])
+    if (initialPass.slice(i, i+8).map(tools.fst).every(
+         function(x, i) {
+           return x === defop_pattern[i];
+         })) {
       rep.OPInfo[initialPass[i+5][1]] = [parseInt(initialPass[i+1][1], 10),
                                          initialPass[i+2][1]];
+         }
 
   }
   operators = Object.keys(rep.OPInfo);
