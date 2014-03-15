@@ -1,3 +1,6 @@
+defop 2 Left (a ## b)
+ (a - b)
+
 def (f a b)
   (a ++ b)
 
