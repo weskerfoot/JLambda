@@ -1,131 +1,34 @@
+var _ = require("underscore");
+
 function empty(xs) {
-  return xs.length === 0;
-}
-
-function identity(a) {
-  return a;
-}
-
-function compose(f, g) {
-	return function(x) {
-		return f(g(x));
-	};
+  return _.size(xs) < 1;
 }
 
 function not(x) {
 	return !x;
 }
 
-function on(g, f) {
-	return function(x,y) {
-		return g(f(x), f(y));
-	};
-}
-
-function maxf(f, a, b) {
-  if (f(a) >= f(b))
-    return a;
-  return b;
-}
-
-function max(a, b) {
-  if (a > b)
-    return 1;
-  else if (a < b)
-    return -1;
-  else
-    return 0;
-}
-
 function min(a, b) {
-  if (a < b)
+  if (a < b) {
     return 1;
-  else if (a > b)
+  }
+  else if (a > b) {
     return -1;
-  else
+  }
+  else {
     return 0;
-}
-
-function maxBy(f, xs) {
-  if (xs.length < 1)
-    return false;
-  return xs.reduce(function(maxval, a) { return maxf(f, maxval, a); });
-}
-
-function sortBy(f, xs) {
-  return xs.sort(f);
-}
-
-function len(xs) {
-  return xs.length;
-}
-
-function takeWhile(f, xs) {
-  var result = [];
-  for (var i = 0; i < xs.length; i++) {
-    if (f(xs[i]))
-      result.push(xs[i]);
-    else
-      break;
   }
-  return result;
-}
-
-function dropWhile(f, xs) {
-  for (i = 0; i < xs.length; i++) {
-    if (!f(xs[i]))
-      break;
-  }
-  return xs.slice(i);
-}
-
-function span(f, xs) {
-  return [takeWhile(f, xs), dropWhile(f, xs)];
-}
-
-function eq(a) {
-  return function(b) {
-    return a[0] === b[0];
-  };
-}
-
-function fst(xs) {
-  return xs[0];
-}
-
-function rst(xs) {
-  return xs.slice(1,xs.length);
-}
-
-function equal(a) {
-  return function(b) {
-    return a === b;
-  };
-}
-
-function groupBy(eq, xs) {
-  var groups = [];
-  var spanned;
-  while (xs.length > 0) {
-    spanned = span(eq(xs[0]), xs.slice(1));
-    groups.push([xs[0]].concat(spanned[0]));
-    xs = spanned[1];
-  }
-  return groups;
 }
 
 function groupOps(ops) {
-  return groupBy(function (x) { return function(y) { return x === y; };}, ops.sort());
-}
-
-function unique(ops) {
-  return groupOps(ops).map(fst);
+  return _.groupBy(ops.sort(), _.isEqual);
 }
 
 function find(f, haystack) {
   for(var i = 0; i < haystack.length; i++) {
-    if (f(haystack[i]))
+    if (f(haystack[i])) {
       return i;
+    }
   }
   return false;
 }
@@ -139,10 +42,14 @@ function dict(pairs) {
 }
 
 function flatten(xs) {
-  if (!(xs instanceof Array))
+  if (!(xs instanceof Array)) {
     return xs;
-  if (xs.every(function (x) { return !(x instanceof Array); }))
+  }
+  if (xs.every(function (x) {
+    return !(x instanceof Array);
+  })) {
     return xs;
+  }
   return [].concat.apply([], xs);
 }
 
@@ -151,21 +58,6 @@ function extend(xs, ys) {
   return xs;
 }
 
-function difference(xs, ys) {
-  var difflist = groupOps(extend(xs, ys));
-  return difflist.filter(function (group) {
-    if (group.length > 1) {
-      return false;
-    }
-    return true;
-  }).map(fst);
-}
-
-/*
- * Problem:
- *  >> > >>^ <- longest one must be matched
- *  regex?
- */
 RegExp.escape= function(s) {
       return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
@@ -178,36 +70,20 @@ function operatorMatch(ops) {
   var reg = new RegExp(rstring);
   return function(x) {
     var matched = reg.exec(x);
-    if (matched[0])
+    if (matched[0]) {
       return matched[0];
-    else
+    }
+    else {
       return false;
+    }
   };
 }
 
-
-/*
-var print = console.log;
-
-var testOps = [">>", ">>&", ">", "aaaaa:", ">="];
-
-var matcher = operatorMatch(testOps);
-print(matcher(">="));
-*/
-
-module.exports = {compose : compose,
-          not  : not,
-          on  : on,
-          maxBy : maxBy,
-          len   : len,
-          groupOps : groupOps,
-          opMatch : operatorMatch,
-          dict: dict,
-          unique : unique,
-          fst : fst,
-          rst : rst,
-          eq: eq,
-          extend : extend,
-          flatten : flatten,
-          difference : difference,
-          empty : empty };
+module.exports = {
+  not  : not,
+  groupOps : groupOps,
+  opMatch : operatorMatch,
+  dict: dict,
+  extend : extend,
+  empty : empty,
+};

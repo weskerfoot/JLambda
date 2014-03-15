@@ -2,7 +2,8 @@
 
 var fs = require("fs");
 var typ = require("./representation.js");
-var tool = require("./tools.js");
+var $ = require("./tools.js");
+var _ = require("underscore");
 var tokenizer = require("./tokenize.js");
 var desugarer = require("./desugar.js");
 var pprint = require("./pprint.js");
@@ -166,7 +167,7 @@ function parseDefFunction(tokens) {
 }
 
 validLet = makeChecker(["Definition", "FunctionDefinition"]);
-letEnd = tool.compose(tool.not, makeChecker(["right_brace"]));
+letEnd = _.compose($.not, makeChecker(["right_brace"]));
 
 function parseLetForm(tokens, linenum, charnum) {
   if (!fst(tokens)) {
@@ -444,8 +445,8 @@ function parseLambda(tokens) {
 }
 
 var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_brace", "left_brace", "right_brace"];
-var validArgument = tool.compose(tool.not, makeChecker(invalidArguments));
-var validArgTypes = tool.compose(tool.not, makeChecker(["Definition"]));
+var validArgument = _.compose($.not, makeChecker(invalidArguments));
+var validArgTypes = _.compose($.not, makeChecker(["Definition"]));
 var validOperator = makeChecker(["identifier"]);
 
 /* Parses function application (either infix or prefix) */
@@ -576,7 +577,7 @@ function parse(tokens) {
   }
 }
 
-var istr = fs.readFileSync('/dev/stdin').toString();
+
 function parseFull(tokenized) {
   var ast = [];
   try {
@@ -595,11 +596,4 @@ module.exports = { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
                             }
                  };
-
-
-console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint).join("\n"));
-
-//console.log(tokenizer.tokenize(istr));
-//console.log(parseFull(tokenizer.tokenize(istr)));
-
-//module.exports = {parse : tool.compose(parseFull, tokenizer.tokenize) };
+//var istr = fs.readFileSync('/dev/stdin').toString();

@@ -1,5 +1,3 @@
-var tool = require("./tools.js");
-
 var Expression = {
 	display :
 		function() {
@@ -25,6 +23,7 @@ function Closure(bound_vars, free_vars, body, env) {
   this.free_vars = free_vars;
   this.body = body;
   this.env = env;
+  this.exprType = "Closure";
   return this;
 }
 

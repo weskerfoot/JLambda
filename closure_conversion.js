@@ -20,8 +20,9 @@ var errors = require("./errors.js");
 var parser = require("./parse.js");
 var pprint = require("./pprint.js");
 var $ = require("./tools.js");
+var _ = require("underscore");
 
-var notEmpty = $.compose($.not, $.eq([]));
+var notEmpty = _.compose($.not, _.partial(_.equal, []));
 
 function fvs(stx) {
   switch (stx.exprType) {
@@ -40,22 +41,22 @@ function fvs(stx) {
     case "Let":
       return [];
     case "Unary":
-      return $.flatten([stx.op.ident, fvs(stx.val)]);
+      return _.flatten([stx.op.ident, fvs(stx.val)]);
     case "Definition":
-      return $.flatten(fvs(stx.val));
+      return _.flatten(fvs(stx.val));
     case "Application":
-      var vs = $.flatten(fvs(stx.p));
-      var f_fvs = $.flatten(fvs(stx.func));
-      return $.flatten([vs, f_fvs]);
+      var vs = _.flatten(fvs(stx.p));
+      var f_fvs = _.flatten(fvs(stx.func));
+      return _.flatten([vs, f_fvs]);
     case "If":
       if (stx.elseexp) {
         var cond_fvs = fvs(stx.condition);
         var then_fvs = fvs(stx.thenexp);
         var else_fvs = fvs(stx.elseexp);
-        return $.flatten([cond_fvs, then_fvs, else_fvs]);
+        return _.flatten([cond_fvs, then_fvs, else_fvs]);
       }
       else {
-        return $.flatten([fvs(stx.condition), fvs(stx.thenexp)]);
+        return _.flatten([fvs(stx.condition), fvs(stx.thenexp)]);
       }
       break;
     case "Name":
@@ -89,15 +90,15 @@ function closure_convert(stx) {
          });
       var let_fvs = stx.pairs.map(fvs);
       var body_fvs = fvs(stx.body);
-      variables = $.flatten(let_fvs);
-      $.extend(variables, $.flatten(body_fvs));
+      variables = _.flatten(let_fvs);
+      $.extend(variables, _.flatten(body_fvs));
       break;
     case "Function":
       bound_vars = [stx.p.ident,];
       variables = fvs(stx.body);
       break;
   }
-  free_variables = $.difference($.unique(variables), bound_vars);
+  free_variables = _.difference(_.uniq(variables), bound_vars);
   return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
@@ -141,15 +142,14 @@ function closure_convert_all(stx) {
 }
 
 
-//var ast = parser.parse("let { c = trtr a = let {tttt = (rtertret^yyyy) } let { dfsdf = let { asdsd = 3434 } gdfgdfg } (45+(asdddy*uyuy))  q = ((lambda x y -> (x+y)) 4 ui) } (^ wat (a+(ar*b*c^twerp+\"sdfdsfsdfsdfsdf\")*rtcccc))")[0];
-//var ast = parser.parse("let { a = let { b = let {dsdfgf = sddd } fdgfg } gggggg } t")[0];
-//console.log(pprint.pprint(ast));
-//var ast = parser.parse("let { a = 12 b = (a + t) } (a + b * d)")[0];
-//console.log(fvs(ast));
-//var ast = parser.parse("((lambda a b c -> (+ a b c)) 2 3.0 4)");
-//var ast = parser.parse("def (f a b c) 12")[0];
-//console.log(JSON.stringify(ast, null, 4));
-//console.log(pprint.pprint(ast));
-var ast = parser.parse("(lambda a -> if true then ((lambda b -> (+ a b)) q))")[0];
-console.log(JSON.stringify(closure_convert_all(ast), null, 4));
-//console.log(pprint.pprint(ast));
+function test(src) {
+  var ast = parser.parse(src)[0];
+  console.log(JSON.stringify(closure_convert_all(ast), null, 4));
+}
+
+test("(lambda a -> (+ a b c))");
+
+module.export = {
+  test : test,
+  closureConvert : closure_convert_all
+};

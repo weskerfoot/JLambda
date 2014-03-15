@@ -1,9 +1,10 @@
 #!  /usr/bin/node
 
 var rep = require("./representation.js");
-var tools = require("./tools.js");
+var $ = require("./tools.js");
 var error = require("./errors.js");
 var operators = Object.keys(rep.OPInfo);
+var _ = require("underscore");
 
 function isDigit(a) {
   if (!a)
@@ -337,25 +338,31 @@ function tokenize(tokstream, matchop) {
   return tokens;
 }
 
-function tokenizeHelp(input, matchop) {
+function tokenizeHelp(input, matchop, strip_whitespace) {
   try {
     return tokenize(input, matchop).reverse().filter(function(x) {
-      return x[0] !== "whitespace";
+      if (strip_whitespace) {
+        return x[0] !== "whitespace";
+      }
+      else {
+        return true;
+      }
     });
   } catch (e) {
     console.log(e.stxerror());
     process.exit(1);
   }
 }
+
 var defop_pattern = ["defop", "integer", "identifier",
                      "left_paren", "identifier",
                      "identifier", "identifier", "right_paren"];
 
 function tokenizeFull(input) {
-  var matchop = tools.opMatch(operators);
-  var initialPass = tokenizeHelp(input, matchop).reverse();
+  var matchop = $.opMatch(operators);
+  var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
   for (var i = 0; i < initialPass.length; i++) {
-    if (initialPass.slice(i, i+8).map(tools.fst).every(
+    if (initialPass.slice(i, i+8).map(_.first).every(
          function(x, i) {
            return x === defop_pattern[i];
          })) {
@@ -365,9 +372,8 @@ function tokenizeFull(input) {
 
   }
   operators = Object.keys(rep.OPInfo);
-  matchop = tools.opMatch(operators);
-  return tokenizeHelp(input, matchop);
+  matchop = $.opMatch(operators);
+  return tokenizeHelp(input, matchop, true);
 }
-
 
 module.exports = {tokenize : tokenizeFull};

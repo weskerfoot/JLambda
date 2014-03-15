@@ -5,7 +5,7 @@
  */
 
 var typ = require("./representation.js");
-var $ = require("./tools.js");
+var _ = require("underscore");
 
 // Lists get desugared to nested function calls
 // i.e. (cons (cons (cons ...)))
@@ -27,12 +27,12 @@ function desugarDefFunc(def) {
 }
 
 function curryFunc(ps, body) {
-  if ($.empty(ps)) {
+  if (_.isEmpty(ps)) {
     return desugar(body);
   }
   else {
-    return new typ.FuncT(desugar($.fst(ps)),
-                         curryFunc($.rst(ps), body));
+    return new typ.FuncT(desugar(_.first(ps)),
+                         curryFunc(_.rest(ps), body));
   }
 }
 
