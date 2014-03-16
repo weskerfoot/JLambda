@@ -1,5 +1,4 @@
 var _ = require("underscore");
-var example = require("./failing.js");
 
 function empty(xs) {
   return _.size(xs) < 1;
@@ -55,7 +54,7 @@ RegExp.escape= function(s) {
 function operatorMatch(ops) {
   ops = _.filter(ops,
                  function (op) {
-                   return op.replace(/ /g,'').length > 1;
+                   return op.length > 0;
                  });
   var rstring = ops.sort(min).reduce(
   function(acc, x) {

@@ -97,6 +97,9 @@ function extendProp(pair) {
   return x.length + y.length === extended.length;
 }
 
+/* Tokenizer tests */
+
+
 function toolsTests() {
   assert.equal(true, tools.empty([]));
   assert.equal(true, qc.forAll(dictProp, arbArrayofPairs));
