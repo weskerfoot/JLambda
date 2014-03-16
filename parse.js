@@ -454,8 +454,9 @@ function computeApp(tokens, charnum, linenum) {
   var lhs = parse(tokens);
   var next;
   var result;
-	if (fst(tokens))
+	if (fst(tokens)) {
 		next = fst(tokens);
+  }
 	else {
 		throw error.JSyntaxError(linenum,
                              charnum,
@@ -476,13 +477,18 @@ function computeApp(tokens, charnum, linenum) {
 	}
 	else {
 		/* it's a prefix application */
-
-		var parameters = parseMany(parse,
+    var parameters;
+		if (fst(tokens)[0] !== "right_paren") {
+      parameters = parseMany(parse,
                                validArgTypes,
                                validArgument,
                                tokens,
                                charnum,
                                linenum);
+    }
+    else {
+      parameters = [];
+    }
 		if ((!fst(tokens)) || fst(tokens)[0] !== "right_paren") {
 			throw error.JSyntaxError(linenum,
                                charnum,
