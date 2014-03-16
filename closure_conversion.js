@@ -147,8 +147,6 @@ function test(src) {
   console.log(JSON.stringify(closure_convert_all(ast), null, 4));
 }
 
-test("(lambda a -> (+ a b c))");
-
 module.export = {
   test : test,
   closureConvert : closure_convert_all

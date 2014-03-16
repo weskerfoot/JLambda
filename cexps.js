@@ -102,7 +102,7 @@ var lessoreq = Primop("<=");
 var greatthan = Primop(">");
 var greatoreq = Primop(">=");
 var bang = Primop("!");
-var subscript = Protoype("subscript");
+var subscript = Primop("subscript");
 var ordof = Primop("ordof");
 var assign = Primop(":=");
 var unboxedassign = Primop("unboxedassign");

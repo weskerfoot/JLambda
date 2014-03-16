@@ -41,21 +41,10 @@ function dict(pairs) {
   return o;
 }
 
-function flatten(xs) {
-  if (!(xs instanceof Array)) {
-    return xs;
-  }
-  if (xs.every(function (x) {
-    return !(x instanceof Array);
-  })) {
-    return xs;
-  }
-  return [].concat.apply([], xs);
-}
-
 function extend(xs, ys) {
-  xs.push.apply(xs, ys);
-  return xs;
+  var result = _.clone(xs);
+  result.push.apply(result, ys);
+  return result;
 }
 
 RegExp.escape= function(s) {
