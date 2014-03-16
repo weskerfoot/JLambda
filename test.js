@@ -20,6 +20,15 @@ function arbArray(gen) {
   return qc.arbArray(gen);
 }
 
+function arbArrays(gen) {
+  return function() {
+    return qc.arbArray(
+    function () {
+      return qc.arbArray(gen);
+    })
+  };
+}
+
 
 function arbPair(gen) {
   return function() {
@@ -48,9 +57,30 @@ function emptyProp(xs) {
 
 function dictProp(pairs) {
   var dict = tools.dict(pairs);
-  return _.map(pairs,
+  var result = _.map(pairs,
          function(pair) {
-           dict[pair[0]] === pair[1];
+           if  ((_.size(pair) < 2) ||
+               (_.size(pair[0]) < 1) ||
+               (_.size(pair[1]) < 1)) {
+                 return true;
+               }
+           return dict[pair[0]] === pair[1];
+         });
+  if (_.every(result, _.identity)) {
+    return true;
+  }
+  return false;
+}
+
+function opMatchProp(strings) {
+  console.log(typeof strings);
+  if (strings.length < 1) {
+    return true;
+  }
+  var match = tools.opMatch(strings);
+  return _.map(strings,
+         function(str) {
+           return match(str);
          });
 }
 
@@ -70,6 +100,7 @@ function toolsTests() {
   assert.equal(true, tools.empty([]));
   assert.equal(true, qc.forAll(dictProp, arbArrayofPairs));
   assert.equal(true, qc.forAll(extendProp, arbPairs));
+  assert.equal(true, qc.forAll(opMatchProp, arbArrays(qc.arbString)));
 }
 
 
