@@ -18,12 +18,37 @@ var Expression = {
 		}
 };
 
+function Closure(bound_vars, free_vars, body, env) {
+  this.bound_vars = bound_vars;
+  this.free_vars = free_vars;
+  this.body = body;
+  this.env = env;
+  this.exprType = "Closure";
+  return this;
+}
+
+function LetExp(pairs, body) {
+  if (!pairs.every(function(x) {
+    return (x.exprType === "Definition" ||
+            x.exprType === "FunctionDefinition");
+  })) {
+    throw "let can only be used to bind things to names or functions";
+  }
+  this.exprType = "Let";
+  this.val = [pairs, body];
+  this.pairs = pairs;
+  this.body = body;
+  return this;
+}
+LetExp.prototype = Expression;
+
 function UnaryOp(op, v) {
   this.exprType = "Unary";
   this.val = v;
   this.op = op;
   return this;
 }
+UnaryOp.prototype = Expression;
 
 function IntT(v) {
 	this.exprType = "Integer";
@@ -138,6 +163,17 @@ function If(condition, thenexp, elseexp) {
 	return this;
 }
 
+function TypeVar(name) {
+  this.name = name;
+  return this;
+}
+
+function TypeOp(name, params, body) {
+  this.name = name;
+  this.params = params;
+  this.body = body;
+  return this;
+}
 
 //convenience function to construct binary operators
 //assumes that the identifier refers to the name of a primitive
@@ -159,38 +195,59 @@ function makeApp(name, parameters) {
 
 }
 
+function makeGensym() {
+  var n = 0;
+  return function() {
+    var x = "G"+n;
+    n = n + 1;
+    return x;
+  };
+}
+
+var gensym = makeGensym();
+
 OPInfo = {"+" : [3, "Left"],
-		  "-" : [3, "Left"],
-		  "*" : [4, "Left"],
-		  "/" : [4, "Left"],
-		  "^" : [5, "Right"],
-      "++" : [3, "Left"],
-      "==" : [2, "Left"],
-      ">" : [2, "Left"],
-      ">=" : [2, "Left"],
-      "<" : [2, "Left"],
-      "<=" : [2, "Left"],
-      ":" : [2, "Left"],
-      "$" : [1, "Left"],
-      ">>" : [1, "Left"],
-      ">>=" : [1, "Left"],
-      "<$>" : [1, "Left"],
-      "." : [1, "Left"]}
+         "-" :  [3, "Left"],
+         "*" :  [4, "Left"],
+         "/" :  [4, "Left"],
+         "^" :  [5, "Right"],
+          "++" : [3, "Left"],
+          "==" : [2, "Left"],
+          ">" :  [2, "Left"],
+          ">=" : [2, "Left"],
+          "<" :  [2, "Left"],
+          "<=" : [2, "Left"],
+          "&&" : [2, "Left"],
+          "||" : [2, "Left"],
+          "::" : [2, "Left"],
+          ":" : [1, "Left"],
+          "$" : [1, "Left"],
+          ">>" : [1, "Left"],
+          ">>=" : [1, "Left"],
+          "<$>" : [1, "Left"],
+          "." : [1, "Left"],
+          "," : [1, "Left"]};
 
 module.exports =
    { IntT   : IntT,
-	 FloatT : FloatT,
-	 StrT   : StrT,
-	 BoolT  : BoolT,
-	 ListT  : ListT,
-	 FuncT  : FuncT,
-	 App    : App,
-	 Name   : Name,
-	 Def	: Def,
-	 OpT 	: OpT,
-	 OPInfo : OPInfo,
-	 makeApp : makeApp,
-	 If      : If,
+  FloatT : FloatT,
+  StrT   : StrT,
+  BoolT  : BoolT,
+  ListT  : ListT,
+  FuncT  : FuncT,
+  App    : App,
+  Name   : Name,
+  Def    : Def,
+  OpT   : OpT,
+  OPInfo : OPInfo,
+  makeApp : makeApp,
+  If      : If,
    DefFunc : DefFunc,
    UnaryOp : UnaryOp,
-   Nil : Nil }
+   Nil : Nil,
+   LetExp : LetExp,
+   gensym : gensym,
+   TypeVar : TypeVar,
+   TypeOp : TypeOp,
+   Closure : Closure
+   };

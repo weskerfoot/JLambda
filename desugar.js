@@ -5,6 +5,7 @@
  */
 
 var typ = require("./representation.js");
+var _ = require("underscore");
 
 // Lists get desugared to nested function calls
 // i.e. (cons (cons (cons ...)))
@@ -20,14 +21,29 @@ function desugarList(lst) {
 }
 
 function desugarDefFunc(def) {
-  return new typ.Def(def.ident, new typ.FuncT(desugar(def.params), desugar(def.body)));
+  return new typ.Def(def.ident,
+                     curryFunc(def.params,
+                               def.body));
 }
 
-//function desugarString(str) {
+function curryFunc(ps, body) {
+  if (_.isEmpty(ps)) {
+    return desugar(body);
+  }
+  else {
+    return new typ.FuncT(desugar(_.first(ps)),
+                         curryFunc(_.rest(ps), body));
+  }
+}
 
+
+function desugarLet(stx) {
+  var values = stx.pairs.map(desugar);
+  return new typ.LetExp(values, desugar(stx.body));
+}
 
 function desugar(stx) {
-  switch (stx.exprType) {
+ switch (stx.exprType) {
     case "If":
       if (stx.elseexp)
         return new typ.If(desugar(stx.condition), desugar(stx.thenexp), desugar(stx.elseexp));
@@ -48,7 +64,7 @@ function desugar(stx) {
         return new typ.App(desugar(stx.func), desugar(stx.p));
       return new typ.App(stx.func);
     case "Function":
-      return new typ.FuncT(stx.p, desugar(stx.body));
+      return curryFunc(stx.p, stx.body);
     case "List":
       return desugarList(stx);
     case "Bool":
@@ -59,6 +75,8 @@ function desugar(stx) {
       return stx;
     case "Integer":
       return stx;
+    case "Let":
+      return desugarLet(stx);
     default:
       return stx;
   }
