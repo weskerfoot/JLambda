@@ -411,6 +411,11 @@ function parseIf(tokens) {
 
 			if (fst(tokens) && fst(tokens)[0] === "elsexp") {
 				tokens.pop();
+        if (_.size(tokens) < 1) {
+          throw error.JSyntaxError(linenum,
+                                   charnum,
+                                   "Unexpected end of source");
+        }
 				var elseC = parse(tokens);
 				return new typ.If(ifC, thenC, elseC);
 
