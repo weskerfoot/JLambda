@@ -157,8 +157,7 @@ function DefFunc(ident, params, body) {
 function If(condition, thenexp, elseexp) {
 	this.condition = condition;
 	this.thenexp = thenexp;
-  if (elseexp)
-		this.elseexp = elseexp;
+	this.elseexp = elseexp;
 	this.exprType = "If";
 	return this;
 }

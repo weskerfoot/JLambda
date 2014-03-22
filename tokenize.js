@@ -215,7 +215,7 @@ function tokenize(tokstream, matchop) {
       case 45: // '-'
         lambda = peek(tokstream, "arrow", "->");
         if (lambda) {
-          tokens.push(lambda);
+          tokens.push($.extend(lambda, [charnum, linenum]));
           tokstream = tokstream.substr(2);
           break;
         }
@@ -242,7 +242,7 @@ function tokenize(tokstream, matchop) {
       case 116: // 't'
         result = tokenizeT(tokstream);
         if (result) {
-          tokens.push(result);
+          tokens.push($.extend(result, [charnum, linenum]));
           tokstream = tokstream.substr(4); // 4 = length of either token
           break;
         }
@@ -250,13 +250,13 @@ function tokenize(tokstream, matchop) {
       case 105: // 'i'
         var ifexp = peek(tokstream, "ifexp", "if");
         if (ifexp) {
-          tokens.push(ifexp);
+          tokens.push($.extend(ifexp, [linenum, charnum]));
           tokstream = tokstream.substr(2);
           break;
         }
         var inkeyword = peek(tokstream, "in", "in ");
         if (inkeyword) {
-          tokens.push(inkeyword);
+          tokens.push($.extend(inkeyword, [charnum, linenum]));
           tokstream = tokstream.substr(3);
           break;
         }
@@ -279,7 +279,7 @@ function tokenize(tokstream, matchop) {
       case 101: // e
         result = peek(tokstream, "elsexp", "else");
         if (result) {
-          tokens.push(result);
+          tokens.push($.extend(result, [charnum, linenum]));
           tokstream = tokstream.substr(4);
           break;
         }
@@ -287,7 +287,7 @@ function tokenize(tokstream, matchop) {
       case 102: // f
         result = peek(tokstream, "falselit", "false");
         if (result) {
-          tokens.push(result);
+          tokens.push($.extend(result, [charnum, linenum]));
           tokstream = tokstream.substr(5);
           break;
         }
@@ -295,13 +295,13 @@ function tokenize(tokstream, matchop) {
       case 108: // l
         lambda = peek(tokstream, "lambda", "lambda");
         if (lambda) {
-          tokens.push(lambda);
+          tokens.push($.extend(lambda, [linenum, charnum]));
           tokstream = tokstream.substr(6);
           break;
         }
         var letexp = peek(tokstream, "let", "let");
         if (letexp) {
-          tokens.push(letexp);
+          tokens.push($.extend(letexp, [charnum, linenum]));
           tokstream = tokstream.substr(3);
           break;
         }
