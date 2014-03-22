@@ -1,5 +1,4 @@
 #! /usr/bin/node
-
 var fs = require("fs");
 var typ = require("./representation.js");
 var $ = require("./tools.js");
@@ -401,10 +400,11 @@ function parseIf(tokens) {
 	}
 	else {
 		var ifC = parse(tokens);
-		if (!fst(tokens) || fst(tokens)[0] !== "thenexp")
+		if (!fst(tokens) || fst(tokens)[0] !== "thenexp") {
 			throw error.JSyntaxError(fst(tokens)[3],
                                fst(tokens)[2],
                                "if ``exp'' must be folowed by ``then'' exp, not "+snd(tokens)[0]);
+    }
 		else {
 			tokens.pop();
 			var thenC = parse(tokens);
@@ -416,15 +416,18 @@ function parseIf(tokens) {
                                    charnum,
                                    "Unexpected end of source");
         }
+      else {
 				var elseC = parse(tokens);
 				return new typ.If(ifC, thenC, elseC);
-
-			}
-			else {
-				return new typ.If(ifC, thenC);
-			}
-		}
-	}
+        }
+      }
+      else {
+        throw error.JSyntaxError(linenum,
+                                 charnum,
+                                 "If expression must include an else variant");
+      }
+    }
+  }
 }
 
 
