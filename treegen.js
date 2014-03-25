@@ -10,10 +10,11 @@ var qc = require("quickcheck");
 function arbIdentifier() {
     var st = qc.arbString()
     if (lex.isIdentifier(st)) {
-      return st;
+      return new repr.Name(st);
     }
     else {
       return arbIdentifier();
     }
 }
 
+console.log(arbIdentifier());

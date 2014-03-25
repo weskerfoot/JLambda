@@ -10,6 +10,9 @@ function isDigit(a) {
   if (!a)
     return false;
   var code = a.charCodeAt();
+  if (isNaN(code)) {
+    return false;
+  }
   return (46 < code &&
           code < 58 ||
           code < 58 &&
@@ -21,6 +24,9 @@ function isWhitespace(a) {
     return true;
 
   var code = a.charCodeAt();
+  if (isNaN(code)) {
+    return false;
+  }
   return (code === 9 ||
           code === 32 ||
           code === 10 ||
@@ -30,7 +36,8 @@ function isWhitespace(a) {
 
 function isIdentifier(a) {
   var code = a.charCodeAt();
-  return (code !== 41 &&
+  return (!isNaN(code) &&
+          code !== 41 &&
           code !== 40 &&
           code !== 125 &&
           code !== 123 &&
