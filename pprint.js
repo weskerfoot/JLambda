@@ -4,9 +4,9 @@ function pprintName(ident) {
 
 function pprintFunc(func) {
   if (func.p.exprType === "Name")
-    return "(\\ " + pprint(func.p) + " -> " + pprint(func.body) + ")";
+    return "(lambda " + pprint(func.p) + " -> " + pprint(func.body) + ")";
   else
-    return "(\\ " + func.p.map(pprint).join(" ") + " -> " + pprint(func.body) + ")";
+    return "(lambda " + func.p.map(pprint).join(" ") + " -> " + pprint(func.body) + ")";
 
 }
 
@@ -21,10 +21,9 @@ function pprintDef(def) {
 }
 
 function pprintIf(ifexp) {
-  if (ifexp.elseexp)
-    return "(if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + " else " + pprint(ifexp.elseexp) + ")";
-  else
-    return "(if " + pprint(ifexp.condition) + " then " + pprint(ifexp.thenexp) + ")";
+  return ("(if " + pprint(ifexp.condition) +
+         " then " + pprint(ifexp.thenexp) +
+         " else " + pprint(ifexp.elseexp) + ")");
 }
 
 function pprint(expr) {

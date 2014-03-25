@@ -10,7 +10,10 @@ function isDigit(a) {
   if (!a)
     return false;
   var code = a.charCodeAt();
-  return (46 < code && code < 58 || code < 58 && code > 46);
+  return (46 < code &&
+          code < 58 ||
+          code < 58 &&
+          code > 46);
 }
 
 function isWhitespace(a) {
@@ -18,12 +21,22 @@ function isWhitespace(a) {
     return true;
 
   var code = a.charCodeAt();
-  return (code === 9 || code === 32 || code === 10 || code === 13 || code === 11);
+  return (code === 9 ||
+          code === 32 ||
+          code === 10 ||
+          code === 13 ||
+          code === 11);
 }
 
 function isIdentifier(a) {
   var code = a.charCodeAt();
-  return code !== 41 && code !== 40 && code && 125 && code && 123 && code !== 93 && code !== 91 && code !== 44;
+  return (code !== 41 &&
+          code !== 40 &&
+          code !== 125 &&
+          code !== 123 &&
+          code !== 93 &&
+          code !== 91 &&
+          code !== 44);
 }
 
 function tokenizeNum(tokstream, charnum, linenum) {
@@ -376,4 +389,5 @@ function tokenizeFull(input) {
   return tokenizeHelp(input, matchop, true);
 }
 
-module.exports = {tokenize : tokenizeFull};
+module.exports = {tokenize : tokenizeFull,
+                  isIdentifier : isIdentifier};

@@ -147,6 +147,8 @@ function test(src) {
   console.log(JSON.stringify(closure_convert_all(ast), null, 4));
 }
 
+console.log(pprint.pprint(parser.parse(pprint.pprint(parser.parse("if something then if a then if b then c else d else rtrrt else some_other_thing")[0]))[0]));
+
 module.export = {
   test : test,
   closureConvert : closure_convert_all
