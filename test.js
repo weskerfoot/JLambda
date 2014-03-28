@@ -29,12 +29,23 @@ function arbIdentifier(construct) {
   }
 }
 
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function arbCapital() {
+  return String.fromCharCode(randomInt(65, 90));
+}
+
 function arbName() {
   return arbIdentifier(representation.Name);
 }
 
 function arbTypeOp() {
-  return arbIdentifier(representation.TypeOp);
+  var result = arbIdentifier(representation.TypeOp);
+  result.name = arbCapital()+result.name;
+  result.val = result.name;
+  return result;
 }
 
 function arbArray(gen) {
