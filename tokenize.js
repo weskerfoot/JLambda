@@ -43,7 +43,9 @@ function isIdentifier(c) {
           code !== 123 &&
           code !== 93 &&
           code !== 91 &&
-          code !== 44);
+          code !== 44 &&
+          code !== 34 &&
+          code > 32);
 }
 
 function isUpper(c) {

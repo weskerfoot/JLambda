@@ -35,15 +35,22 @@ function arbChar(max, min) {
 function arbCharRanges(ranges, max) {
   return function() {
     return _.flatten(
-      _.map(ranges,
+      _.shuffle(
+       _.map(ranges,
         function(bound) {
-          return arbChars(max, bound[0], bound[1])();
-        })).join("");
+          return _.sample(arbChars(max, bound[0], bound[1])(),
+                                   bound[1] - bound[0]);
+        }))).join("");
   };
 }
 
 
-
+var arbName = arbCharRanges([[33, 33],
+                             [35, 39],
+                             [42,43],
+                             [45, 122],
+                             [124, 126]],
+                             200);
 
 var arbCapital = arbChar(65, 90);
 
@@ -138,5 +145,5 @@ function toolsTests() {
   //assert.equal(true, qc.forAll(opMatchProp, arbStrings));
 }
 
-
+console.log(arbName());
 //toolsTests();
