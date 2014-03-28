@@ -2,7 +2,7 @@
  * A closure is a triple of:
  *  the bound variables in a function or let
  *  the free variables in a function or let
- *  a function body or let body and bound values
+ *  a function body or let body and bound values (if it is an escaping closure only)
  * The closure has the property that all of the free variables of the function or let
  * are in the environment, or an exception is raised because the variable is not bound
  * in the current environment.
@@ -12,6 +12,10 @@
  * call the function with the environment associated with it.
  * For the purposes of type checking it does not matter how the function gets called, the environment
  * is only used for looking up the types of names. Formal parameters are given type variables.
+ *
+ * The first phase of closure conversion is not really closure conversion exactly.
+ * All it does is find out the free variables in scope and tie those up into a data structure with their types later.
+ * The second phase will be done to the CPS language and closures will actually lambda-lifted out potentially.
  */
 
 var rep = require("./representation.js");
@@ -102,7 +106,7 @@ function closure_convert(stx) {
   return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
-function closure_convert_all(stx) {
+function closure_convert_all(stx, env) {
   var closure;
   switch (stx.exprType) {
     case "Let":
@@ -147,6 +151,8 @@ function test(src) {
   console.log(JSON.stringify(closure_convert_all(ast), null, 4));
 }
 
+//console.log(test(pprint.pprint(parser.parse(pprint.pprint(parser.parse("if something then if a then if b then c else d else rtrrt else some_other_thing")[0]))[0])));
+//console.log(pprint.pprint(parser.parse("def main (print let { a = def {f = (lambda a b -> (a+b))} f} (a 2 3))")[0]));
 module.export = {
   test : test,
   closureConvert : closure_convert_all

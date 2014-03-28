@@ -553,27 +553,40 @@ function parse(tokens) {
 	}
 	var token = fst(tokens)[1];
 	tokens.pop();
-	if (toktype === "stringlit")
+	if (toktype === "stringlit") {
 		return new typ.StrT(token);
-  else if (toktype === "left_square")
+  }
+  else if (toktype === "left_square") {
     return parseList(tokens);
-	else if (toktype === "lambda")
+  }
+	else if (toktype === "lambda") {
 		return parseLambda(tokens);
-	else if (toktype === "integer")
+  }
+	else if (toktype === "integer") {
 		return new typ.IntT(token);
-	else if (toktype === "float")
+  }
+	else if (toktype === "float") {
 		return new typ.FloatT(token);
-	else if (toktype === "identifier")
+  }
+	else if (toktype === "identifier") {
     return new typ.Name(token);
-	else if (toktype === "truelit" || toktype === "falselit")
+  }
+  else if (toktype === "constructor") {
+    return new typ.TypeOp(token);
+  }
+	else if (toktype === "truelit" || toktype === "falselit") {
 		return new typ.BoolT(token);
+  }
 	else if (toktype === "def" ||
-           toktype === "let")
+           toktype === "let") {
 		return parseDef(tokens, fst(tokens)[3], fst(tokens)[2]);
-  else if (toktype === "defop")
+  }
+  else if (toktype === "defop") {
     return parseDefOp(tokens, fst(tokens)[3], fst(tokens)[2]);
-	else if (toktype === "ifexp")
+  }
+	else if (toktype === "ifexp") {
 		return parseIf(tokens);
+  }
 	else if (toktype === "left_paren") {
 		if (fst(tokens)[0] === "lambda") {
       tokens.pop();
@@ -610,4 +623,5 @@ module.exports = { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
                             }
                  };
-//var istr = fs.readFileSync('/dev/stdin').toString();
+/*var istr = fs.readFileSync('/dev/stdin').toString();
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));*/
