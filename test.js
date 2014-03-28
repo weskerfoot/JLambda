@@ -9,6 +9,7 @@ var errors = require("./errors.js");
 var tokens = require("./tokenize.js");
 var tools = require("./tools.js");
 var typecheck = require("./typecheck.js");
+var representation = require("./representation.js");
 var _ = require("underscore");
 
 var qc = require("quickcheck");
@@ -16,6 +17,43 @@ var assert = require("assert");
 
 
 /* my own generators */
+
+function arbChars(n, max, min) {
+  return function () {
+    return _.invoke(_.times(_.random(1, n),
+                   _.partial(arbChar, max, min)),
+                    "call");
+  };
+}
+
+function arbChar(max, min) {
+  return function() {
+    return String.fromCharCode(_.random(max, min));
+  };
+}
+
+function arbCharRanges(ranges, max) {
+  return function() {
+    return _.flatten(
+      _.shuffle(
+       _.map(ranges,
+        function(bound) {
+          return _.sample(arbChars(max, bound[0], bound[1])(),
+                                   bound[1] - bound[0]);
+        }))).join("");
+  };
+}
+
+
+var arbName = arbCharRanges([[33, 33],
+                             [35, 39],
+                             [42,43],
+                             [45, 122],
+                             [124, 126]],
+                             200);
+
+var arbCapital = arbChar(65, 90);
+
 function arbArray(gen) {
   return qc.arbArray(gen);
 }
@@ -107,5 +145,5 @@ function toolsTests() {
   //assert.equal(true, qc.forAll(opMatchProp, arbStrings));
 }
 
-
-toolsTests();
+console.log(arbName());
+//toolsTests();

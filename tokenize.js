@@ -43,7 +43,9 @@ function isIdentifier(c) {
           code !== 123 &&
           code !== 93 &&
           code !== 91 &&
-          code !== 44);
+          code !== 44 &&
+          code !== 34 &&
+          code > 32);
 }
 
 function isUpper(c) {
@@ -422,7 +424,6 @@ function tokenizeFull(input) {
   matchop = $.opMatch(operators);
   return tokenizeHelp(input, matchop, true);
 }
-
 
 module.exports = {tokenize : tokenizeFull,
                   isIdentifier : isIdentifier};
