@@ -20,6 +20,18 @@ function min(a, b) {
   }
 }
 
+function max(a, b) {
+  if (a > b) {
+    return 1;
+  }
+  else if (a < b) {
+    return -1;
+  }
+  else {
+    return 0;
+  }
+}
+
 function groupOps(ops) {
   return _.groupBy(ops.sort(), _.isEqual);
 }
@@ -56,7 +68,8 @@ function operatorMatch(ops) {
                  function (op) {
                    return op.length > 0;
                  });
-  var rstring = ops.sort(min).reduce(
+  ops.sort(min);
+  var rstring = ops.reduce(
   function(acc, x) {
     if (!x || x.length < 1) {
       return "";

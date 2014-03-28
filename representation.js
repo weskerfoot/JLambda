@@ -164,13 +164,14 @@ function If(condition, thenexp, elseexp) {
 
 function TypeVar(name) {
   this.name = name;
+  this.exprType = "TypeVariable";
   return this;
 }
 
-function TypeOp(name, params, body) {
+function TypeOp(name) {
   this.name = name;
-  this.params = params;
-  this.body = body;
+  this.val = name;
+  this.exprType = "TypeOperator"
   return this;
 }
 
@@ -205,27 +206,28 @@ function makeGensym() {
 
 var gensym = makeGensym();
 
-OPInfo = {"+" : [3, "Left"],
-         "-" :  [3, "Left"],
-         "*" :  [4, "Left"],
-         "/" :  [4, "Left"],
-         "^" :  [5, "Right"],
-          "++" : [3, "Left"],
-          "==" : [2, "Left"],
-          ">" :  [2, "Left"],
-          ">=" : [2, "Left"],
-          "<" :  [2, "Left"],
-          "<=" : [2, "Left"],
-          "&&" : [2, "Left"],
-          "||" : [2, "Left"],
-          "::" : [2, "Left"],
-          ":" : [1, "Left"],
-          "$" : [1, "Left"],
-          ">>" : [1, "Left"],
-          ">>=" : [1, "Left"],
-          "<$>" : [1, "Left"],
-          "." : [1, "Left"],
-          "," : [1, "Left"]};
+OPInfo = {"+" : [4, "Left"],
+         "-" :  [4, "Left"],
+         "*" :  [5, "Left"],
+         "/" :  [5, "Left"],
+         "^" :  [6, "Right"],
+          "++" : [4, "Left"],
+          "==" : [3, "Left"],
+          ">" :  [3, "Left"],
+          ">=" : [3, "Left"],
+          "<" :  [3, "Left"],
+          "<=" : [3, "Left"],
+          "&&" : [3, "Left"],
+          "||" : [3, "Left"],
+          "::" : [1, "Left"],
+          ":" : [2, "Left"],
+          "$" : [2, "Left"],
+          ">>" : [2, "Left"],
+          ">>=" : [2, "Left"],
+          "<$>" : [2, "Left"],
+          "." : [2, "Left"],
+          "," : [2, "Left"],
+          "->" : [2, "Right"]}
 
 module.exports =
    { IntT   : IntT,

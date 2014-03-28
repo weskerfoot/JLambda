@@ -27,38 +27,56 @@ function pprintIf(ifexp) {
 }
 
 function pprint(expr) {
-  if (expr.exprType === "Name")
+  if (expr.exprType === "Name") {
     return expr.val;
-  else if (expr.exprType === "Bool")
-    if (expr.val)
+  }
+  else if (expr.exprType === "TypeOperator") {
+    return expr.val;
+  }
+  else if (expr.exprType === "Bool") {
+    if (expr.val) {
       return "True";
-    else
+    }
+    else {
       return "False";
-  else if (expr.exprType === "Integer")
+    }
+  }
+  else if (expr.exprType === "Integer") {
     return "("+expr.val+")";
-  else if (expr.exprType === "Float")
+  }
+  else if (expr.exprType === "Float") {
     return "("+expr.val+")";
-  else if (expr.exprType === "String")
+  }
+  else if (expr.exprType === "String") {
     return '"'+expr.val+'"';
-  else if (expr.exprType === "Name")
+  }
+  else if (expr.exprType === "Name") {
     return expr.val;
-  else if (expr.exprType === "Application")
+  }
+  else if (expr.exprType === "Application") {
     return pprintApp(expr);
-  else if (expr.exprType === "Definition")
+  }
+  else if (expr.exprType === "Definition") {
     return pprintDef(expr);
-  else if (expr.exprType === "If")
+  }
+  else if (expr.exprType === "If") {
     return pprintIf(expr);
-  else if (expr.exprType === "Function")
+  }
+  else if (expr.exprType === "Function") {
     return pprintFunc(expr);
-  else if (expr.exprType === "Nil")
+  }
+  else if (expr.exprType === "Nil") {
     return "[]";
-  else if (expr.exprType === "Unary")
+  }
+  else if (expr.exprType === "Unary") {
     return "("+expr.op.ident+" "+pprint(expr.val)+")";
-  else if (expr.exprType === "Let")
+  }
+  else if (expr.exprType === "Let") {
     return "let {" + expr.pairs.map(
           function (v) {
             return pprint(v);
           }).join(" ; ") + "} in " + pprint(expr.body);
+  }
 }
 
 module.exports = {pprint : pprint};

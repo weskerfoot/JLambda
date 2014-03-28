@@ -6,10 +6,10 @@ var error = require("./errors.js");
 var operators = Object.keys(rep.OPInfo);
 var _ = require("underscore");
 
-function isDigit(a) {
-  if (!a)
+function isDigit(c) {
+  if (!c)
     return false;
-  var code = a.charCodeAt();
+  var code = c.charCodeAt();
   if (isNaN(code)) {
     return false;
   }
@@ -19,11 +19,11 @@ function isDigit(a) {
           code > 46);
 }
 
-function isWhitespace(a) {
-  if (!a)
+function isWhitespace(c) {
+  if (!c)
     return true;
 
-  var code = a.charCodeAt();
+  var code = c.charCodeAt();
   if (isNaN(code)) {
     return false;
   }
@@ -34,8 +34,8 @@ function isWhitespace(a) {
           code === 11);
 }
 
-function isIdentifier(a) {
-  var code = a.charCodeAt();
+function isIdentifier(c) {
+  var code = c.charCodeAt();
   return (!isNaN(code) &&
           code !== 41 &&
           code !== 40 &&
@@ -44,6 +44,13 @@ function isIdentifier(a) {
           code !== 93 &&
           code !== 91 &&
           code !== 44);
+}
+
+function isUpper(c) {
+  var code = c.charCodeAt();
+  return (!isNaN(code) &&
+          (code >= 65) &&
+          (code <= 90));
 }
 
 function tokenizeNum(tokstream, charnum, linenum) {
@@ -99,7 +106,10 @@ function tokenizeNum(tokstream, charnum, linenum) {
  * Everything after the operator goes back on to the token stream
  */
 
-function tokenizeIdent(tokstream, matchop, charnum, linenum) {
+function tokenizeIdent(tokstream,
+                       matchop,
+                       charnum,
+                       linenum) {
   var identifier = [];
   var n = 0;
   while ((!isWhitespace(tokstream[0])) && isIdentifier(tokstream[0]) && !matchop(tokstream)) {
@@ -111,6 +121,18 @@ function tokenizeIdent(tokstream, matchop, charnum, linenum) {
   identifier = identifier.join('');
 
   return [[n, ["identifier", identifier, charnum, linenum]]];
+}
+
+function tokenizeCtor(tokstream,
+                      matchop,
+                      charnum,
+                      linenum) {
+    var ident = tokenizeIdent(tokstream,
+                              matchop,
+                              charnum,
+                              linenum);
+    ident[0][1][0] = "constructor";
+    return ident;
 }
 
 function tokenizeStr(tokstream, charnum, linenum) {
@@ -232,9 +254,9 @@ function tokenize(tokstream, matchop) {
         break;
 
       /* falls through */
-      case 45: // '-'
+      /*case 45: // '-'
         lambda = peek(tokstream, "arrow", "->");
-        if (lambda) {
+        if (false) {
           tokens.push($.extend(lambda, [charnum, linenum]));
           tokstream = tokstream.substr(2);
           break;
@@ -346,7 +368,12 @@ function tokenize(tokstream, matchop) {
           tokens.push(["identifier", op, charnum, linenum]);
         }
         else {
-          result = tokenizeIdent(tokstream, matchop, charnum, linenum);
+          if (isUpper(tokstream[0])) {
+            result = tokenizeCtor(tokstream, matchop, charnum, linenum);
+          }
+          else {
+            result = tokenizeIdent(tokstream, matchop, charnum, linenum);
+          }
           for(var index = 0; index < result.length; index++) {
             charnum++;
             tokens.push(result[index][1]);
@@ -395,6 +422,7 @@ function tokenizeFull(input) {
   matchop = $.opMatch(operators);
   return tokenizeHelp(input, matchop, true);
 }
+
 
 module.exports = {tokenize : tokenizeFull,
                   isIdentifier : isIdentifier};
