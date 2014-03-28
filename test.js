@@ -20,7 +20,7 @@ var assert = require("assert");
 
 function arbChars(n, max, min) {
   return function () {
-    return _.invoke(_.times(randomInt(1, n),
+    return _.invoke(_.times(_.random(1, n),
                    _.partial(arbChar, max, min)),
                     "call");
   };
@@ -28,7 +28,7 @@ function arbChars(n, max, min) {
 
 function arbChar(max, min) {
   return function() {
-    return String.fromCharCode(randomInt(max, min));
+    return String.fromCharCode(_.random(max, min));
   };
 }
 
@@ -44,10 +44,6 @@ function arbCharRanges(ranges, max) {
 
 
 
-
-function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 var arbCapital = arbChar(65, 90);
 
