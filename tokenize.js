@@ -423,6 +423,5 @@ function tokenizeFull(input) {
   return tokenizeHelp(input, matchop, true);
 }
 
-
 module.exports = {tokenize : tokenizeFull,
                   isIdentifier : isIdentifier};

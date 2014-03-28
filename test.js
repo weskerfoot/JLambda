@@ -9,6 +9,7 @@ var errors = require("./errors.js");
 var tokens = require("./tokenize.js");
 var tools = require("./tools.js");
 var typecheck = require("./typecheck.js");
+var representation = require("./representation.js");
 var _ = require("underscore");
 
 var qc = require("quickcheck");
@@ -16,6 +17,26 @@ var assert = require("assert");
 
 
 /* my own generators */
+
+function arbIdentifier(construct) {
+  var result = qc.arbString();
+  if (_.size(result) > 0 &&
+      tokens.isIdentifier(result[0])) {
+    return new construct(result);
+  }
+  else {
+    return arbIdentifier();
+  }
+}
+
+function arbName() {
+  return arbIdentifier(representation.Name);
+}
+
+function arbTypeOp() {
+  return arbIdentifier(representation.TypeOp);
+}
+
 function arbArray(gen) {
   return qc.arbArray(gen);
 }
@@ -108,4 +129,5 @@ function toolsTests() {
 }
 
 
-toolsTests();
+//toolsTests();
+console.log(arbTypeOp());
