@@ -18,35 +18,38 @@ var assert = require("assert");
 
 /* my own generators */
 
-function arbIdentifier(construct) {
-  var result = qc.arbString();
-  if (_.size(result) > 0 &&
-      tokens.isIdentifier(result[0])) {
-    return new construct(result);
-  }
-  else {
-    return arbIdentifier();
-  }
+function arbChars(n, max, min) {
+  return function () {
+    return _.invoke(_.times(randomInt(1, n),
+                   _.partial(arbChar, max, min)),
+                    "call");
+  };
 }
+
+function arbChar(max, min) {
+  return function() {
+    return String.fromCharCode(randomInt(max, min));
+  };
+}
+
+function arbCharRanges(ranges, max) {
+  return function() {
+    return _.flatten(
+      _.map(ranges,
+        function(bound) {
+          return arbChars(max, bound[0], bound[1])();
+        })).join("");
+  };
+}
+
+
+
 
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function arbCapital() {
-  return String.fromCharCode(randomInt(65, 90));
-}
-
-function arbName() {
-  return arbIdentifier(representation.Name);
-}
-
-function arbTypeOp() {
-  var result = arbIdentifier(representation.TypeOp);
-  result.name = arbCapital()+result.name;
-  result.val = result.name;
-  return result;
-}
+var arbCapital = arbChar(65, 90);
 
 function arbArray(gen) {
   return qc.arbArray(gen);
@@ -141,4 +144,3 @@ function toolsTests() {
 
 
 //toolsTests();
-console.log(arbTypeOp());
