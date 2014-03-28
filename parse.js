@@ -36,8 +36,20 @@ function notFollowedBy(tokens, checks, linenum, charnum) {
    checks if it is in the array ``props''*/
 function makeChecker(props) {
 	return function(x) {
-		return x && props.some(function (y) {return y === x;});
+		return x && props.some(function (y) {return y(x);});
 	};
+}
+
+function tokTypeCheck(name) {
+  return function(tok) {
+    return tok[0] === name;
+  };
+}
+
+function formTypeCheck(stxtype) {
+  return function(stx) {
+    return stx.exprType === stxtype;
+  };
 }
 
 /*Tries to parse until the prediction ``valid'' fails or the wrong type is parsed
@@ -52,7 +64,7 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
 	var results = [];
 	var parsed;
 
-	if (valid(fst(tokens)[0])) {
+	if (valid(fst(tokens))) {
 		parsed = parse(tokens);
 	}
 	else {
@@ -63,9 +75,9 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
   results.push(parsed);
 
 	//make sure there are at least 2 tokens to parse
-	if (tokens.length > 1 && fst(tokens) && valid(fst(tokens)[0])) {
-		while (valid(snd(tokens)[0])) {
-			if (!(valid(fst(tokens)[0])))
+	if (tokens.length > 1 && fst(tokens) && valid(fst(tokens))) {
+		while (valid(snd(tokens))) {
+			if (!(valid(fst(tokens))))
         break;
       results.push(parse(tokens));
 			if (!exprType(fst(results).exprType))
@@ -83,7 +95,7 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
     throw error.JSyntaxError(linenum,
                              charnum,
                              "unexpected end of source");
-	if (valid(fst(tokens)[0]))
+	if (valid(fst(tokens)))
 		results.push(parse(tokens));
 	return results;
 }
@@ -149,11 +161,11 @@ function parseDefFunction(tokens) {
   }
   else {
     parameters = parseMany(parse,
-                               validName,
-                               validFormPar,
-                               tokens,
-                               fst(tokens)[2],
-                               fst(tokens)[3]);
+                           validName,
+                           validFormPar,
+                           tokens,
+                           fst(tokens)[2],
+                           fst(tokens)[3]);
   }
   if ((fst(tokens)[0]) !== "right_paren") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -165,8 +177,8 @@ function parseDefFunction(tokens) {
   return new typ.DefFunc(fname, parameters, body);
 }
 
-validLet = makeChecker(["Definition", "FunctionDefinition"]);
-letEnd = _.compose($.not, makeChecker(["right_brace"]));
+validLet = makeChecker(["Definition", "FunctionDefinition"].map(formTypeCheck));
+letEnd = _.compose($.not, makeChecker(["right_brace"].map(tokTypeCheck)));
 
 function parseLetForm(tokens, linenum, charnum) {
   if (!fst(tokens)) {
@@ -223,11 +235,11 @@ function parseLetFunction(tokens, linenum, charnum) {
   }
   else {
     parameters = parseMany(parse,
-                               validName,
-                               validFormPar,
-                               tokens,
-                               fst(tokens)[2],
-                               fst(tokens)[3]);
+                           validName,
+                           validFormPar,
+                           tokens,
+                           fst(tokens)[2],
+                           fst(tokens)[3]);
   }
   if ((fst(tokens)[0]) !== "right_paren") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -235,7 +247,7 @@ function parseLetFunction(tokens, linenum, charnum) {
                              "Formal parameters must be followed by )");
   }
   tokens.pop();
-  if (fst(tokens)[0] !== "arrow") {
+  if (fst(tokens)[1] !== "->") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "Function parameters in let/def form must be followed by ->");
@@ -430,19 +442,23 @@ function parseIf(tokens) {
   }
 }
 
+var validName = makeChecker(["Name"].map(formTypeCheck));
 
-var validFormPar = makeChecker(["identifier"]);
-var validName = makeChecker(["Name"]);
+function validFormPar(tok) {
+  return tok[0] === "identifier" &&
+         tok[1] !== "->";
+}
 
 function parseLambda(tokens) {
+  var linenum = fst(tokens)[2];
+  var charnum = fst(tokens)[3];
 	var parameters = parseMany(parse,
                              validName,
                              validFormPar,
                              tokens,
-                             fst(tokens)[2],
-                             fst(tokens)[3]);
-
-	if (fst(tokens)[0] !== "arrow") {
+                             charnum,
+                             linenum);
+	if (fst(tokens)[1] !== "->") {
 		throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "arrow must follow parameters in lambda, not "+fst(tokens)[0]);
@@ -452,10 +468,9 @@ function parseLambda(tokens) {
 	return new typ.FuncT(parameters, body);
 }
 
-var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_brace", "left_brace", "right_brace"];
+var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_brace", "left_brace", "right_brace"].map(tokTypeCheck);
 var validArgument = _.compose($.not, makeChecker(invalidArguments));
-var validArgTypes = _.compose($.not, makeChecker(["Definition"]));
-var validOperator = makeChecker(["identifier"]);
+var validArgTypes = _.compose($.not, makeChecker(["Definition"].map(formTypeCheck)));
 
 /* Parses function application (either infix or prefix) */
 function computeApp(tokens, charnum, linenum) {
@@ -488,11 +503,11 @@ function computeApp(tokens, charnum, linenum) {
     var parameters;
 		if (fst(tokens)[0] !== "right_paren") {
       parameters = parseMany(parse,
-                               validArgTypes,
-                               validArgument,
-                               tokens,
-                               charnum,
-                               linenum);
+                             validArgTypes,
+                             validArgument,
+                             tokens,
+                             charnum,
+                             linenum);
     }
     else {
       parameters = [];
