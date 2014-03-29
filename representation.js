@@ -164,22 +164,14 @@ function If(condition, thenexp, elseexp) {
 
 function TypeVar(name) {
   this.name = name;
-  this.exprType = "TypeVariable";
   return this;
 }
 
-function TypeOp(name) {
+function TypeOp(name, params, body) {
   this.name = name;
-  this.val = name;
-  this.exprType = "TypeOperator"
+  this.params = params;
+  this.body = body;
   return this;
-}
-
-//convenience function to construct binary operators
-//assumes that the identifier refers to the name of a primitive
-//operation
-function makeBin(ident) {
-	return new OpT(new FuncT (new Name("a"), new FuncT(new Name("b"), new App(new App(ident, "a"), "b"))));
 }
 
 //Applies the function ``name'' to the list of parameters
@@ -206,28 +198,27 @@ function makeGensym() {
 
 var gensym = makeGensym();
 
-OPInfo = {"+" : [4, "Left"],
-         "-" :  [4, "Left"],
-         "*" :  [5, "Left"],
-         "/" :  [5, "Left"],
-         "^" :  [6, "Right"],
-          "++" : [4, "Left"],
-          "==" : [3, "Left"],
-          ">" :  [3, "Left"],
-          ">=" : [3, "Left"],
-          "<" :  [3, "Left"],
-          "<=" : [3, "Left"],
-          "&&" : [3, "Left"],
-          "||" : [3, "Left"],
-          "::" : [1, "Left"],
-          ":" : [2, "Left"],
-          "$" : [2, "Left"],
-          ">>" : [2, "Left"],
-          ">>=" : [2, "Left"],
-          "<$>" : [2, "Left"],
-          "." : [2, "Left"],
-          "," : [2, "Left"],
-          "->" : [2, "Right"]}
+OPInfo = {"+" : [3, "Left"],
+         "-" :  [3, "Left"],
+         "*" :  [4, "Left"],
+         "/" :  [4, "Left"],
+         "^" :  [5, "Right"],
+          "++" : [3, "Left"],
+          "==" : [2, "Left"],
+          ">" :  [2, "Left"],
+          ">=" : [2, "Left"],
+          "<" :  [2, "Left"],
+          "<=" : [2, "Left"],
+          "&&" : [2, "Left"],
+          "||" : [2, "Left"],
+          "::" : [2, "Left"],
+          ":" : [1, "Left"],
+          "$" : [1, "Left"],
+          ">>" : [1, "Left"],
+          ">>=" : [1, "Left"],
+          "<$>" : [1, "Left"],
+          "." : [1, "Left"],
+          "," : [1, "Left"]};
 
 module.exports =
    { IntT   : IntT,
