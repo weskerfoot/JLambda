@@ -1,3 +1,6 @@
+var errors = require("./errors.js");
+var _ = require("underscore");
+
 var Expression = {
 	display :
 		function() {
@@ -6,17 +9,23 @@ var Expression = {
 	type :
 		function () {
 			return this.exprType;
-		},
-	unify :
-		function (t) {
-			if (this.exprType === t.exprType) {
-				return t.exprType;
-			}
-			else {
-				console.log("Could not unify " + this.exprType + " with " + t.exprType);
-			}
 		}
 };
+
+var TypeExpression = {
+  unify :
+		function (t) {
+			if (this.expr === t.expr) {
+				return t.expr;
+			}
+			else {
+				console.log("Could not unify " + this.expr + " with " + t.expr);
+			}
+		},
+  isTypeExpr : true
+};
+
+var isTypeExpr = _.property("isTypeExpr");
 
 function Closure(bound_vars, free_vars, body, env) {
   this.bound_vars = bound_vars;
@@ -163,24 +172,36 @@ function If(condition, thenexp, elseexp) {
 }
 
 function TypeVar(name) {
+  this.exprtype = "TypeVar";
   this.name = name;
-  this.exprType = "TypeVariable";
   return this;
 }
 
-function TypeOp(name) {
+TypeVar.prototype = TypeExpression;
+
+function TypeOp(name, params, body) {
+  if (!_.every(params, _.compose(
+                          _.partial(_.isEqual, "TypeVar"),
+                          _.property("exprtype")))) {
+    throw errors.JInternalError(
+        "Parameters to a type operator must be type variables"
+    );
+  }
   this.name = name;
-  this.val = name;
-  this.exprType = "TypeOperator"
+  this.params = params;
+  this.body = body;
   return this;
 }
 
-//convenience function to construct binary operators
-//assumes that the identifier refers to the name of a primitive
-//operation
-function makeBin(ident) {
-	return new OpT(new FuncT (new Name("a"), new FuncT(new Name("b"), new App(new App(ident, "a"), "b"))));
+TypeOp.prototype = TypeExpression;
+
+function TypeBinding(expression, type) {
+  this.expr = expression;
+  this.type = type;
+  return this;
 }
+
+TypeBinding.prototype = TypeExpression;
 
 //Applies the function ``name'' to the list of parameters
 function makeApp(name, parameters) {
@@ -192,7 +213,6 @@ function makeApp(name, parameters) {
 	else {
 		return new App(name);
 	}
-
 }
 
 function makeGensym() {
@@ -206,49 +226,50 @@ function makeGensym() {
 
 var gensym = makeGensym();
 
-OPInfo = {"+" : [4, "Left"],
-         "-" :  [4, "Left"],
-         "*" :  [5, "Left"],
-         "/" :  [5, "Left"],
-         "^" :  [6, "Right"],
-          "++" : [4, "Left"],
-          "==" : [3, "Left"],
-          ">" :  [3, "Left"],
-          ">=" : [3, "Left"],
-          "<" :  [3, "Left"],
-          "<=" : [3, "Left"],
-          "&&" : [3, "Left"],
-          "||" : [3, "Left"],
-          "::" : [1, "Left"],
-          ":" : [2, "Left"],
-          "$" : [2, "Left"],
-          ">>" : [2, "Left"],
-          ">>=" : [2, "Left"],
-          "<$>" : [2, "Left"],
-          "." : [2, "Left"],
-          "," : [2, "Left"],
-          "->" : [2, "Right"]}
+OPInfo = {"+" : [3, "Left"],
+         "-" :  [3, "Left"],
+         "*" :  [4, "Left"],
+         "/" :  [4, "Left"],
+         "^" :  [5, "Right"],
+          "++" : [3, "Left"],
+          "==" : [2, "Left"],
+          ">" :  [2, "Left"],
+          ">=" : [2, "Left"],
+          "<" :  [2, "Left"],
+          "<=" : [2, "Left"],
+          "&&" : [2, "Left"],
+          "||" : [2, "Left"],
+          "::" : [2, "Left"],
+          ":" : [1, "Left"],
+          "$" : [1, "Left"],
+          ">>" : [1, "Left"],
+          ">>=" : [1, "Left"],
+          "<$>" : [1, "Left"],
+          "." : [1, "Left"],
+          "," : [1, "Left"]};
 
 module.exports =
-   { IntT   : IntT,
-  FloatT : FloatT,
-  StrT   : StrT,
-  BoolT  : BoolT,
-  ListT  : ListT,
-  FuncT  : FuncT,
-  App    : App,
-  Name   : Name,
-  Def    : Def,
-  OpT   : OpT,
-  OPInfo : OPInfo,
-  makeApp : makeApp,
-  If      : If,
-   DefFunc : DefFunc,
-   UnaryOp : UnaryOp,
-   Nil : Nil,
-   LetExp : LetExp,
-   gensym : gensym,
-   TypeVar : TypeVar,
-   TypeOp : TypeOp,
-   Closure : Closure
+   {
+     IntT   : IntT,
+     FloatT : FloatT,
+     StrT   : StrT,
+     BoolT  : BoolT,
+     ListT  : ListT,
+     FuncT  : FuncT,
+     App    : App,
+     Name   : Name,
+     Def    : Def,
+     OpT   : OpT,
+     OPInfo : OPInfo,
+     makeApp : makeApp,
+     If : If,
+     DefFunc : DefFunc,
+     UnaryOp : UnaryOp,
+     Nil : Nil,
+     LetExp : LetExp,
+     gensym : gensym,
+     TypeVar : TypeVar,
+     TypeOp : TypeOp,
+     TypeBinding : TypeBinding,
+     Closure : Closure
    };

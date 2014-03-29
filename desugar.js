@@ -26,6 +26,7 @@ function desugarDefFunc(def) {
                                def.body));
 }
 
+
 function curryFunc(ps, body) {
   if (_.isEmpty(ps)) {
     return desugar(body);
@@ -55,6 +56,10 @@ function desugar(stx) {
     case "Name":
       return stx;
     case "Application":
+      if (stx.func.ident === "::") {
+        //It's a type binding
+        return desugarTypeBinding(stx);
+      }
       if ((stx.func.ident === "-" ||
           stx.func.ident === "+") &&
           stx.p) {
