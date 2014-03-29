@@ -106,7 +106,7 @@ function closure_convert(stx) {
   return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
-function closure_convert_all(stx, env) {
+function closure_convert_all(stx) {
   var closure;
   switch (stx.exprType) {
     case "Let":
@@ -151,8 +151,8 @@ function test(src) {
   console.log(JSON.stringify(closure_convert_all(ast), null, 4));
 }
 
-console.log(pprint.pprint(parser.parse(pprint.pprint(parser.parse("if something then if a then if b then c else d else rtrrt else some_other_thing")[0]))[0]));
-console.log(pprint.pprint(parser.parse("def main (print let { a = def {f = (lambda a b -> (a+b))} f} (a 2 3))")[0]));
+//console.log(test(pprint.pprint(parser.parse(pprint.pprint(parser.parse("if something then if a then if b then c else d else rtrrt else some_other_thing")[0]))[0])));
+console.log(pprint.pprint(parser.parse("defop 1 Right (a $# b) (a - b) def main (4 $# b $# c)")[1]));
 module.export = {
   test : test,
   closureConvert : closure_convert_all
