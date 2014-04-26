@@ -41,7 +41,9 @@ function LetExp(pairs, body) {
     return (x.exprType === "Definition" ||
             x.exprType === "FunctionDefinition");
   })) {
-    throw "let can only be used to bind things to names or functions";
+    throw Errors.JInternalError(
+      "let can only be used to bind things to names or functions"
+      );
   }
   this.exprType = "Let";
   this.val = [pairs, body];
@@ -179,29 +181,28 @@ function TypeVar(name) {
 
 TypeVar.prototype = TypeExpression;
 
-function TypeOp(name, params, body) {
-  if (!_.every(params, _.compose(
-                          _.partial(_.isEqual, "TypeVar"),
-                          _.property("exprtype")))) {
-    throw errors.JInternalError(
-        "Parameters to a type operator must be type variables"
-    );
-  }
+function TypeOp(name) {
   this.name = name;
-  this.params = params;
-  this.body = body;
+  this.val = name;
+  this.exprType = "TypeOperator";
   return this;
 }
 
 TypeOp.prototype = TypeExpression;
 
-function TypeBinding(expression, type) {
+function TypeApp(expression, type) {
+  if (expression.prototype.isTypeExpr) {
+    throw errors.JInternalError(
+      "Left-hand-side of type application must not be in the type language"
+      );
+  }
   this.expr = expression;
   this.type = type;
+  this.exprType = "TypeApplication";
   return this;
 }
 
-TypeBinding.prototype = TypeExpression;
+TypeApp.prototype = TypeExpression;
 
 //Applies the function ``name'' to the list of parameters
 function makeApp(name, parameters) {
@@ -270,6 +271,6 @@ module.exports =
      gensym : gensym,
      TypeVar : TypeVar,
      TypeOp : TypeOp,
-     TypeBinding : TypeBinding,
+     TypeApp: TypeApp,
      Closure : Closure
    };

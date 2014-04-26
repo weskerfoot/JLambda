@@ -152,6 +152,7 @@ function test(src) {
 }
 
 //console.log(test(pprint.pprint(parser.parse(pprint.pprint(parser.parse("if something then if a then if b then c else d else rtrrt else some_other_thing")[0]))[0])));
+console.log(pprint.pprint(parser.parse("(34 :: A)")[0]));
 module.export = {
   test : test,
   closureConvert : closure_convert_all
