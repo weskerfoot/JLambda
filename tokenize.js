@@ -25,7 +25,7 @@ function isWhitespace(c) {
 
   var code = c.charCodeAt();
   if (isNaN(code)) {
-    return false;
+    return true;
   }
   return (code === 9 ||
           code === 32 ||
@@ -256,21 +256,6 @@ function tokenize(tokstream, matchop) {
         break;
 
       /* falls through */
-      /*case 45: // '-'
-        lambda = peek(tokstream, "arrow", "->");
-        if (false) {
-          tokens.push($.extend(lambda, [charnum, linenum]));
-          tokstream = tokstream.substr(2);
-          break;
-        }
-        else {
-          tokens.push(["identifier", "-", charnum, linenum]);
-          charnum++;
-          tokstream = tokstream.substr(1);
-          break;
-        }
-
-      /* falls through */
       case 46: // '.'
         if (isDigit(tokstream[1])) {
           result = tokenizeNum(tokstream, charnum, linenum);
@@ -403,12 +388,12 @@ function tokenizeHelp(input, matchop, strip_whitespace) {
   }
 }
 
-var defop_pattern = ["defop", "integer", "identifier",
+var defop_pattern = ["defop", "integer", "constructor",
                      "left_paren", "identifier",
                      "identifier", "identifier", "right_paren"];
 
 function tokenizeFull(input) {
-  var matchop = $.opMatch(operators);
+  var matchop;
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
   for (var i = 0; i < initialPass.length; i++) {
     if (initialPass.slice(i, i+8).map(_.first).every(
