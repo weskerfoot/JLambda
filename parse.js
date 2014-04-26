@@ -636,7 +636,8 @@ function parseFull(tokenized) {
 
 module.exports = { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
-                            }
+                            },
+                  tokenize : tokenizer.tokenize
                  };
-/*var istr = fs.readFileSync('/dev/stdin').toString();
-console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));*/
+var istr = fs.readFileSync('/dev/stdin').toString();
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));
