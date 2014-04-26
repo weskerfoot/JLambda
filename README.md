@@ -1,6 +1,13 @@
-This is the beginnings of a little language based on a typed LC with let
-and mainly inspired by these: 
-  * http://cs.brown.edu/~sk/Publications/Books/ProgLangs/
-  * http://www.cs.indiana.edu/hyplan/dfried/ts.ps (I plan on generating code in
-    trampolined style)
-  * http://lucacardelli.name/papers/basictypechecking.a4.pdf
+JLambda is a functional language in the spirit of languages such as Scheme,
+SML, or Clean. It aims to have a very flexible syntax and a clean and easy to
+understand type system. Another goal is to generate very efficient JavaScript
+code and possibly native code as well. Currently the type system is still being
+conceived, and the various parts that conspire to generate actual code are
+being written and will likely change quite a bit. It is possible to parse code
+and generate a pretty printed version of it (see example.jl for what the syntax
+looks like at the moment).
+
+JLambda also aims to support concurrency which will be built on a
+continuation-passing style intermediate language. I have not figured out how
+scheduling threads will work, or whether I will provide any programmer directed
+way of scheduling (i.e. yield).

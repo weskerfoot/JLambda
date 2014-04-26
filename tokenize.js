@@ -256,21 +256,6 @@ function tokenize(tokstream, matchop) {
         break;
 
       /* falls through */
-      /*case 45: // '-'
-        lambda = peek(tokstream, "arrow", "->");
-        if (false) {
-          tokens.push($.extend(lambda, [charnum, linenum]));
-          tokstream = tokstream.substr(2);
-          break;
-        }
-        else {
-          tokens.push(["identifier", "-", charnum, linenum]);
-          charnum++;
-          tokstream = tokstream.substr(1);
-          break;
-        }
-
-      /* falls through */
       case 46: // '.'
         if (isDigit(tokstream[1])) {
           result = tokenizeNum(tokstream, charnum, linenum);
