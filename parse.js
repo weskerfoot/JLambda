@@ -458,6 +458,7 @@ function parseLambda(tokens) {
                              tokens,
                              charnum,
                              linenum);
+  console.log(tokens);
 	if (fst(tokens)[1] !== "->") {
 		throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
@@ -639,5 +640,5 @@ module.exports = { parse : function(str) {
                             },
                   tokenize : tokenizer.tokenize
                  };
-//var istr = fs.readFileSync('/dev/stdin').toString();
-//console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));
+var istr = fs.readFileSync('/dev/stdin').toString();
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));

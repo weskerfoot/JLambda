@@ -196,6 +196,11 @@ function TypeApp(expression, type) {
       "Left-hand-side of type application must not be in the type language"
       );
   }
+  if (!type.prototype.isTypeExpr) {
+    throw errors.JInternalError(
+      "Right-hand-side of type application must be a type expression"
+      );
+  }
   this.expr = expression;
   this.type = type;
   this.exprType = "TypeApplication";
@@ -247,7 +252,8 @@ OPInfo = {"+" : [3, "Left"],
           ">>=" : [1, "Left"],
           "<$>" : [1, "Left"],
           "." : [1, "Left"],
-          "," : [1, "Left"]};
+          "," : [1, "Left"],
+          "->" : [1, "Right"]};
 
 module.exports =
    {
