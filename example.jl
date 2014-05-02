@@ -1,8 +1,12 @@
-defop 2 Left (a ## b)
+defop 2 Left (a ++#$ b)
  (a - b)
 
 def (f a b)
   (a ++ b)
+
+
+(qat :: (Int -> Int -> Int -> Int))
+def qat (lambda a b c -> (a + b))
 
 def (add a b)
   (a + b)
@@ -63,6 +67,6 @@ def main
       if False
         then undefined
       else
-        (unary >>
-         fileLines >>
+        (unary +
+         fileLines +
          (print splitted))
