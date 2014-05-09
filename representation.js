@@ -176,6 +176,7 @@ function If(condition, thenexp, elseexp) {
 function TypeVar(name) {
   this.exprtype = "TypeVar";
   this.name = name;
+  this.exprType = "TypeVar";
   return this;
 }
 
@@ -188,20 +189,29 @@ function TypeOp(name) {
   return this;
 }
 
+function isTypeExpr(expr) {
+  if (!expr.exprType) {
+    throw errors.JInternalError(expr);
+  }
+  return ((expr.exprType === "TypeOperator") ||
+          (expr.exprType === "TypeVar") ||
+          (expr.exprType === "TypeApplication"));
+}
+
 TypeOp.prototype = TypeExpression;
 
 function TypeApp(expression, type) {
-  if (expression.prototype.isTypeExpr) {
+  if (isTypeExpr(expression)) {
     throw errors.JInternalError(
       "Left-hand-side of type application must not be in the type language"
       );
   }
-  if (!type.prototype.isTypeExpr) {
+  if (!isTypeExpr(type)) {
     throw errors.JInternalError(
       "Right-hand-side of type application must be a type expression"
       );
   }
-  this.expr = expression;
+  this.expression = expression;
   this.type = type;
   this.exprType = "TypeApplication";
   return this;

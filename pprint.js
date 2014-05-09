@@ -30,9 +30,6 @@ function pprint(expr) {
   if (expr.exprType === "Name") {
     return expr.val;
   }
-  else if (expr.exprType === "TypeOperator") {
-    return expr.val;
-  }
   else if (expr.exprType === "Bool") {
     if (expr.val) {
       return "True";
@@ -76,6 +73,15 @@ function pprint(expr) {
           function (v) {
             return pprint(v);
           }).join(" ; ") + "} in " + pprint(expr.body);
+  }
+  else if (expr.exprType === "TypeOperator") {
+    return "("+expr.val+")";
+  }
+  else if (expr.exprType === "TypeVar") {
+    return "("+expr.name+")";
+  }
+  else if (expr.exprType === "TypeApplication") {
+    return "( " + pprint(expr.expression) + " :: " + pprint(expr.type) + " )";
   }
 }
 

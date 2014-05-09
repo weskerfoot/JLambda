@@ -458,7 +458,6 @@ function parseLambda(tokens) {
                              tokens,
                              charnum,
                              linenum);
-  console.log(tokens);
 	if (fst(tokens)[1] !== "->") {
 		throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],

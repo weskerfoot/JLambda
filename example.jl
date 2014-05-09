@@ -1,11 +1,8 @@
 defop 2 Left (a ++#$ b)
  (a - b)
 
-def (f a b)
-  (a ++ b)
 
-
-(qat :: (Int -> Int -> Int -> Int))
+(qat :: A)
 def qat (lambda a b c -> (a + b))
 
 def (add a b)
