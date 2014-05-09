@@ -2,26 +2,26 @@ var errors = require("./errors.js");
 var _ = require("underscore");
 
 var Expression = {
-	display :
-		function() {
-			return this.exprType + " " + this.val;
-		},
-	type :
-		function () {
-			return this.exprType;
-		}
+  display :
+    function() {
+      return this.exprType + " " + this.val;
+    },
+  type :
+    function () {
+      return this.exprType;
+    }
 };
 
 var TypeExpression = {
   unify :
-		function (t) {
-			if (this.expr === t.expr) {
-				return t.expr;
-			}
-			else {
-				console.log("Could not unify " + this.expr + " with " + t.expr);
-			}
-		},
+    function (t) {
+      if (this.expr === t.expr) {
+        return t.expr;
+      }
+      else {
+        console.log("Could not unify " + this.expr + " with " + t.expr);
+      }
+    },
   isTypeExpr : true
 };
 
@@ -62,46 +62,46 @@ function UnaryOp(op, v) {
 UnaryOp.prototype = Expression;
 
 function IntT(v) {
-	this.exprType = "Integer";
-	this.val = parseInt(v, 10);
-	return this;
+  this.exprType = "Integer";
+  this.val = parseInt(v, 10);
+  return this;
 }
 IntT.prototype = Expression;
 
 function FloatT(v) {
-	this.exprType = "Float";
-	this.val = parseFloat(v, 10);
-	return this;
+  this.exprType = "Float";
+  this.val = parseFloat(v, 10);
+  return this;
 }
 
 FloatT.prototype = Expression;
 
 function StrT(v) {
-	this.exprType = "String";
-	this.val = v;
-	return this;
+  this.exprType = "String";
+  this.val = v;
+  return this;
 }
 
 StrT.prototype = Expression;
 
 function BoolT(b) {
-	if (b === "true") {
-		this.val = true;
-	}
-	else {
-		this.val = false;
-	}
-	this.exprType = "Bool";
-	return this;
+  if (b === "true") {
+    this.val = true;
+  }
+  else {
+    this.val = false;
+  }
+  this.exprType = "Bool";
+  return this;
 }
 
 BoolT.prototype = Expression;
 
 function ListT(xs) {
-	this.xs = xs;
-	this.val = xs;
-	this.exprType = "List";
-	return this;
+  this.xs = xs;
+  this.val = xs;
+  this.exprType = "List";
+  return this;
 }
 
 function Nil() {
@@ -113,47 +113,47 @@ Nil.prototype = Expression;
 ListT.prototype = Expression;
 
 function FuncT(p, body) {
-	this.p = p;
-	this.body = body;
-	this.val = [p, body];
-	this.exprType = "Function";
-	return this;
+  this.p = p;
+  this.body = body;
+  this.val = [p, body];
+  this.exprType = "Function";
+  return this;
 }
 
 FuncT.prototype = Expression;
 
 //Wrapper for function objects
 function OpT(operator) {
-	this.op = operator;
-	this.val = this.op;
-	this.exprType = "Function";
-	return this;
+  this.op = operator;
+  this.val = this.op;
+  this.exprType = "Function";
+  return this;
 }
 
 OpT.prototype = Expression;
 
 // Applications separate from other types
 function App(func, p) {
-	this.func = func;
-	this.exprType = "Application";
-	if (p)
-		this.p = p;
-	return this;
+  this.func = func;
+  this.exprType = "Application";
+  if (p)
+    this.p = p;
+  return this;
 }
 
 // Names are not types
 function Name(identifier) {
-	this.ident = identifier;
-	this.val = this.ident;
-	this.exprType = "Name";
-	return this;
+  this.ident = identifier;
+  this.val = this.ident;
+  this.exprType = "Name";
+  return this;
 }
 
 function Def(ident, exp) {
-	this.ident = ident;
-	this.val = exp;
-	this.exprType = "Definition";
-	return this;
+  this.ident = ident;
+  this.val = exp;
+  this.exprType = "Definition";
+  return this;
 }
 
 function DefFunc(ident, params, body) {
@@ -166,11 +166,11 @@ function DefFunc(ident, params, body) {
 }
 
 function If(condition, thenexp, elseexp) {
-	this.condition = condition;
-	this.thenexp = thenexp;
-	this.elseexp = elseexp;
-	this.exprType = "If";
-	return this;
+  this.condition = condition;
+  this.thenexp = thenexp;
+  this.elseexp = elseexp;
+  this.exprType = "If";
+  return this;
 }
 
 function TypeVar(name) {
@@ -221,14 +221,14 @@ TypeApp.prototype = TypeExpression;
 
 //Applies the function ``name'' to the list of parameters
 function makeApp(name, parameters) {
-	if (parameters) {
-		return parameters.slice(1).reduce(function(f, ident) {
-			return new App(f, ident);
-		}, new App(name, parameters[0]));
-	}
-	else {
-		return new App(name);
-	}
+  if (parameters) {
+    return parameters.slice(1).reduce(function(f, ident) {
+      return new App(f, ident);
+    }, new App(name, parameters[0]));
+  }
+  else {
+    return new App(name);
+  }
 }
 
 function makeGensym() {
