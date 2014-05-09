@@ -392,14 +392,15 @@ var defop_pattern = ["defop", "integer", "constructor",
                      "left_paren", "identifier",
                      "identifier", "identifier", "right_paren"];
 
+function checkPattern(x, i) {
+  return x === defop_pattern[i];
+}
+
 function tokenizeFull(input) {
   var matchop;
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
   for (var i = 0; i < initialPass.length; i++) {
-    if (initialPass.slice(i, i+8).map(_.first).every(
-         function(x, i) {
-           return x === defop_pattern[i];
-         })) {
+    if (initialPass.slice(i, i+8).map(_.first).every(checkPattern)) {
       rep.OPInfo[initialPass[i+5][1]] = [parseInt(initialPass[i+1][1], 10),
                                          initialPass[i+2][1]];
          }

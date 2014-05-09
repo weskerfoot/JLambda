@@ -64,7 +64,7 @@ function desugar(stx) {
     case "Name":
       return stx;
     case "Application":
-      if ((stx.func.func != undefined ) &&
+      if ((stx.func.func !== undefined ) &&
           (stx.func.func.ident === "::")) {
             /* It's a type application probably (will be verified later)
              * In this case we actually *add* syntax here to differentiate type applications

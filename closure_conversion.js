@@ -137,6 +137,7 @@ function closure_convert_all(stx) {
         stx.thenexp = closure_convert_all(stx.thenexp);
         return stx;
       }
+      break;
     case "Definition":
       stx.val = closure_convert_all(stx.val);
       return stx;
