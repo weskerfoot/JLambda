@@ -26,7 +26,6 @@ function desugarDefFunc(def) {
                                def.body));
 }
 
-
 function curryFunc(ps, body) {
   if (_.isEmpty(ps)) {
     return desugar(body);
@@ -43,6 +42,15 @@ function desugarLet(stx) {
   return new typ.LetExp(values, desugar(stx.body));
 }
 
+function sugarTypeApp(stx) {
+  var type;
+  var expression;
+  type = stx.p;
+  expression = desugar(stx.func.p);
+  return new typ.TypeApp(expression, type);
+}
+
+
 function desugar(stx) {
  switch (stx.exprType) {
     case "If":
@@ -56,10 +64,15 @@ function desugar(stx) {
     case "Name":
       return stx;
     case "Application":
-      if (stx.func.ident === "::") {
-        //It's a type binding
-        return desugarTypeBinding(stx);
-      }
+      if ((stx.func.func != undefined ) &&
+          (stx.func.func.ident === "::")) {
+            /* It's a type application probably (will be verified later)
+             * In this case we actually *add* syntax here to differentiate type applications
+             * from normal applications
+             */
+            return sugarTypeApp(stx);
+          }
+
       if ((stx.func.ident === "-" ||
           stx.func.ident === "+") &&
           stx.p) {
