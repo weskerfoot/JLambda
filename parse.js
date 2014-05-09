@@ -77,26 +77,33 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
   //make sure there are at least 2 tokens to parse
   if (tokens.length > 1 && fst(tokens) && valid(fst(tokens))) {
     while (valid(snd(tokens))) {
-      if (!(valid(fst(tokens))))
+      if (!(valid(fst(tokens)))) {
         break;
+      }
       results.push(parse(tokens));
-      if (!exprType(fst(results).exprType))
+      if (!exprType(fst(results).exprType)) {
         break;
-      if (fst(tokens))
+      }
+      if (fst(tokens)) {
         current = fst(tokens)[0];
-      else
+      }
+      else {
         throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
-      if (tokens.length <= 1)
+      }
+      if (tokens.length <= 1) {
         break;
+      }
     }
   }
   //do the same validity check as before and in the loop
-  if (!fst(tokens))
+  if (!fst(tokens)) {
     throw error.JSyntaxError(linenum,
                              charnum,
                              "unexpected end of source");
-  if (valid(fst(tokens)))
+  }
+  if (valid(fst(tokens))) {
     results.push(parse(tokens));
+  }
   return results;
 }
 
