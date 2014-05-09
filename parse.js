@@ -640,4 +640,4 @@ module.exports = { parse : function(str) {
                   tokenize : tokenizer.tokenize
                  };
 var istr = fs.readFileSync('/dev/stdin').toString();
-console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));
+parseFull(tokenizer.tokenize(istr)).map(pprint.pprint);
