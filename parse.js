@@ -638,7 +638,12 @@ function parseFull(tokenized) {
     }
     return ast;
   } catch (e) {
-      e.stxerror();
+      if (e.stxerror !== undefined) {
+        e.stxerror();
+      }
+      else {
+        console.log(e.errormessage);
+      }
       process.exit(1);
   }
 }
