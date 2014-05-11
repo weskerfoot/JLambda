@@ -400,11 +400,13 @@ function tokenizeFull(input) {
   var matchop;
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
   for (var i = 0; i < initialPass.length; i++) {
-    if (initialPass.slice(i, i+8).map(_.first).every(checkPattern)) {
-      rep.OPInfo[initialPass[i+5][1]] = [parseInt(initialPass[i+1][1], 10),
-                                         initialPass[i+2][1]];
+    if (initialPass.slice(i, i+8).
+        map(_.first).
+        every(checkPattern)) {
+          rep.OPInfo[initialPass[i+5][1]] =
+            [parseInt(initialPass[i+1][1], 10),
+            initialPass[i+2][1]];
          }
-
   }
   operators = Object.keys(rep.OPInfo);
   matchop = $.opMatch(operators);

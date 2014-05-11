@@ -143,7 +143,9 @@ function parseList(tokens) {
     xs = [];
   }
   else {
-    xs = parseBetween(function (x) { return true; }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
+    xs = parseBetween(function (x) {
+      return true;
+    }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
   }
   if (!fst(tokens) || fst(tokens)[0] !== "right_square") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -158,7 +160,7 @@ function parseList(tokens) {
 function parseDefFunction(tokens) {
   var fname = parse(tokens);
   var parameters;
-  if (fname.exprType != "Name") {
+  if (fname.exprType !== "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "Expected an identifier in function definition");
@@ -647,4 +649,4 @@ module.exports = { parse : function(str) {
                   tokenize : tokenizer.tokenize
                  };
 var istr = fs.readFileSync('/dev/stdin').toString();
-parseFull(tokenizer.tokenize(istr)).map(pprint.pprint);
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));

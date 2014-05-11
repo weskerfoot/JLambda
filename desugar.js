@@ -5,6 +5,7 @@
  */
 
 var typ = require("./representation.js");
+var errors = require("./errors.js");
 var _ = require("underscore");
 
 // Lists get desugared to nested function calls
@@ -54,8 +55,9 @@ function sugarTypeApp(stx) {
 function desugar(stx) {
  switch (stx.exprType) {
     case "If":
-      if (stx.elseexp)
+      if (stx.elseexp) {
         return new typ.If(desugar(stx.condition), desugar(stx.thenexp), desugar(stx.elseexp));
+      }
       return new typ.If(desugar(stx.condition), desugar(stx.thenexp));
     case "FunctionDefinition":
       return desugarDefFunc(stx);
@@ -70,6 +72,9 @@ function desugar(stx) {
              * In this case we actually *add* syntax here to differentiate type applications
              * from normal applications
              */
+            if (!typ.isTypeExpr(stx.p)) {
+              throw errors.JInternalError("Type application error");
+            }
             return sugarTypeApp(stx);
           }
 
@@ -78,8 +83,9 @@ function desugar(stx) {
           stx.p) {
             return new typ.UnaryOp(desugar(stx.func), desugar(stx.p));
           }
-      if (stx.p)
+      if (stx.p) {
         return new typ.App(desugar(stx.func), desugar(stx.p));
+      }
       return new typ.App(stx.func);
     case "Function":
       return curryFunc(stx.p, stx.body);
