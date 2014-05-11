@@ -5,7 +5,7 @@ function empty(xs) {
 }
 
 function not(x) {
-	return !x;
+  return !x;
 }
 
 function min(a, b) {

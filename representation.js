@@ -25,7 +25,42 @@ var TypeExpression = {
   isTypeExpr : true
 };
 
-var isTypeExpr = _.property("isTypeExpr");
+function isTypeExpr(x) {
+  return x.isTypeExpr !== undefined;
+}
+
+function isIrregularTypeOp(x) {
+  return (x === "->");
+}
+
+function isTypeExprRec(stx, isTypeOp) {
+  if (isTypeExpr(stx)) {
+    return true;
+  }
+  if (stx.exprType === "Application") {
+    /* it might be a type application so recursively check it */
+    if (stx.p !== undefined) {
+      return (isTypeExprRec(stx.p) &&
+              isTypeExprRec(stx.func));
+    }
+    else {
+      return isTypeExprRec(stx.func);
+    }
+  }
+  if (stx.exprType === "Name") {
+    /* Check if it might be a type operator that is not capitalized */
+    return isIrregularTypeOp(stx.ident);
+  }
+  return false;
+}
+
+function App(func, p) {
+  this.func = func;
+  this.exprType = "Application";
+  if (p)
+    this.p = p;
+  return this;
+}
 
 function Closure(bound_vars, free_vars, body, env) {
   this.bound_vars = bound_vars;
@@ -41,7 +76,7 @@ function LetExp(pairs, body) {
     return (x.exprType === "Definition" ||
             x.exprType === "FunctionDefinition");
   })) {
-    throw Errors.JInternalError(
+    throw errors.JInternalError(
       "let can only be used to bind things to names or functions"
       );
   }
@@ -189,6 +224,8 @@ function TypeOp(name) {
   return this;
 }
 
+TypeOp.prototype = TypeExpression;
+
 function isTypeExpr(expr) {
   if (!expr.exprType) {
     throw errors.JInternalError(expr);
@@ -198,15 +235,13 @@ function isTypeExpr(expr) {
           (expr.exprType === "TypeApplication"));
 }
 
-TypeOp.prototype = TypeExpression;
-
 function TypeApp(expression, type) {
-  if (isTypeExpr(expression)) {
+  if (isTypeExprRec(expression)) {
     throw errors.JInternalError(
       "Left-hand-side of type application must not be in the type language"
       );
   }
-  if (!isTypeExpr(type)) {
+  if (!isTypeExprRec(type)) {
     throw errors.JInternalError(
       "Right-hand-side of type application must be a type expression"
       );
@@ -241,6 +276,8 @@ function makeGensym() {
 }
 
 var gensym = makeGensym();
+
+//console.log(isTypeExpr(new Name("T")));
 
 OPInfo = {"+" : [3, "Left"],
          "-" :  [3, "Left"],
@@ -288,5 +325,6 @@ module.exports =
      TypeVar : TypeVar,
      TypeOp : TypeOp,
      TypeApp: TypeApp,
-     Closure : Closure
+     Closure : Closure,
+     isTypeExpr : isTypeExprRec
    };

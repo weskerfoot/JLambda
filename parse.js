@@ -77,26 +77,33 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
   //make sure there are at least 2 tokens to parse
   if (tokens.length > 1 && fst(tokens) && valid(fst(tokens))) {
     while (valid(snd(tokens))) {
-      if (!(valid(fst(tokens))))
+      if (!(valid(fst(tokens)))) {
         break;
+      }
       results.push(parse(tokens));
-      if (!exprType(fst(results).exprType))
+      if (!exprType(fst(results).exprType)) {
         break;
-      if (fst(tokens))
+      }
+      if (fst(tokens)) {
         current = fst(tokens)[0];
-      else
+      }
+      else {
         throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
-      if (tokens.length <= 1)
+      }
+      if (tokens.length <= 1) {
         break;
+      }
     }
   }
   //do the same validity check as before and in the loop
-  if (!fst(tokens))
+  if (!fst(tokens)) {
     throw error.JSyntaxError(linenum,
                              charnum,
                              "unexpected end of source");
-  if (valid(fst(tokens)))
+  }
+  if (valid(fst(tokens))) {
     results.push(parse(tokens));
+  }
   return results;
 }
 
@@ -136,7 +143,9 @@ function parseList(tokens) {
     xs = [];
   }
   else {
-    xs = parseBetween(function (x) { return true; }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
+    xs = parseBetween(function (x) {
+      return true;
+    }, "comma", tokens, fst(tokens)[3], fst(tokens)[2]);
   }
   if (!fst(tokens) || fst(tokens)[0] !== "right_square") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -151,7 +160,7 @@ function parseList(tokens) {
 function parseDefFunction(tokens) {
   var fname = parse(tokens);
   var parameters;
-  if (fname.exprType != "Name") {
+  if (fname.exprType !== "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "Expected an identifier in function definition");
@@ -629,7 +638,12 @@ function parseFull(tokenized) {
     }
     return ast;
   } catch (e) {
-      e.stxerror();
+      if (e.stxerror !== undefined) {
+        e.stxerror();
+      }
+      else {
+        console.log(e.errormessage);
+      }
       process.exit(1);
   }
 }
@@ -640,4 +654,4 @@ module.exports = { parse : function(str) {
                   tokenize : tokenizer.tokenize
                  };
 var istr = fs.readFileSync('/dev/stdin').toString();
-parseFull(tokenizer.tokenize(istr)).map(pprint.pprint);
+console.log(parseFull(tokenizer.tokenize(istr)).map(pprint.pprint));
