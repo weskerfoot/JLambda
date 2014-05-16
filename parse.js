@@ -10,6 +10,25 @@ var error = require("./errors.js");
 
 var print = console.log;
 
+function sourcePos(tokens, linenum, charnum) {
+  if (!tokens || tokens.length === 0) {
+    return { linenum : linenum,
+             charnum : charnum
+    };
+  }
+  return {
+    linenum : fst(tokens)[3],
+    charnum : fst(tokens)[2]
+  };
+}
+
+function addSrcPos(stx, tokens, linenum, charnum) {
+  var pos = sourcePos(tokens, linenum, charnum);
+  stx.linenum = pos.linenum;
+  stx.charnum = pos.charnum;
+  return stx;
+}
+
 function fst(ts) {
   return ts[ts.length-1];
 }
@@ -68,8 +87,8 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
     parsed = parse(tokens);
   }
   else {
-    throw error.JSyntaxError(linenum,
-                             charnum,
+    throw error.JSyntaxError(fst(tokens)[3],
+                             fst(tokens)[2],
                              "Unexpected token: ``"+fst(tokens)[0]+"''");
   }
   results.push(parsed);
@@ -88,7 +107,9 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
         current = fst(tokens)[0];
       }
       else {
-        throw error.JSyntaxError(charnum, linenum, "Unexpected end of source");
+        throw error.JSyntaxError(linenum,
+                                 charnum,
+                                 "Unexpected end of source");
       }
       if (tokens.length <= 1) {
         break;
@@ -97,8 +118,8 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
   }
   //do the same validity check as before and in the loop
   if (!fst(tokens)) {
-    throw error.JSyntaxError(linenum,
-                             charnum,
+    throw error.JSyntaxError(fst(tokens)[3],
+                             fst(tokens)[2],
                              "unexpected end of source");
   }
   if (valid(fst(tokens))) {
@@ -114,7 +135,7 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
 function parseBetween(exprType, between, tokens, charnum, linenum) {
   var first = parse(tokens);
   if (!exprType(first)) {
-    throw error.JSyntaxError(charnum, linenum, "Unexpected token: ``"+fst(tokens)[0]+"''");
+    throw error.JSyntaxError(fst(tokens)[2], fst(tokens)[3], "Unexpected token: ``"+fst(tokens)[0]+"''");
   }
   var items = [first];
   var parsed;
@@ -123,8 +144,8 @@ function parseBetween(exprType, between, tokens, charnum, linenum) {
       tokens.pop();
       parsed = parse(tokens);
       if (!fst(tokens))
-        throw error.JSyntaxError(linenum,
-                                 charnum,
+        throw error.JSyntaxError(fst(tokens)[3],
+                                 fst(tokens)[2],
                                  "Missing terminator: "+between);
       items.push(parsed);
     }
@@ -133,8 +154,9 @@ function parseBetween(exprType, between, tokens, charnum, linenum) {
   return items;
 }
 
-function parseList(tokens) {
+function parseList(tokens, linenum, charnum) {
   var xs;
+  var result;
   if (fst(tokens)[0] === "right_square") {
       xs = [];
   }
@@ -153,13 +175,15 @@ function parseList(tokens) {
                              "list must be terminated by ]");
   }
   tokens.pop();
-  return new typ.ListT(xs);
+  result = addSrcPos(new typ.ListT(xs), tokens, linenum, charnum);
+  return result;
 }
 
 
-function parseDefFunction(tokens) {
+function parseDefFunction(tokens, linenum, charnum) {
   var fname = parse(tokens);
   var parameters;
+  var result;
   if (fname.exprType !== "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
@@ -183,13 +207,16 @@ function parseDefFunction(tokens) {
   }
   tokens.pop();
   var body = parse(tokens);
-  return new typ.DefFunc(fname, parameters, body);
+  result = addSrcPos(new typ.DefFunc(fname, parameters, body), tokens, linenum, charnum);
+  return result;
 }
 
 validLet = makeChecker(["Definition", "FunctionDefinition"].map(formTypeCheck));
 letEnd = _.compose($.not, makeChecker(["right_brace"].map(tokTypeCheck)));
 
 function parseLetForm(tokens, linenum, charnum) {
+  var result;
+
   if (!fst(tokens)) {
     error.JSyntaxError(linenum,
                        charnum,
@@ -211,28 +238,28 @@ function parseLetForm(tokens, linenum, charnum) {
                              charnum,
                              "Unexpected end of source");
   }
-  linenum = fst(tokens)[3];
-  charnum = fst(tokens)[2];
   tokens.pop();
   if (tokens.length <= 0) {
-    throw error.JSyntaxError(linenum,
-                             charnum,
+    throw error.JSyntaxError(fst(tokens)[3],
+                             fst(tokens)[2],
                              "let/def form must have a body");
   }
   var body = parse(tokens);
   if (body.exprType === "Definition" ||
       body.exprType === "FunctionDefinition") {
-        throw error.JSyntaxError(linenum,
-                                 charnum,
+        throw error.JSyntaxError(fst(tokens)[3],
+                                 fst(tokens)[2],
                                  "Body of a let/def expression cannot be a definition");
       }
-  return new typ.LetExp(pairs, body);
+  result = addSrcPos(new typ.LetExp(pairs, body), tokens, linenum, charnum);
+  return result;
 
 }
 
 function parseLetFunction(tokens, linenum, charnum) {
   var fname = parse(tokens);
   var parameters;
+  var result;
 
   if (fname.exprType != "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -263,11 +290,14 @@ function parseLetFunction(tokens, linenum, charnum) {
   }
   tokens.pop();
   var body = parse(tokens);
-  return new typ.DefFunc(fname, parameters, body);
+  result = addSrcPos(new typ.DefFunc(fname, parameters, body), tokens, linenum, charnum);
+  return result;
 }
 
 function parseLetBinding(tokens, linenum, charnum) {
   var name = parse(tokens);
+  var result;
+
   if (name.exprType != "Name") {
     throw error.JSyntaxError(linenum,
                              charnum,
@@ -294,7 +324,8 @@ function parseLetBinding(tokens, linenum, charnum) {
                                  charnum,
                                  "A definition cannot be the value of a binding");
       }
-  return new typ.Def(name, bound);
+  result = addSrcPos(new typ.Def(name, bound), tokens, linenum, charnum);
+  return result;
 }
 
 function parseLetItem(tokens) {
@@ -312,6 +343,8 @@ function parseLetItem(tokens) {
 }
 
 function parseDef(tokens, linenum, charnum) {
+  var result;
+
   if (tokens.length < 2)
     throw error.JSyntaxError(linenum,
                              charnum,
@@ -358,11 +391,15 @@ function parseDef(tokens, linenum, charnum) {
                                  charnum,
                                  "A definition cannot be the value of a binding");
       }
-    return new typ.Def(identifier, bound);
+    result = addSrcPos(new typ.Def(identifier, bound), tokens, linenum, charnum);
+    return result;
   }
  }
 
 function parseDefOp(tokens, linenum, charnum) {
+  var result;
+  var names;
+
   if (fst(tokens)[0] !== "integer" ||
       fst(tokens)[1] < 1) {
     throw error.JSyntaxError(linenum,
@@ -400,10 +437,22 @@ function parseDefOp(tokens, linenum, charnum) {
                              "defop pattern must be terminated with )");
   }
   tokens.pop();
-  return new typ.DefFunc(new typ.Name(pattern[1][1]),
-                         [new typ.Name(pattern[0][1]),
-                          new typ.Name(pattern[2][1])],
-                         parse(tokens));
+  names = [new typ.Name(pattern[1][1]),
+           new typ.Name(pattern[0][1]),
+           new typ.Name(pattern[2][1])];
+  names.map(function(name) {
+    name.linenum = linenum;
+    name.charnum = charnum;
+    return name;
+  });
+
+  result = addSrcPos(new typ.DefFunc(names[0],
+                                    names.slice(1,3),
+                                    parse(tokens)),
+                     tokens,
+                     linenum,
+                     charnum);
+  return result;
 }
 
 
@@ -411,6 +460,7 @@ function parseDefOp(tokens, linenum, charnum) {
 function parseIf(tokens) {
   var linenum = fst(tokens)[3];
   var charnum = fst(tokens)[2];
+  var result;
   if (!notFollowedBy(tokens,
                      ["def","comma","lambda"],
                      linenum,
@@ -439,7 +489,8 @@ function parseIf(tokens) {
         }
       else {
         var elseC = parse(tokens);
-        return new typ.If(ifC, thenC, elseC);
+        result = addSrcPos(new typ.If(ifC, thenC, elseC), tokens, linenum, charnum);
+        return result;
         }
       }
       else {
@@ -461,6 +512,7 @@ function validFormPar(tok) {
 function parseLambda(tokens) {
   var linenum = fst(tokens)[2];
   var charnum = fst(tokens)[3];
+  var result;
   var parameters = parseMany(parse,
                              validName,
                              validFormPar,
@@ -474,7 +526,8 @@ function parseLambda(tokens) {
   }
   tokens.pop();
   var body = parse(tokens);
-  return new typ.FuncT(parameters, body);
+  result = addSrcPos(new typ.FuncT(parameters, body), tokens, linenum, charnum);
+  return result;
 }
 
 var invalidArguments = ["def", "comma", "right_paren", "right_square", "right_brace", "left_brace", "right_brace"].map(tokTypeCheck);
@@ -498,8 +551,8 @@ function computeApp(tokens, charnum, linenum) {
     /* it's an infix expression */
     result = parseInfix(tokens, 1, lhs, linenum, charnum);
     if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
-      throw error.JSyntaxError(linenum,
-                               charnum,
+      throw error.JSyntaxError(fst(tokens)[3],
+                               fst(tokens)[2],
                                "Mismatched parentheses or missing parenthesis on right-hand side");
     }
     else {
@@ -515,25 +568,26 @@ function computeApp(tokens, charnum, linenum) {
                              validArgTypes,
                              validArgument,
                              tokens,
-                             charnum,
-                             linenum);
+                             fst(tokens)[2],
+                             fst(tokens)[3]);
     }
     else {
       parameters = [];
     }
     if ((!fst(tokens)) || fst(tokens)[0] !== "right_paren") {
-      throw error.JSyntaxError(linenum,
-                               charnum,
+      throw error.JSyntaxError(fst(tokens)[3],
+                               fst(tokens)[2],
                                "Mismatched parentheses or missing parenthesis on right-hand side");
     }
     else {
       tokens.pop();
-      return typ.makeApp(lhs, parameters);
+      return addSrcPos(typ.makeApp(lhs, parameters), tokens, linenum, charnum);
     }
   }
 }
 
 /*Parses infix expressions by precedence climbing
+ * console.log(stx);
   See this for more info and an implementation in python
   http://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing/
 */
@@ -553,14 +607,14 @@ function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
     if (!opinfo || opinfo[0] < minPrec)
       break;
 
-    var op = new typ.Name(cur[1]);
+    var op = addSrcPos(new typ.Name(cur[1]), tokens, linenum, charnum);
     var prec = opinfo[0];
     var assoc = opinfo[1];
     var nextMinPrec = assoc === "Left" ? prec + 1 : prec;
     tokens.pop();
     /*remove the operator token*/
     var rhs = parseInfix(tokens, nextMinPrec);
-    lhs = typ.makeApp(op, [lhs, rhs]);
+    lhs = addSrcPos(typ.makeApp(op, [lhs, rhs]), tokens, linenum, charnum);
   }
   return lhs;
 }
@@ -569,6 +623,7 @@ function parse(tokens) {
   var charnum = fst(tokens)[2];
   var linenum = fst(tokens)[3];
   var toktype;
+  var result;
   if (fst(tokens)) {
     toktype = fst(tokens)[0];
   }
@@ -578,35 +633,41 @@ function parse(tokens) {
   var token = fst(tokens)[1];
   tokens.pop();
   if (toktype === "stringlit") {
-    return new typ.StrT(token);
+    result = addSrcPos(new typ.StrT(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "left_square") {
-    return parseList(tokens);
+    return parseList(tokens, linenum, charnum);
   }
   else if (toktype === "lambda") {
     return parseLambda(tokens);
   }
   else if (toktype === "integer") {
-    return new typ.IntT(token);
+    result = addSrcPos(new typ.IntT(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "float") {
-    return new typ.FloatT(token);
+    result = addSrcPos(new typ.FloatT(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "identifier") {
-    return new typ.Name(token);
+    result = addSrcPos(new typ.Name(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "constructor") {
-    return new typ.TypeOp(token);
+    result = addSrcPos(new typ.TypeOp(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "truelit" || toktype === "falselit") {
-    return new typ.BoolT(token);
+    result = addSrcPos(new typ.BoolT(token), tokens, linenum, charnum);
+    return result;
   }
   else if (toktype === "def" ||
            toktype === "let") {
-    return parseDef(tokens, fst(tokens)[3], fst(tokens)[2]);
+    return parseDef(tokens, linenum, charnum);
   }
   else if (toktype === "defop") {
-    return parseDefOp(tokens, fst(tokens)[3], fst(tokens)[2]);
+    return parseDefOp(tokens, linenum, charnum);
   }
   else if (toktype === "ifexp") {
     return parseIf(tokens);
@@ -619,11 +680,11 @@ function parse(tokens) {
       return parsed;
     }
     else
-      return computeApp(tokens, charnum, linenum);
+      return computeApp(tokens, linenum, charnum);
   }
   else {
-    throw error.JSyntaxError(fst(tokens)[3],
-                             fst(tokens)[2],
+    throw error.JSyntaxError(linenum,
+                             charnum,
                              "Unexpected token: ``" + toktype+"''");
   }
 }

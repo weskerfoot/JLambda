@@ -28,12 +28,16 @@ function desugarDefFunc(def) {
 }
 
 function curryFunc(ps, body) {
+  var result;
   if (_.isEmpty(ps)) {
     return desugar(body);
   }
   else {
-    return new typ.FuncT(desugar(_.first(ps)),
+    result = new typ.FuncT(desugar(_.first(ps)),
                          curryFunc(_.rest(ps), body));
+    result.charnum = ps.charnum;
+    result.linenum = ps.linenum;
+    return result;
   }
 }
 
@@ -73,7 +77,7 @@ function desugar(stx) {
              * from normal applications
              */
             if (!typ.isTypeExpr(stx.p)) {
-              throw errors.JInternalError("Type application error");
+              throw errors.JInternalError("Type application error near line " + stx.linenum + " at character #"+stx.charnum);
             }
             return sugarTypeApp(stx);
           }
