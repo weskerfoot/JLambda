@@ -140,18 +140,19 @@ function tokenizeCtor(tokstream,
 function tokenizeStr(tokstream, charnum, linenum) {
   var stringlit = [];
   var n = 1;
+  var new_charnum = charnum;
   tokstream = tokstream.substr(1);
   while (tokstream[0].charCodeAt() !== 34) {
     stringlit.push(tokstream[0]);
     tokstream = tokstream.substr(1);
     n++;
-    charnum++;
+    new_charnum++;
     if (tokstream.length < 1) {
       throw error.JSyntaxError(linenum, charnum, "Error: missing quotation mark");
     }
   }
   n++;
-  return [n, ["stringlit", stringlit.join(''), charnum, linenum]];
+  return [n, ["stringlit", stringlit.join(''), new_charnum, linenum]];
 
 }
 
@@ -200,7 +201,7 @@ function tokenize(tokstream, matchop) {
       /* falls through */
       case 10: // '\n'
         linenum++;
-        charnum = 1;
+        charnum = 1; /* Reset the character number for each line to 1 */
         tokens.push(["whitespace", '\n', charnum, linenum]);
         tokstream = tokstream.substr(1);
         break;
@@ -279,7 +280,7 @@ function tokenize(tokstream, matchop) {
       case 105: // 'i'
         var ifexp = peek(tokstream, "ifexp", "if");
         if (ifexp) {
-          tokens.push($.extend(ifexp, [linenum, charnum]));
+          tokens.push($.extend(ifexp, [charnum, linenum]));
           tokstream = tokstream.substr(2);
           break;
         }
@@ -324,7 +325,7 @@ function tokenize(tokstream, matchop) {
       case 108: // l
         lambda = peek(tokstream, "lambda", "lambda");
         if (lambda) {
-          tokens.push($.extend(lambda, [linenum, charnum]));
+          tokens.push($.extend(lambda, [charnum, linenum]));
           tokstream = tokstream.substr(6);
           break;
         }

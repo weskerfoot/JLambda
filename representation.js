@@ -9,7 +9,9 @@ var Expression = {
   type :
     function () {
       return this.exprType;
-    }
+    },
+  linenum : 0,
+  charnum : 0
 };
 
 var TypeExpression = {
@@ -139,13 +141,15 @@ function ListT(xs) {
   return this;
 }
 
+ListT.prototype = Expression;
+
 function Nil() {
   this.exprType = "Nil";
   return this;
 }
+
 Nil.prototype = Expression;
 
-ListT.prototype = Expression;
 
 function FuncT(p, body) {
   this.p = p;
@@ -176,6 +180,8 @@ function App(func, p) {
   return this;
 }
 
+App.prototype = Expression;
+
 // Names are not types
 function Name(identifier) {
   this.ident = identifier;
@@ -184,12 +190,16 @@ function Name(identifier) {
   return this;
 }
 
+Name.prototype = Expression;
+
 function Def(ident, exp) {
   this.ident = ident;
   this.val = exp;
   this.exprType = "Definition";
   return this;
 }
+
+Def.prototype = Expression;
 
 function DefFunc(ident, params, body) {
   this.ident = ident;
@@ -200,6 +210,8 @@ function DefFunc(ident, params, body) {
   return this;
 }
 
+DefFunc.prototype = Expression;
+
 function If(condition, thenexp, elseexp) {
   this.condition = condition;
   this.thenexp = thenexp;
@@ -207,6 +219,8 @@ function If(condition, thenexp, elseexp) {
   this.exprType = "If";
   return this;
 }
+
+If.prototype = Expression;
 
 function TypeVar(name) {
   this.exprtype = "TypeVar";
