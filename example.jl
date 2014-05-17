@@ -1,7 +1,7 @@
 defop 2 Left (a ++ b)
  (a - b)
 
-(qat :: (T -> 2))
+(qat :: (T -> B -> "wat"))
 def qat (lambda a b c -> (a + b))
 
 def (add a b)

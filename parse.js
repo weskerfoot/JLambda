@@ -701,11 +701,12 @@ function parseFull(tokenized) {
   } catch (e) {
       if (e.stxerror !== undefined) {
         e.stxerror();
+        process.exit(1);
       }
       else {
         console.log(e.errormessage);
+        process.exit(1);
       }
-      process.exit(1);
   }
 }
 

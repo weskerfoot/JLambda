@@ -35,26 +35,47 @@ function isIrregularTypeOp(x) {
   return (x === "->");
 }
 
-function isTypeExprRec(stx, isTypeOp) {
+function flattenTypeApp(stx) {
   if (isTypeExpr(stx)) {
-    return true;
+    return stx;
   }
   if (stx.exprType === "Application") {
     /* it might be a type application so recursively check it */
     if (stx.p !== undefined) {
-      return (isTypeExprRec(stx.p) &&
-              isTypeExprRec(stx.func));
+      return  _.flatten([stx, flattenTypeApp(stx.p), flattenTypeApp(stx.func)]);
     }
     else {
-      return isTypeExprRec(stx.func);
+      return _.flatten([stx, flattenTypeApp(stx.func)]);
     }
   }
   if (stx.exprType === "Name") {
     /* Check if it might be a type operator that is not capitalized */
-    return isIrregularTypeOp(stx.ident);
+    if (isIrregularTypeOp(stx.ident)) {
+      return stx;
+    }
+    return {
+      failed : true,
+      stx : stx
+    };
   }
-  return false;
+  return {
+    failed : true,
+    stx : stx
+  };
 }
+
+function isTypeExprRec(stx) {
+  var flattened = flattenTypeApp(stx);
+  for(var i = 0; i < flattened.length; i++) {
+    if (flattened[i].failed !== undefined &&
+        flattened[i].failed) {
+          return flattened[i];
+        }
+  }
+  return true;
+}
+
+
 
 function App(func, p) {
   this.func = func;

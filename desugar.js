@@ -57,6 +57,8 @@ function sugarTypeApp(stx) {
 
 
 function desugar(stx) {
+ var typeExpTest;
+
  switch (stx.exprType) {
     case "If":
       if (stx.elseexp) {
@@ -76,8 +78,13 @@ function desugar(stx) {
              * In this case we actually *add* syntax here to differentiate type applications
              * from normal applications
              */
-            if (!typ.isTypeExpr(stx.p)) {
-              throw errors.JInternalError("Type application error near line " + stx.linenum + " at character #"+stx.charnum);
+            typeExpTest = typ.isTypeExpr(stx.p);
+
+            if (typeExpTest.failed !== undefined &&
+                typeExpTest.failed) {
+              throw errors.JInternalError(
+                "Type application error near line " + stx.linenum + " at character #"+stx.charnum +
+                "\n"+typeExpTest.stx.exprType+" (" + typeExpTest.stx.val + ") found where a type operator or type application was expected");
             }
             return sugarTypeApp(stx);
           }
