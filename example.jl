@@ -1,11 +1,13 @@
 defop 2 Left (a ++ b)
  (a - b)
 
-(qat :: (T -> 2))
+(qat :: A -> b)
 def qat (lambda a b c -> (a + b))
 
 def (add a b)
   (a + b)
+
+def wat [[1,2,3], [4,5,6]]
 
 def (catstrs strs)
   (foldr f

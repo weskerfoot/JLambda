@@ -10,7 +10,7 @@ function JSyntaxError(linenum, charnum, message) {
   this.charnum = charnum;
   this.errormessage = message;
   this.stxerror = function() {
-  console.log("Syntax Error\n",
+    console.log("Syntax Error\n",
                 "Line #", this.linenum-2,"\n",
                 "Near character #", this.charnum, "\n",
                 this.errormessage);
@@ -28,7 +28,6 @@ function JTypeError(linenum, charnum, token, message) {
 
 function JInternalError(message) {
   this.errormessage = message;
-  console.log(message);
   return this;
 }
 

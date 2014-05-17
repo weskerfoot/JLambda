@@ -24,7 +24,9 @@ var TypeExpression = {
         console.log("Could not unify " + this.expr + " with " + t.expr);
       }
     },
-  isTypeExpr : true
+  isTypeExpr : true,
+  linenum : 0,
+  charnum : 0
 };
 
 function isTypeExpr(x) {
@@ -35,25 +37,43 @@ function isIrregularTypeOp(x) {
   return (x === "->");
 }
 
-function isTypeExprRec(stx, isTypeOp) {
+function flattenTypeApp(stx) {
   if (isTypeExpr(stx)) {
     return true;
   }
   if (stx.exprType === "Application") {
     /* it might be a type application so recursively check it */
     if (stx.p !== undefined) {
-      return (isTypeExprRec(stx.p) &&
-              isTypeExprRec(stx.func));
+      return  _.flatten([flattenTypeApp(stx.p), flattenTypeApp(stx.func)]);
     }
     else {
-      return isTypeExprRec(stx.func);
+      return _.flatten([flattenTypeApp(stx.func)]);
     }
   }
   if (stx.exprType === "Name") {
-    /* Check if it might be a type operator that is not capitalized */
-    return isIrregularTypeOp(stx.ident);
+    /*
+     * Either it is a type operator
+     * or we assume it is a type variable
+     * since it was not capitalized
+     */
+    return true;
   }
-  return false;
+  return {
+    failed : true,
+    stx : stx
+  };
+}
+
+
+function isTypeExprRec(stx) {
+  var flattened = flattenTypeApp(stx);
+  for(var i = 0; i < flattened.length; i++) {
+    if (flattened[i].failed !== undefined &&
+        flattened[i].failed) {
+          return flattened[i];
+        }
+  }
+  return true;
 }
 
 function App(func, p) {
@@ -250,8 +270,11 @@ function isTypeExpr(expr) {
 }
 
 function TypeApp(expression, type) {
-  if (isTypeExprRec(expression)) {
-    throw errors.JInternalError(
+  if (isTypeExprRec(expression) &&
+      expression.exprType !== "Name") {
+    throw errors.JSyntaxError(
+      expression.linenum,
+      expression.charnum,
       "Left-hand-side of type application must not be in the type language"
       );
   }
