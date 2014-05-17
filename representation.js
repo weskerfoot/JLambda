@@ -24,7 +24,9 @@ var TypeExpression = {
         console.log("Could not unify " + this.expr + " with " + t.expr);
       }
     },
-  isTypeExpr : true
+  isTypeExpr : true,
+  linenum : 0,
+  charnum : 0
 };
 
 function isTypeExpr(x) {
@@ -270,7 +272,9 @@ function isTypeExpr(expr) {
 function TypeApp(expression, type) {
   if (isTypeExprRec(expression) &&
       expression.exprType !== "Name") {
-    throw errors.JInternalError(
+    throw errors.JSyntaxError(
+      expression.linenum,
+      expression.charnum,
       "Left-hand-side of type application must not be in the type language"
       );
   }

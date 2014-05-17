@@ -52,6 +52,8 @@ function sugarTypeApp(stx) {
   var expression;
   type = stx.p;
   expression = desugar(stx.func.p);
+  expression.linenum = stx.linenum;
+  expression.charnum = stx.charnum;
   return new typ.TypeApp(expression, type);
 }
 
