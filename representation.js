@@ -37,26 +37,24 @@ function isIrregularTypeOp(x) {
 
 function flattenTypeApp(stx) {
   if (isTypeExpr(stx)) {
-    return stx;
+    return true;
   }
   if (stx.exprType === "Application") {
     /* it might be a type application so recursively check it */
     if (stx.p !== undefined) {
-      return  _.flatten([stx, flattenTypeApp(stx.p), flattenTypeApp(stx.func)]);
+      return  _.flatten([flattenTypeApp(stx.p), flattenTypeApp(stx.func)]);
     }
     else {
-      return _.flatten([stx, flattenTypeApp(stx.func)]);
+      return _.flatten([flattenTypeApp(stx.func)]);
     }
   }
   if (stx.exprType === "Name") {
-    /* Check if it might be a type operator that is not capitalized */
-    if (isIrregularTypeOp(stx.ident)) {
-      return stx;
-    }
-    return {
-      failed : true,
-      stx : stx
-    };
+    /*
+     * Either it is a type operator
+     * or we assume it is a type variable
+     * since it was not capitalized
+     */
+    return true;
   }
   return {
     failed : true,
@@ -66,6 +64,7 @@ function flattenTypeApp(stx) {
 
 function isTypeExprRec(stx) {
   var flattened = flattenTypeApp(stx);
+  console.log(flattened);
   for(var i = 0; i < flattened.length; i++) {
     if (flattened[i].failed !== undefined &&
         flattened[i].failed) {
