@@ -62,9 +62,9 @@ function flattenTypeApp(stx) {
   };
 }
 
+
 function isTypeExprRec(stx) {
   var flattened = flattenTypeApp(stx);
-  console.log(flattened);
   for(var i = 0; i < flattened.length; i++) {
     if (flattened[i].failed !== undefined &&
         flattened[i].failed) {
@@ -73,8 +73,6 @@ function isTypeExprRec(stx) {
   }
   return true;
 }
-
-
 
 function App(func, p) {
   this.func = func;
@@ -270,7 +268,8 @@ function isTypeExpr(expr) {
 }
 
 function TypeApp(expression, type) {
-  if (isTypeExprRec(expression)) {
+  if (isTypeExprRec(expression) &&
+      expression.exprType !== "Name") {
     throw errors.JInternalError(
       "Left-hand-side of type application must not be in the type language"
       );
