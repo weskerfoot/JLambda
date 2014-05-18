@@ -178,15 +178,21 @@ function peek(tokstream, toktype, word, charnum, linenum) {
   return false;
 }
 
+
 function tokenize(tokstream, matchop) {
   var tokens = [];
   var charnum = 1;
   var linenum = 1;
-  var i, result, lambda, num;
+  var i, result, lambda, num, comment;
 
   while (tokstream) {
     switch (tokstream[0].charCodeAt()) {
       /* falls through */
+      case 59: // ;
+        while (tokstream[0].charCodeAt() !== 10) {
+          tokstream = tokstream.substr(1);
+        }
+        break;
       case 9: // '\t'
         charnum++;
         tokens.push(["whitespace", '\t', charnum, linenum]);
@@ -216,6 +222,7 @@ function tokenize(tokstream, matchop) {
         charnum++;
         tokens.push(["left_paren", '(', charnum, linenum]);
         tokstream = tokstream.substr(1);
+
         break;
       /* falls through */
       case 41: // ')'
