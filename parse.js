@@ -400,7 +400,7 @@ function parseDefType(tokens, linenum, charnum) {
                                rhs.charnum,
                                "was expecting an application or type operator on the right-hand side of a type definition");
     }
-    result = new typ.DefType(lhs, rhs);
+    result = addSrcPos(new typ.DefType(lhs, rhs), tokens, linenum, charnum);
     return result;
   }
 }

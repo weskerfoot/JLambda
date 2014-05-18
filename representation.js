@@ -291,11 +291,11 @@ function TypeApp(expression, type) {
 
 TypeApp.prototype = TypeExpression;
 
-function DefType(rhs, lhs) {
+function DefType(lhs, rhs) {
   /* Both rhs and lhs are expected
    * to be fully desugared already
    */
-  if (!isTypeExpr(rhs) ||
+  if (!isTypeExprRec(rhs) ||
       !isTypeExpr(lhs)) {
         throw errors.JSyntaxError(
           rhs.linenum,
@@ -309,6 +309,12 @@ function DefType(rhs, lhs) {
 }
 
 DefType.prototype = Expression;
+
+function DataType(params, type) {
+  /* Params is a list of type variables
+   * type is a type expression
+   */
+}
 
 
 //Applies the function ``name'' to the list of parameters

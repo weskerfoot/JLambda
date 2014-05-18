@@ -57,6 +57,14 @@ function sugarTypeApp(stx) {
   return new typ.TypeApp(expression, type);
 }
 
+function desugarDefType(stx) {
+  var result;
+  result = new typ.DefType(desugar(stx.lhs), desugar(stx.rhs));
+  result.linenum = stx.linenum;
+  result.charnum = stx.charnum;
+  return result;
+}
+
 
 function desugar(stx) {
  var typeExpTest;
@@ -71,6 +79,8 @@ function desugar(stx) {
       return desugarDefFunc(stx);
     case "Definition":
       return new typ.Def(stx.ident, desugar(stx.val));
+    case "TypeDefinition":
+      return desugarDefType(stx);
     case "Name":
       return stx;
     case "Application":
