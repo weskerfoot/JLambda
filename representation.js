@@ -319,10 +319,17 @@ function checkName(exp) {
   }
 }
 
-function DataType(params, type) {
+function DataType(name, params, type) {
   /* Params is a list of type variables
    * type is a type expression
    */
+  if (name.exprType !== "TypeOperator") {
+    throw errors.JSyntaxError(
+      name.linenum,
+      name.charnum,
+      "First element in a data type definition must be its name " +
+      "which is a type operator");
+  }
   _.each(params, checkName);
   if (!isTypeExprRec(type)) {
     throw errors.JSyntaxError(
@@ -330,6 +337,7 @@ function DataType(params, type) {
       type.charnum,
       "Body of a type definition must be a valid type expression");
   }
+  this.name = name;
   this.params = params;
   this.type = type;
   this.exprType = "TypeFuncDefinition";

@@ -377,7 +377,7 @@ function parseDataType(tokens, linenum, charnum) {
   }
   tokens.pop();
   typeBody = parse(tokens);
-  result = addSrcPos(new typ.DataType(parameters, typeBody), tokens, typeBody.linenum, typeBody.charnum);
+  result = addSrcPos(new typ.DataType(typeName, parameters, typeBody), tokens, typeBody.linenum, typeBody.charnum);
 
   return result;
 }
