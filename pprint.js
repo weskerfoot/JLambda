@@ -26,6 +26,10 @@ function pprintIf(ifexp) {
          " else " + pprint(ifexp.elseexp) + ")");
 }
 
+function pprintDefType(stx) {
+  return pprint(stx.lhs) + " = " + pprint(stx.rhs);
+}
+
 function pprint(expr) {
   if (expr.exprType === "Name") {
     return expr.val;
@@ -55,6 +59,9 @@ function pprint(expr) {
   }
   else if (expr.exprType === "Definition") {
     return pprintDef(expr);
+  }
+  else if (expr.exprType === "TypeDefinition") {
+    return pprintDefType(expr);
   }
   else if (expr.exprType === "If") {
     return pprintIf(expr);

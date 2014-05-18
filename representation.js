@@ -291,13 +291,13 @@ function TypeApp(expression, type) {
 
 TypeApp.prototype = TypeExpression;
 
-function DefType(rhs, lhs) {
+function DefType(lhs, rhs) {
   /* Both rhs and lhs are expected
    * to be fully desugared already
    */
-  if (!isExprType(rhs) ||
-      !isExprType(lhs)) {
-        throw erros.JSyntaxError(
+  if (!isTypeExprRec(rhs) ||
+      !isTypeExpr(lhs)) {
+        throw errors.JSyntaxError(
           rhs.linenum,
           rhs.charnum,
           "Illegal type definition, both sides must be valid type expressions");
@@ -305,6 +305,34 @@ function DefType(rhs, lhs) {
   this.rhs = rhs;
   this.lhs = lhs;
   this.exprType = "TypeDefinition";
+  return this;
+}
+
+DefType.prototype = Expression;
+
+function checkName(exp) {
+  if (exp.exprType !== "Name") {
+    throw errors.JSyntaxError(
+      exp.linenum,
+      exp.charnum,
+      "Expected a type variable (an identifier starting with a lowercase character), got " + exp.val);
+  }
+}
+
+function DataType(params, type) {
+  /* Params is a list of type variables
+   * type is a type expression
+   */
+  _.each(params, checkName);
+  if (!isTypeExprRec(type)) {
+    throw errors.JSyntaxError(
+      type.linenum,
+      type.charnum,
+      "Body of a type definition must be a valid type expression");
+  }
+  this.params = params;
+  this.type = type;
+  this.exprType = "TypeFuncDefinition";
   return this;
 }
 
@@ -381,5 +409,6 @@ module.exports =
      TypeOp : TypeOp,
      TypeApp: TypeApp,
      Closure : Closure,
-     isTypeExpr : isTypeExprRec
+     isTypeExpr : isTypeExprRec,
+     DefType : DefType
    };
