@@ -291,6 +291,24 @@ function TypeApp(expression, type) {
 
 TypeApp.prototype = TypeExpression;
 
+function DefType(rhs, lhs) {
+  /* Both rhs and lhs are expected
+   * to be fully desugared already
+   */
+  if (!isExprType(rhs) ||
+      !isExprType(lhs)) {
+        throw erros.JSyntaxError(
+          rhs.linenum,
+          rhs.charnum,
+          "Illegal type definition, both sides must be valid type expressions");
+      }
+  this.rhs = rhs;
+  this.lhs = lhs;
+  this.exprType = "TypeDefinition";
+  return this;
+}
+
+
 //Applies the function ``name'' to the list of parameters
 function makeApp(name, parameters) {
   if (parameters) {
