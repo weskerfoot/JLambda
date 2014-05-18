@@ -310,10 +310,30 @@ function DefType(lhs, rhs) {
 
 DefType.prototype = Expression;
 
+function checkName(exp) {
+  if (exp.exprType !== "Name") {
+    throw errors.JSyntaxError(
+      exp.linenum,
+      exp.charnum,
+      "Expected a type variable (an identifier starting with a lowercase character), got " + exp.val);
+  }
+}
+
 function DataType(params, type) {
   /* Params is a list of type variables
    * type is a type expression
    */
+  _.each(params, checkName);
+  if (!isTypeExprRec(type)) {
+    throw errors.JSyntaxError(
+      type.linenum,
+      type.charnum,
+      "Body of a type definition must be a valid type expression");
+  }
+  this.params = params;
+  this.type = type;
+  this.exprType = "TypeFuncDefinition";
+  return this;
 }
 
 
