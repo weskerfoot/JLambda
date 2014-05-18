@@ -18,6 +18,8 @@ deftype Byte Intrinsic
 
 deftype Void Intrinsic
 
+(: :: (a -> (List a) -> (List a)))
+
 (map :: ((a -> b) -> (List a) -> (List b)))
 
 (head :: ((List a) -> a))
