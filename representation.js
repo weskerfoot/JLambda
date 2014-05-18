@@ -410,5 +410,6 @@ module.exports =
      TypeApp: TypeApp,
      Closure : Closure,
      isTypeExpr : isTypeExprRec,
-     DefType : DefType
+     DefType : DefType,
+     DataType : DataType
    };
