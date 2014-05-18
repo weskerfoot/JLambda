@@ -11,7 +11,7 @@ function JSyntaxError(linenum, charnum, message) {
   this.errormessage = message;
   this.stxerror = function() {
     console.log("Syntax Error\n",
-                "Line #", this.linenum-2,"\n",
+                "Line #", this.linenum,"\n",
                 "Near character #", this.charnum, "\n",
                 this.errormessage);
   };
