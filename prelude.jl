@@ -7,3 +7,23 @@ deftype String (List Char)
 deftype (List a)
   (Empty |
    (Cons a (List a)))
+
+deftype Int Intrinsic
+
+deftype Float Intrinsic
+
+deftype Char Intrinsic
+
+deftype Byte Intrinsic
+
+deftype Void Intrinsic
+
+(map :: ((a -> b) -> (List a) -> (List b)))
+
+(head :: ((List a) -> a))
+
+(tail :: ((List a) -> (List a)))
+
+(!! :: (Int -> (List a) -> a))
+
+(print :: (String -> (IO Void)))
