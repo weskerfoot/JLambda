@@ -357,6 +357,7 @@ function parseDataType(tokens, linenum, charnum) {
   var typeName = parse(tokens, linenum, charnum);
   var typeParams;
   var typeBody;
+  var result;
 
   if (typeName.exprType !== "TypeOperator") {
     throw error.JSyntaxError(typeName.linenum,
@@ -376,7 +377,9 @@ function parseDataType(tokens, linenum, charnum) {
   }
   tokens.pop();
   typeBody = parse(tokens);
-  return addSrcPos(new typ.DataType, tokens, typeBody.linenum, typeBody.charnum);
+  result = addSrcPos(new typ.DataType(parameters, typeBody), tokens, typeBody.linenum, typeBody.charnum);
+
+  return result;
 }
 
 
