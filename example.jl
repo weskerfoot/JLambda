@@ -3,6 +3,9 @@ defop 2 Left (a ++ b)
 
 deftype Foo (A -> B)
 
+deftype (Foo a b)
+  (a -> b)
+
 (qat :: A -> b)
 def tdeftype (lambda a b c -> (a + b))
 

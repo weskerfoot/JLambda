@@ -30,6 +30,10 @@ function pprintDefType(stx) {
   return pprint(stx.lhs) + " = " + pprint(stx.rhs);
 }
 
+function pprintTypeFunc(stx) {
+  return "(" + stx.name.name + " " + stx.params.map(pprint).join(" ") + ") = " + pprint(stx.type);
+}
+
 function pprint(expr) {
   if (expr.exprType === "Name") {
     return expr.val;
@@ -62,6 +66,9 @@ function pprint(expr) {
   }
   else if (expr.exprType === "TypeDefinition") {
     return pprintDefType(expr);
+  }
+  else if (expr.exprType === "TypeFuncDefinition") {
+    return pprintTypeFunc(expr);
   }
   else if (expr.exprType === "If") {
     return pprintIf(expr);

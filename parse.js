@@ -207,7 +207,7 @@ function parseDefFunction(tokens, linenum, charnum) {
                            fst(tokens)[2],
                            fst(tokens)[3]);
   }
-  if ((fst(tokens)[0]) !== "right_paren") {
+  if (!tokens || (fst(tokens)[0]) !== "right_paren") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
                              "Formal parameters must be followed by )");
@@ -353,6 +353,37 @@ function parseLetItem(tokens) {
   }
 }
 
+function parseDataType(tokens, linenum, charnum) {
+  var typeName = parse(tokens, linenum, charnum);
+  var typeParams;
+  var typeBody;
+  var result;
+
+  if (typeName.exprType !== "TypeOperator") {
+    throw error.JSyntaxError(typeName.linenum,
+                             typeName.charnum,
+                             "Expected a type operator in data type definition");
+  }
+  parameters = parseMany(parse,
+                             validName,
+                             validFormPar,
+                             tokens,
+                             charnum,
+                             linenum);
+  if (!tokens || (fst(tokens)[0]) !== "right_paren") {
+    throw error.JSyntaxError(fst(tokens)[3],
+                             fst(tokens)[2],
+                             "Data type parameters must be followed by )");
+  }
+  tokens.pop();
+  typeBody = parse(tokens);
+  result = addSrcPos(new typ.DataType(typeName, parameters, typeBody), tokens, typeBody.linenum, typeBody.charnum);
+
+  return result;
+}
+
+
+
 function parseDefType(tokens, linenum, charnum) {
   var result;
   var rhs;
@@ -464,7 +495,7 @@ function parseDef(tokens, linenum, charnum) {
                                  charnum,
                                  "A definition cannot be the value of a binding");
       }
-    result = addSrcPos(new typ.Def(identifier, bound), tokens, linenum, charnum);
+    result = addSrcPos(new typ.Def(identifier, bound), tokens, bound.linenum, bound.charnum);
     return result;
   }
  }
@@ -562,7 +593,7 @@ function parseIf(tokens) {
         }
       else {
         var elseC = parse(tokens);
-        result = addSrcPos(new typ.If(ifC, thenC, elseC), tokens, linenum, charnum);
+        result = addSrcPos(new typ.If(ifC, thenC, elseC), tokens, elseC.linenum, elseC.charnum);
         return result;
         }
       }
@@ -599,7 +630,7 @@ function parseLambda(tokens) {
   }
   tokens.pop();
   var body = parse(tokens);
-  result = addSrcPos(new typ.FuncT(parameters, body), tokens, linenum, charnum);
+  result = addSrcPos(new typ.FuncT(parameters, body), tokens, body.linenum, body.charnum);
   return result;
 }
 
@@ -687,7 +718,7 @@ function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
     tokens.pop();
     /*remove the operator token*/
     var rhs = parseInfix(tokens, nextMinPrec);
-    lhs = addSrcPos(typ.makeApp(op, [lhs, rhs]), tokens, linenum, charnum);
+    lhs = addSrcPos(typ.makeApp(op, [lhs, rhs]), tokens, rhs.linenum, rhs.charnum);
   }
   return lhs;
 }
