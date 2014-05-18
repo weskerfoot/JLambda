@@ -134,11 +134,15 @@ function parseMany(parse, exprType, valid, tokens, charnum, linenum) {
  */
 function parseBetween(exprType, between, tokens, charnum, linenum) {
   var first = parse(tokens);
+  var items;
+  var parsed;
+
   if (!exprType(first)) {
     throw error.JSyntaxError(fst(tokens)[2], fst(tokens)[3], "Unexpected token: ``"+fst(tokens)[0]+"''");
   }
-  var items = [first];
-  var parsed;
+
+  items = [first];
+
   if (tokens.length > 1 && fst(tokens)[0] === between) {
     while (fst(tokens)[0] === between) {
       tokens.pop();
@@ -157,6 +161,7 @@ function parseBetween(exprType, between, tokens, charnum, linenum) {
 function parseList(tokens, linenum, charnum) {
   var xs;
   var result;
+
   if (fst(tokens)[0] === "right_square") {
       xs = [];
   }
@@ -184,6 +189,8 @@ function parseDefFunction(tokens, linenum, charnum) {
   var fname = parse(tokens);
   var parameters;
   var result;
+  var body;
+
   if (fname.exprType !== "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
                              fst(tokens)[2],
@@ -206,7 +213,7 @@ function parseDefFunction(tokens, linenum, charnum) {
                              "Formal parameters must be followed by )");
   }
   tokens.pop();
-  var body = parse(tokens);
+  body = parse(tokens);
   result = addSrcPos(new typ.DefFunc(fname, parameters, body), tokens, linenum, charnum);
   return result;
 }
@@ -216,13 +223,15 @@ letEnd = _.compose($.not, makeChecker(["right_brace"].map(tokTypeCheck)));
 
 function parseLetForm(tokens, linenum, charnum) {
   var result;
+  var pairs;
+  var body;
 
   if (!fst(tokens)) {
     error.JSyntaxError(linenum,
                        charnum,
                        "Unexpected end of source");
   }
-  var pairs = parseMany(parseLetItem,
+  pairs = parseMany(parseLetItem,
                         validLet,
                         letEnd,
                         tokens,
@@ -244,7 +253,7 @@ function parseLetForm(tokens, linenum, charnum) {
                              fst(tokens)[2],
                              "let/def form must have a body");
   }
-  var body = parse(tokens);
+  body = parse(tokens);
   if (body.exprType === "Definition" ||
       body.exprType === "FunctionDefinition") {
         throw error.JSyntaxError(fst(tokens)[3],
@@ -260,6 +269,7 @@ function parseLetFunction(tokens, linenum, charnum) {
   var fname = parse(tokens);
   var parameters;
   var result;
+  var body;
 
   if (fname.exprType != "Name") {
     throw error.JSyntaxError(fst(tokens)[3],
@@ -289,7 +299,7 @@ function parseLetFunction(tokens, linenum, charnum) {
                              "Function parameters in let/def form must be followed by ->");
   }
   tokens.pop();
-  var body = parse(tokens);
+  body = parse(tokens);
   result = addSrcPos(new typ.DefFunc(fname, parameters, body), tokens, linenum, charnum);
   return result;
 }
@@ -297,6 +307,7 @@ function parseLetFunction(tokens, linenum, charnum) {
 function parseLetBinding(tokens, linenum, charnum) {
   var name = parse(tokens);
   var result;
+  var bound;
 
   if (name.exprType != "Name") {
     throw error.JSyntaxError(linenum,
@@ -317,7 +328,7 @@ function parseLetBinding(tokens, linenum, charnum) {
                                charnum,
                                "The binding of " + identifier.val + " must not be followed by " + fst(tokens)[0]);
                        }
-  var bound = parse(tokens);
+  bound = parse(tokens);
   if (bound.exprType === "Definition" ||
       bound.exprType === "FunctionDefinition") {
         throw error.JSyntaxError(linenum,
@@ -342,13 +353,73 @@ function parseLetItem(tokens) {
   }
 }
 
-function parseDef(tokens, linenum, charnum) {
+function parseDefType(tokens, linenum, charnum) {
   var result;
+  var rhs;
+  var lhs;
 
-  if (tokens.length < 2)
+  if (tokens.length < 2) {
+    /* Minimal number of tokens required is 2
+     * because it could be 'deftype Foo Blah'
+     */
     throw error.JSyntaxError(linenum,
                              charnum,
                              "Unexpected end of source");
+  }
+  if (fst(tokens)[0] === "left_paren") {
+    /* It's an actual data type definition
+     * i.e. not just a newtype
+     */
+    tokens.pop();
+    return parseDataType(tokens, linenum, charnum);
+  }
+
+  if (notFollowedBy(tokens, ["constructor"]. linenum, charnum)) {
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "deftype must be followed by a single constructor" +
+                             " if it is not a data type definition with type variables");
+  }
+  else {
+    lhs = parse(tokens, linenum, charnum);
+    if (!tokens) {
+      throw error.JSyntaxError(linenum,
+                               charnum,
+                               "Unexpected end of source");
+    }
+    if (lhs.exprType !== "TypeOperator") {
+      throw error.JSyntaxError(lhs.linenum,
+                               lhs.charnum,
+                               "left-hand side of type definition was not a type operator");
+    }
+    rhs = parse(tokens, linenum, charnum);
+
+    if (rhs.exprType !== "Application" &&
+        rhs.exprType !== "TypeOperator") {
+      throw error.JSyntaxError(rhs.linenum,
+                               rhs.charnum,
+                               "was expecting an application or type operator on the right-hand side of a type definition");
+    }
+  }
+}
+
+
+
+
+
+function parseDef(tokens, linenum, charnum) {
+  var result;
+  var identifier;
+  var bound;
+
+  if (tokens.length < 2) {
+    /* Minimal number of tokens required is 2
+     * because it could be 'def foo blah'
+     */
+    throw error.JSyntaxError(linenum,
+                             charnum,
+                             "Unexpected end of source");
+  }
   if (fst(tokens)[0] === "left_paren") {
     /* It's a function definition */
     tokens.pop();
@@ -369,7 +440,7 @@ function parseDef(tokens, linenum, charnum) {
                              "def must be followed by identifier, not "+fst(tokens)[0]);
   }
   else {
-    var identifier = parse(tokens);
+    identifier = parse(tokens);
     if (!fst(tokens))
       throw error.JSyntaxError(linenum,
                                charnum,
@@ -384,7 +455,7 @@ function parseDef(tokens, linenum, charnum) {
                                charnum,
                                "def " + identifier.val + " must not be followed by " + fst(tokens)[0]);
     }
-    var bound = parse(tokens);
+    bound = parse(tokens);
     if (bound.exprType === "Definition" ||
       bound.exprType === "FunctionDefinition") {
         throw error.JSyntaxError(linenum,
