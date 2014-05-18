@@ -299,6 +299,12 @@ function tokenize(tokstream, matchop) {
           tokstream = tokstream.substr(5);
           break;
         }
+        var deftype = peek(tokstream, "deftype", "deftype");
+        if (deftype) {
+          tokens.push(["deftype", "deftype", charnum, linenum]);
+          tokstream = tokstream.substr(7);
+          break
+        }
         var def = peek(tokstream, "def", "def");
         if (def) {
           tokens.push(["def", "def", charnum, linenum]);
