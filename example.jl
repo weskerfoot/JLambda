@@ -3,6 +3,9 @@ defop 2 Left (a ++ b)
 
 deftype Foo (A -> B)
 
+;; here is a comment
+; here is another comment
+
 deftype (Foo a b)
   (a -> b)
 

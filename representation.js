@@ -391,7 +391,8 @@ OPInfo = {"+" : [3, "Left"],
           "<$>" : [1, "Left"],
           "." : [1, "Left"],
           "," : [1, "Left"],
-          "->" : [1, "Right"]};
+          "->" : [1, "Right"],
+          "|" : [1, "Left"]};
 
 module.exports =
    {
