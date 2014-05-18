@@ -295,9 +295,9 @@ function DefType(rhs, lhs) {
   /* Both rhs and lhs are expected
    * to be fully desugared already
    */
-  if (!isExprType(rhs) ||
-      !isExprType(lhs)) {
-        throw erros.JSyntaxError(
+  if (!isTypeExpr(rhs) ||
+      !isTypeExpr(lhs)) {
+        throw errors.JSyntaxError(
           rhs.linenum,
           rhs.charnum,
           "Illegal type definition, both sides must be valid type expressions");
@@ -307,6 +307,8 @@ function DefType(rhs, lhs) {
   this.exprType = "TypeDefinition";
   return this;
 }
+
+DefType.prototype = Expression;
 
 
 //Applies the function ``name'' to the list of parameters
@@ -381,5 +383,6 @@ module.exports =
      TypeOp : TypeOp,
      TypeApp: TypeApp,
      Closure : Closure,
-     isTypeExpr : isTypeExprRec
+     isTypeExpr : isTypeExprRec,
+     DefType : DefType
    };

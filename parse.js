@@ -374,7 +374,7 @@ function parseDefType(tokens, linenum, charnum) {
     return parseDataType(tokens, linenum, charnum);
   }
 
-  if (notFollowedBy(tokens, ["constructor"]. linenum, charnum)) {
+  if (notFollowedBy(tokens, ["constructor"], linenum, charnum)) {
     throw error.JSyntaxError(linenum,
                              charnum,
                              "deftype must be followed by a single constructor" +
@@ -400,6 +400,8 @@ function parseDefType(tokens, linenum, charnum) {
                                rhs.charnum,
                                "was expecting an application or type operator on the right-hand side of a type definition");
     }
+    result = new typ.DefType(lhs, rhs);
+    return result;
   }
 }
 
@@ -736,6 +738,9 @@ function parse(tokens) {
   else if (toktype === "def" ||
            toktype === "let") {
     return parseDef(tokens, linenum, charnum);
+  }
+  else if (toktype === "deftype") {
+    return parseDefType(tokens, linenum, charnum);
   }
   else if (toktype === "defop") {
     return parseDefOp(tokens, linenum, charnum);
