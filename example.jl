@@ -2,7 +2,7 @@ defop 2 Left (a ++ b)
  (a - b)
 
 (qat :: A -> b)
-def qat (lambda a b c -> (a + b))
+def tdeftype (lambda a b c -> (a + b))
 
 def (add a b)
   (a + b)
@@ -35,6 +35,20 @@ def fileLines
 
 def (testUnary n)
   ((-n) + n)
+
+def (foo bar)
+  let {
+    lol = [1,
+   (lambda qwerty blah ->
+      [qerty, blah,
+       (lambda whatever -> whatever)])]
+  }
+  if bar
+    then [lol,(- 1.2),"lulz",lol]
+  else if something
+    then [,]
+  else
+    somethingelse
 
 def (splitHelp acc xs ys)
   if (null xs)
