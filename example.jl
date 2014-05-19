@@ -49,7 +49,7 @@ def (testUnary n)
 
 def (foo bar)
   let {
-    lol = [1,
+    lol =  [1,
    (lambda qwerty blah ->
       [qerty, blah,
        (lambda whatever -> whatever)])]
@@ -82,6 +82,7 @@ def r def
 
 def main
   let {
+    (f a) -> a
     unary = (print (testUnary 6))
     splitted = def {
                 xs = (fst (splitxs [12,3,4,56]))
