@@ -801,8 +801,7 @@ function parseFull(tokenized) {
   var ast = [];
   try {
     while (tokenized.length > 0) {
-      var parsed = desugarer.desugar(parse(tokenized));
-      ast.push(parsed);
+      ast.push(desugarer.desugar(parse(tokenized)));
     }
     return ast;
   } catch (e) {

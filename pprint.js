@@ -94,7 +94,7 @@ function pprint(expr) {
   else if (expr.exprType === "TypeVar") {
     return "("+expr.name+")";
   }
-  else if (expr.exprType === "TypeApplication") {
+  else if (expr.exprType === "TypeDeclaration") {
     return "( " + pprint(expr.expression) + " :: " + pprint(expr.type) + " )";
   }
 }
