@@ -278,7 +278,7 @@ function TypeDecl(expression, type) {
       "Left-hand-side of type declaration must not be in the type language"
       );
   }
-  if (!isTypeExprRec(type)) {
+  if (isTypeExprRec(type).failed) {
     throw errors.JInternalError(
       "Right-hand-side of type declaration must be a type expression"
       );
@@ -295,7 +295,7 @@ function DefType(lhs, rhs) {
   /* Both rhs and lhs are expected
    * to be fully desugared already
    */
-  if (!isTypeExprRec(rhs) ||
+  if (isTypeExprRec(rhs).failed ||
       !isTypeExpr(lhs)) {
         throw errors.JSyntaxError(
           rhs.linenum,
@@ -331,7 +331,7 @@ function DataType(name, params, type) {
       "which is a type operator");
   }
   _.each(params, checkName);
-  if (!isTypeExprRec(type)) {
+  if (isTypeExprRec(type).failed) {
     throw errors.JSyntaxError(
       type.linenum,
       type.charnum,

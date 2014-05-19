@@ -1,6 +1,9 @@
 defop 2 Left (a ++ b)
  (a - b)
 
+
+def foo# 3
+
 deftype Foo (A -> B)
 
 ;; here is a comment
