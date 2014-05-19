@@ -47,14 +47,14 @@ function desugarLet(stx) {
   return new typ.LetExp(values, desugar(stx.body));
 }
 
-function sugarTypeApp(stx) {
+function sugarTypeDecl(stx) {
   var type;
   var expression;
   type = stx.p;
   expression = desugar(stx.func.p);
   expression.linenum = stx.linenum;
   expression.charnum = stx.charnum;
-  return new typ.TypeApp(expression, type);
+  return new typ.TypeDecl(expression, type);
 }
 
 function desugarDefType(stx) {
@@ -86,19 +86,19 @@ function desugar(stx) {
     case "Application":
       if ((stx.func.func !== undefined ) &&
           (stx.func.func.ident === "::")) {
-            /* It's a type application probably (will be verified later)
-             * In this case we actually *add* syntax here to differentiate type applications
-             * from normal applications
+            /* It's a type declaration probably (will be verified later)
+             * In this case we actually *add* syntax here to differentiate type declarations
+             * from normal function application
              */
             typeExpTest = typ.isTypeExpr(stx.p);
 
             if (typeExpTest.failed !== undefined &&
                 typeExpTest.failed) {
               throw errors.JInternalError(
-                "Type application error near line " + stx.linenum + " at character #"+stx.charnum +
+                "Type declaration error near line " + stx.linenum + " at character #"+stx.charnum +
                 "\n"+typeExpTest.stx.exprType+" (" + typeExpTest.stx.val + ") found where a type operator or type application was expected");
             }
-            return sugarTypeApp(stx);
+            return sugarTypeDecl(stx);
           }
 
       if ((stx.func.ident === "-" ||

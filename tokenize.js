@@ -310,7 +310,7 @@ function tokenize(tokstream, matchop) {
         if (deftype) {
           tokens.push(["deftype", "deftype", charnum, linenum]);
           tokstream = tokstream.substr(7);
-          break
+          break;
         }
         var def = peek(tokstream, "def", "def");
         if (def) {

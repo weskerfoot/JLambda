@@ -37,17 +37,17 @@ function isIrregularTypeOp(x) {
   return (x === "->");
 }
 
-function flattenTypeApp(stx) {
+function flattenTypeDecl(stx) {
   if (isTypeExpr(stx)) {
     return true;
   }
   if (stx.exprType === "Application") {
     /* it might be a type application so recursively check it */
     if (stx.p !== undefined) {
-      return  _.flatten([flattenTypeApp(stx.p), flattenTypeApp(stx.func)]);
+      return  _.flatten([flattenTypeDecl(stx.p), flattenTypeDecl(stx.func)]);
     }
     else {
-      return _.flatten([flattenTypeApp(stx.func)]);
+      return _.flatten([flattenTypeDecl(stx.func)]);
     }
   }
   if (stx.exprType === "Name") {
@@ -66,7 +66,7 @@ function flattenTypeApp(stx) {
 
 
 function isTypeExprRec(stx) {
-  var flattened = flattenTypeApp(stx);
+  var flattened = flattenTypeDecl(stx);
   for(var i = 0; i < flattened.length; i++) {
     if (flattened[i].failed !== undefined &&
         flattened[i].failed) {
@@ -266,36 +266,36 @@ function isTypeExpr(expr) {
   }
   return ((expr.exprType === "TypeOperator") ||
           (expr.exprType === "TypeVar") ||
-          (expr.exprType === "TypeApplication"));
+          (expr.exprType === "TypeDeclaration"));
 }
 
-function TypeApp(expression, type) {
+function TypeDecl(expression, type) {
   if (isTypeExprRec(expression) &&
       expression.exprType !== "Name") {
     throw errors.JSyntaxError(
       expression.linenum,
       expression.charnum,
-      "Left-hand-side of type application must not be in the type language"
+      "Left-hand-side of type declaration must not be in the type language"
       );
   }
-  if (!isTypeExprRec(type)) {
+  if (isTypeExprRec(type).failed) {
     throw errors.JInternalError(
-      "Right-hand-side of type application must be a type expression"
+      "Right-hand-side of type declaration must be a type expression"
       );
   }
   this.expression = expression;
   this.type = type;
-  this.exprType = "TypeApplication";
+  this.exprType = "TypeDeclaration";
   return this;
 }
 
-TypeApp.prototype = TypeExpression;
+TypeDecl.prototype = TypeExpression;
 
 function DefType(lhs, rhs) {
   /* Both rhs and lhs are expected
    * to be fully desugared already
    */
-  if (!isTypeExprRec(rhs) ||
+  if (isTypeExprRec(rhs).failed ||
       !isTypeExpr(lhs)) {
         throw errors.JSyntaxError(
           rhs.linenum,
@@ -331,7 +331,7 @@ function DataType(name, params, type) {
       "which is a type operator");
   }
   _.each(params, checkName);
-  if (!isTypeExprRec(type)) {
+  if (isTypeExprRec(type).failed) {
     throw errors.JSyntaxError(
       type.linenum,
       type.charnum,
@@ -416,7 +416,7 @@ module.exports =
      gensym : gensym,
      TypeVar : TypeVar,
      TypeOp : TypeOp,
-     TypeApp: TypeApp,
+     TypeDecl : TypeDecl,
      Closure : Closure,
      isTypeExpr : isTypeExprRec,
      DefType : DefType,
