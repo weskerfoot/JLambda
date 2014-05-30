@@ -88,6 +88,9 @@ function operatorMatch(ops) {
   };
 }
 
+function debugPrint(stx) {
+
+
 module.exports = {
   not  : not,
   groupOps : groupOps,
