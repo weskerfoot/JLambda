@@ -55,3 +55,17 @@ deftype (Either a b)
 ;; I/O functions
 
 (print :: (String -> (IO Void)))
+
+;; Operator definitions
+
+defop 3 Left (a + b)
+  (add a b)
+
+defop 3 Left (a - b)
+  (minus a b)
+
+defop 4 Left (a * b)
+  (mul a b)
+
+defop 4 Left (a / b)
+  (div a b)
