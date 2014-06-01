@@ -88,6 +88,11 @@ function operatorMatch(ops) {
   };
 }
 
+function debugPrint(stx) {
+  console.log("%j\n", stx);
+}
+
+
 module.exports = {
   not  : not,
   groupOps : groupOps,
@@ -95,4 +100,5 @@ module.exports = {
   dict: dict,
   extend : extend,
   empty : empty,
+  debugPrint : debugPrint
 };
