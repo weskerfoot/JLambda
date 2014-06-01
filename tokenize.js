@@ -1,5 +1,6 @@
 #!  /usr/bin/node
 
+var fs = require("fs");
 var rep = require("./representation.js");
 var $ = require("./tools.js");
 var error = require("./errors.js");
@@ -13,10 +14,7 @@ function isDigit(c) {
   if (isNaN(code)) {
     return false;
   }
-  return (46 < code &&
-          code < 58 ||
-          code < 58 &&
-          code > 46);
+  return (47 < code && code < 58);
 }
 
 function isWhitespace(c) {
@@ -411,8 +409,11 @@ function checkPattern(x, i) {
 }
 
 function tokenizeFull(input) {
+  var preludeSrc = fs.readFileSync("./prelude.jl");
   var matchop;
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
+
+  input = [preludeSrc, input].join("");
   for (var i = 0; i < initialPass.length; i++) {
     if (initialPass.slice(i, i+8).
         map(_.first).

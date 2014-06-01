@@ -3,13 +3,14 @@
  * with a few built-in (a standard Prelude environment)
  */
 
-// returns the new environment after mutating it
-// values = [(identifier, JLambda expression)]
-
 var errors = require("./errors.js");
 var rep = require("./representation.js");
 
 
+/*
+ * returns the new environment after mutating it
+ * values = [(identifier, JLambda expression)]
+ */
 function extend(env, values) {
   var new_env = {};
   var env_keys = Object.keys(env);
@@ -42,14 +43,7 @@ function lookup(name, env) {
   return value;
 }
 
-var prelude = makeEnv("prelude", [[new rep.Name("e"), new rep.FloatT(Math.E)],
-                                  [new rep.Name("pi"), new rep.FloatT(Math.PI)]]);
-
-var prelude_types = makeEnv("prelude_types",
-                            [[new rep.Name("e"), new rep.TypeOp("Float", [], false)],
-                            [new rep.Name("pi"), new rep.TypeOp("Float", [], false)]]);
-
-module.exports = { prelude : prelude,
-                   prelude_types : prelude_types,
-                   lookup : lookup,
-                   extend : extend };
+module.exports = {
+  lookup : lookup,
+  extend : extend
+};

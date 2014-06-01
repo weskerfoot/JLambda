@@ -1,4 +1,4 @@
-/* Takes an AST and converts all of the functions into closures.
+/* Takes an AST and converts all of the functions into "closures"
  * A closure is a triple of:
  *  the bound variables in a function or let
  *  the free variables in a function or let
@@ -19,10 +19,8 @@
  */
 
 var rep = require("./representation.js");
-var env = require("./environments.js");
 var errors = require("./errors.js");
 var parser = require("./parse.js");
-var pprint = require("./pprint.js");
 var $ = require("./tools.js");
 var _ = require("underscore");
 
@@ -68,7 +66,7 @@ function fvs(stx) {
   }
 }
 
-function closure_convert(stx) {
+function annotate_fvs(stx) {
   /* Takes a stx object that is either
    * a lambda
    * a let
@@ -106,40 +104,43 @@ function closure_convert(stx) {
   return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
-function closure_convert_all(stx) {
+/*
+ * This traverse the tree and gathers up all of the free variables of various functions/let bindings
+ */
+function annotate_fvs_all(stx) {
   var closure;
   switch (stx.exprType) {
     case "Let":
-      closure = closure_convert(stx);
-      closure.body.pairs = closure.body.pairs.map(closure_convert_all);
-      closure.body = closure_convert_all(closure.body.body);
+      closure = annotate_fvs(stx);
+      closure.body.pairs = closure.body.pairs.map(annotate_fvs_all);
+      closure.body = annotate_fvs_all(closure.body.body);
       return closure;
     case "Function":
-      closure = closure_convert(stx);
-      closure.body.body = closure_convert_all(closure.body.body);
+      closure = annotate_fvs(stx);
+      closure.body.body = annotate_fvs_all(closure.body.body);
       return closure;
     case "Unary":
-      stx.val = closure_convert_all(stx.val);
+      stx.val = annotate_fvs_all(stx.val);
       return stx;
     case "Application":
-      stx.func = closure_convert_all(stx.func);
-      stx.p = closure_convert_all(stx.p);
+      stx.func = annotate_fvs_all(stx.func);
+      stx.p = annotate_fvs_all(stx.p);
       return stx;
     case "If":
       if (stx.elseexp) {
-        stx.condition = closure_convert_all(stx.condition);
-        stx.thenexp = closure_convert_all(stx.thenexp);
-        stx.elseexp = closure_convert_all(stx.elseexp);
+        stx.condition = annotate_fvs_all(stx.condition);
+        stx.thenexp = annotate_fvs_all(stx.thenexp);
+        stx.elseexp = annotate_fvs_all(stx.elseexp);
         return stx;
       }
       else {
-        stx.condition = closure_convert_all(stx.condition);
-        stx.thenexp = closure_convert_all(stx.thenexp);
+        stx.condition = annotate_fvs_all(stx.condition);
+        stx.thenexp = annotate_fvs_all(stx.thenexp);
         return stx;
       }
       break;
     case "Definition":
-      stx.val = closure_convert_all(stx.val);
+      stx.val = annotate_fvs_all(stx.val);
       return stx;
     default:
       return stx;
@@ -149,11 +150,11 @@ function closure_convert_all(stx) {
 
 function test(src) {
   var ast = parser.parse(src)[0];
-  console.log(JSON.stringify(closure_convert_all(ast), null, 4));
+  console.log(JSON.stringify(annotate_fvs_all(ast), null, 4));
 }
 
 //console.log(test("if something then if a then if b then c else d else rtrrt else some_other_thing"));
 module.export = {
   test : test,
-  closureConvert : closure_convert_all
+  annotate_fvs: annotate_fvs_all
 };

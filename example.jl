@@ -1,7 +1,3 @@
-defop 2 Left (a ++ b)
- (a - b)
-
-
 def foo# 3
 
 deftype Foo (A -> B)
@@ -40,9 +36,9 @@ def empty []
 def getFile
   (readFile "./parse.js")
 
-def fileLines
-  (getFile >>=
-   ((mapM_ putStrLn) . lines))
+;;def fileLines
+;;  (getFile >>=
+;;   ((mapM_ putStrLn) . lines))
 
 def (testUnary n)
   ((-n) + n)
@@ -94,3 +90,5 @@ def main
         (unary +
          fileLines +
          (print splitted))
+
+def blah (3 / 4)

@@ -13,7 +13,7 @@
 var rep = require("./representation.js");
 var env = require("./environments.js");
 
-var TypeOp = rep.TypeOp;
-var TypeVar = rep.TypeVar;
-
-
+/*
+ * Map all bindings with explicit type annotations in the environment
+ */
+function gather_annotations(stx) {

@@ -4,23 +4,28 @@
 
 
 ;; Type definitions
-deftype String (A300 Char)
+deftype String (Vector Char)
 
-deftype Int Intrinsic
+deftype (Int) Intrinsic
 
-deftype Float Intrinsic
+deftype (Float) Intrinsic
 
-deftype Char Intrinsic
+deftype (Char) Intrinsic
 
-deftype Byte Intrinsic
+deftype (Byte) Intrinsic
 
-deftype Void Intrinsic
+deftype (Void) Intrinsic
 
-deftype IO Intrinsic
+deftype (IO a) Intrinsic
+
+deftype (Vector a) Intrinsic
 
 deftype (List a)
   (Empty |
    (Cons a (List a)))
+
+deftype (Bottom)
+  Undefined
 
 deftype (Maybe a)
   (Nothing |
@@ -55,3 +60,59 @@ deftype (Either a b)
 ;; I/O functions
 
 (print :: (String -> (IO Void)))
+
+;; Operator definitions
+
+defop 3 Left (a + b)
+  (add a b)
+
+defop 3 Left (a - b)
+  (minus a b)
+
+defop 4 Left (a * b)
+  (mul a b)
+
+defop 4 Left (a / b)
+  (div a b)
+
+defop 5 Right (a ^ b)
+  (pow a b)
+
+defop 3 Left (a ++ b)
+  (listConcat a b)
+
+defop 2 Left (a == b)
+  (eq a b)
+
+defop 2 Left (a > b)
+  (gt a b)
+
+defop 2 Left (a >= b)
+  (gte a b)
+
+defop 2 Left (a < b)
+  (lt a b)
+
+defop 2 Left (a <= b)
+  (lte a b)
+
+defop 2 Left (a && b)
+  (and a b)
+
+defop 2 Left (a || b)
+  (or a b)
+
+defop 1 Left (x : xs)
+  (cons x xs)
+
+defop 1 Left (f $ x)
+  (fapply f x)
+
+defop 1 Left (f . g)
+  (compose f g)
+
+defop 1 Left (a | b)
+  (bitwiseOr a b)
+
+defop 1 Left (a & b)
+  (bitwiseAnd a b)
