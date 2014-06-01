@@ -69,3 +69,45 @@ defop 4 Left (a * b)
 
 defop 4 Left (a / b)
   (div a b)
+
+defop 5 Right (a ^ b)
+  (pow a b)
+
+defop 3 Left (a ++ b)
+  (listConcat a b)
+
+defop 2 Left (a == b)
+  (eq a b)
+
+defop 2 Left (a > b)
+  (gt a b)
+
+defop 2 Left (a >= b)
+  (gte a b)
+
+defop 2 Left (a < b)
+  (lt a b)
+
+defop 2 Left (a <= b)
+  (lte a b)
+
+defop 2 Left (a && b)
+  (and a b)
+
+defop 2 Left (a || b)
+  (or a b)
+
+defop 1 Left (x : xs)
+  (cons x xs)
+
+defop 1 Left (f $ x)
+  (fapply f x)
+
+defop 1 Left (f . g)
+  (compose f g)
+
+defop 1 Left (a | b)
+  (bitwiseOr a b)
+
+defop 1 Left (a & b)
+  (bitwiseAnd a b)
