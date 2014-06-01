@@ -1,4 +1,4 @@
-/* Takes an AST and converts all of the functions into closures.
+/* Takes an AST and converts all of the functions into "closures"
  * A closure is a triple of:
  *  the bound variables in a function or let
  *  the free variables in a function or let
@@ -19,10 +19,8 @@
  */
 
 var rep = require("./representation.js");
-var env = require("./environments.js");
 var errors = require("./errors.js");
 var parser = require("./parse.js");
-var pprint = require("./pprint.js");
 var $ = require("./tools.js");
 var _ = require("underscore");
 
@@ -106,6 +104,9 @@ function annotate_fvs(stx) {
   return new rep.Closure(bound_vars, free_variables, stx, []);
 }
 
+/*
+ * This traverse the tree and gathers up all of the free variables of various functions/let bindings
+ */
 function annotate_fvs_all(stx) {
   var closure;
   switch (stx.exprType) {

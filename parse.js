@@ -367,12 +367,17 @@ function parseDataType(tokens, linenum, charnum) {
                              typeName.charnum,
                              "Expected a type operator in data type definition");
   }
-  parameters = parseMany(parse,
+  if (fst(tokens)[0] !== "right_paren") {
+    parameters = parseMany(parse,
                          validName,
                          validFormPar,
                          tokens,
                          charnum,
                          linenum);
+  }
+  else {
+    parameters = [];
+  }
   if (!tokens || (fst(tokens)[0]) !== "right_paren") {
     throw error.JSyntaxError(_.last(parameters).linenum,
                              _.last(parameters).charnum,
@@ -402,7 +407,7 @@ function parseDefType(tokens, linenum, charnum) {
   }
   if (fst(tokens)[0] === "left_paren") {
     /* It's an actual data type definition
-     * i.e. not just a newtype
+     * i.e. not just an alias
      */
     tokens.pop();
     return parseDataType(tokens, linenum, charnum);
@@ -424,7 +429,7 @@ function parseDefType(tokens, linenum, charnum) {
     if (lhs.exprType !== "TypeOperator") {
       throw error.JSyntaxError(lhs.linenum,
                                lhs.charnum,
-                               "left-hand side of type definition was not a type operator");
+                               "left-hand side of type alias was not a type operator");
     }
     rhs = parse(tokens, linenum, charnum);
 
@@ -432,7 +437,7 @@ function parseDefType(tokens, linenum, charnum) {
         rhs.exprType !== "TypeOperator") {
       throw error.JSyntaxError(rhs.linenum,
                                rhs.charnum,
-                               "was expecting an application or type operator on the right-hand side of a type definition");
+                               "was expecting an application or type operator on the right-hand side of a type alias");
     }
     result = addSrcPos(new typ.DefType(lhs, rhs), tokens, rhs.linenum, rhs.charnum);
     return result;

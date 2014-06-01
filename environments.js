@@ -3,13 +3,14 @@
  * with a few built-in (a standard Prelude environment)
  */
 
-// returns the new environment after mutating it
-// values = [(identifier, JLambda expression)]
-
 var errors = require("./errors.js");
 var rep = require("./representation.js");
 
 
+/*
+ * returns the new environment after mutating it
+ * values = [(identifier, JLambda expression)]
+ */
 function extend(env, values) {
   var new_env = {};
   var env_keys = Object.keys(env);

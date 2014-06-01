@@ -4,23 +4,28 @@
 
 
 ;; Type definitions
-deftype String (A300 Char)
+deftype String (Vector Char)
 
-deftype Int Intrinsic
+deftype (Int) Intrinsic
 
-deftype Float Intrinsic
+deftype (Float) Intrinsic
 
-deftype Char Intrinsic
+deftype (Char) Intrinsic
 
-deftype Byte Intrinsic
+deftype (Byte) Intrinsic
 
-deftype Void Intrinsic
+deftype (Void) Intrinsic
 
-deftype IO Intrinsic
+deftype (IO a) Intrinsic
+
+deftype (Vector a) Intrinsic
 
 deftype (List a)
   (Empty |
    (Cons a (List a)))
+
+deftype (Bottom)
+  Undefined
 
 deftype (Maybe a)
   (Nothing |

@@ -368,28 +368,11 @@ function makeGensym() {
 
 var gensym = makeGensym();
 
-//console.log(isTypeExpr(new Name("T")));
-
 OPInfo = {
-         /*"+" : [3, "Left"],
-         "-" :  [3, "Left"],
-         "*" :  [4, "Left"],
-         "/" :  [4, "Left"],
-         "^" :  [5, "Right"]
-          "++" : [3, "Left"],
-          "==" : [2, "Left"],
-          ">" :  [2, "Left"],
-          ">=" : [2, "Left"],
-          "<" :  [2, "Left"],
-          "<=" : [2, "Left"],
-          "&&" : [2, "Left"],
-          "||" : [2, "Left"],*/
           "::" : [2, "Left"],
-          /*":" : [1, "Left"],
-          "$" : [1, "Left"],
-          "." : [1, "Left"],*/
           "," : [1, "Left"],
-          "->" : [1, "Right"]};
+          "->" : [1, "Right"]
+         };
 
 module.exports =
    {
