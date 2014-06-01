@@ -89,6 +89,8 @@ function operatorMatch(ops) {
 }
 
 function debugPrint(stx) {
+  console.log("%j\n", stx);
+}
 
 
 module.exports = {
@@ -98,4 +100,5 @@ module.exports = {
   dict: dict,
   extend : extend,
   empty : empty,
+  debugPrint : debugPrint
 };
