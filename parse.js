@@ -811,7 +811,9 @@ function parseFull(tokenized) {
   try {
     while (tokenized.length > 0) {
       ast.push(desugarer.desugar(parse(tokenized), typeBindings));
+      console.log(ast);
     }
+    console.log(ast);
     return [ast, typeBindings];
   } catch (e) {
       if (e.stxerror !== undefined) {
@@ -830,9 +832,7 @@ module.exports = { parse : function(str) {
                             },
                   tokenize : tokenizer.tokenize
                  };
-/*
 var istr = fs.readFileSync('/dev/stdin').toString();
 var testParse = parseFull(tokenizer.tokenize(istr));
 console.log(testParse[1]);
 console.log(testParse[0].map(pprint.pprint));
-*/

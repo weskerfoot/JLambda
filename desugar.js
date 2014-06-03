@@ -70,7 +70,7 @@ function desugarDefType(stx, typeEnv) {
 }
 
 
-function desugar(stx, typeAliases, typeEnv) {
+function desugar(stx, typeEnv) {
  var typeExpTest;
 
  switch (stx.exprType) {
