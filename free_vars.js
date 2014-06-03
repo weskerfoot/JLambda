@@ -149,11 +149,11 @@ function annotate_fvs_all(stx) {
 
 
 function test(src) {
-  var ast = parser.parse(src)[0];
-  console.log(JSON.stringify(annotate_fvs_all(ast), null, 4));
+  var ast = parser.parse(src);
+  console.log(JSON.stringify(ast.map(annotate_fvs_all), null, 4));
 }
 
-//console.log(test("if something then if a then if b then c else d else rtrrt else some_other_thing"));
+console.log(test("if something then if a then if b then c else d else rtrrt else some_other_thing"));
 module.export = {
   test : test,
   annotate_fvs: annotate_fvs_all

@@ -57,30 +57,34 @@ function sugarTypeDecl(stx) {
   return new typ.TypeDecl(expression, type);
 }
 
-function desugarDefType(stx) {
+function desugarDefType(stx, typeEnv) {
   var result;
-  result = new typ.DefType(desugar(stx.lhs), desugar(stx.rhs));
+  var rhs = desugar(stx.rhs);
+  var name = stx.lhs.name;
+  typeEnv[name] = rhs;
+
+  result = new typ.DefType(stx.lhs, desugar(stx.rhs));
   result.linenum = stx.linenum;
   result.charnum = stx.charnum;
   return result;
 }
 
 
-function desugar(stx) {
+function desugar(stx, typeAliases, typeEnv) {
  var typeExpTest;
 
  switch (stx.exprType) {
     case "If":
       if (stx.elseexp) {
-        return new typ.If(desugar(stx.condition), desugar(stx.thenexp), desugar(stx.elseexp));
+        return new typ.If(desugar(stx.condition, typeEnv), desugar(stx.thenexp, typeEnv), desugar(stx.elseexp, typeEnv));
       }
-      return new typ.If(desugar(stx.condition), desugar(stx.thenexp));
+      return new typ.If(desugar(stx.condition, typeEnv), desugar(stx.thenexp, typeEnv));
     case "FunctionDefinition":
       return desugarDefFunc(stx);
     case "Definition":
-      return new typ.Def(stx.ident, desugar(stx.val));
+      return new typ.Def(stx.ident, desugar(stx.val, typeEnv));
     case "TypeDefinition":
-      return desugarDefType(stx);
+      return desugarDefType(stx, typeEnv);
     case "Name":
       return stx;
     case "Application":
@@ -104,10 +108,10 @@ function desugar(stx) {
       if ((stx.func.ident === "-" ||
           stx.func.ident === "+") &&
           stx.p) {
-            return new typ.UnaryOp(desugar(stx.func), desugar(stx.p));
+            return new typ.UnaryOp(desugar(stx.func, typeEnv), desugar(stx.p, typeEnv));
           }
       if (stx.p) {
-        return new typ.App(desugar(stx.func), desugar(stx.p));
+        return new typ.App(desugar(stx.func, typeEnv), desugar(stx.p, typeEnv));
       }
       return new typ.App(stx.func);
     case "Function":
