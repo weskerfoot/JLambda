@@ -14,10 +14,7 @@ function isDigit(c) {
   if (isNaN(code)) {
     return false;
   }
-  if ((47 < code) && (code < 58)) {
-    return true;
-  }
-  return false;
+  return (47 < code) && (code < 58)
 }
 
 function isWhitespace(c) {
