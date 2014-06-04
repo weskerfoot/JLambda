@@ -811,9 +811,7 @@ function parseFull(tokenized) {
   try {
     while (tokenized.length > 0) {
       ast.push(desugarer.desugar(parse(tokenized), typeBindings));
-      console.log(ast);
     }
-    console.log(ast);
     return [ast, typeBindings];
   } catch (e) {
       if (e.stxerror !== undefined) {
