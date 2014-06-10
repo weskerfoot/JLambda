@@ -1,3 +1,6 @@
+JLambda
+=======
+
 JLambda is a functional language in the spirit of languages such as Scheme,
 SML, or Clean. It aims to have a very flexible syntax and a clean and easy to
 understand type system. Another goal is to generate very efficient JavaScript
@@ -11,3 +14,18 @@ JLambda also aims to support concurrency which will be built on a
 continuation-passing style intermediate language. I have not figured out how
 scheduling threads will work, or whether I will provide any programmer directed
 way of scheduling (i.e. yield).
+
+Installation
+------------
+
+    git clone git@github.com:nisstyre56/JLambda.git
+    cd JLambda
+    npm install
+
+Usage
+-----
+
+Since the language is currently under heavy construction, the parser is the
+entry point for now:
+
+    cat example.jl | ./parse.js

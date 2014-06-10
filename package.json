@@ -1,0 +1,26 @@
+{
+  "name": "JLambda",
+  "version": "0.0.0",
+  "description": "yet another static functional language implemented in JS",
+  "scripts": {
+    "test": "./test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nisstyre56/JLambda.git"
+  },
+  "keywords": [
+    "static",
+    "functional",
+    "language"
+  ],
+  "author": "nisstyre56",
+  "license": "ΩF:∅",
+  "bugs": {
+    "url": "https://github.com/nisstyre56/JLambda/issues"
+  },
+  "homepage": "https://github.com/nisstyre56/JLambda",
+  "dependencies": {
+    "underscore": "^1.6.0"
+  }
+}
