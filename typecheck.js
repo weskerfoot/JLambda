@@ -16,4 +16,3 @@ var env = require("./environments.js");
 /*
  * Map all bindings with explicit type annotations in the environment
  */
-function gather_annotations(stx) {

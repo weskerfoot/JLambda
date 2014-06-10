@@ -14,7 +14,7 @@ function isDigit(c) {
   if (isNaN(code)) {
     return false;
   }
-  return (47 < code && code < 58);
+  return (47 < code) && (code < 58)
 }
 
 function isWhitespace(c) {
@@ -411,9 +411,9 @@ function checkPattern(x, i) {
 function tokenizeFull(input) {
   var preludeSrc = fs.readFileSync("./prelude.jl");
   var matchop;
+  input = [preludeSrc, input].join("");
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();
 
-  input = [preludeSrc, input].join("");
   for (var i = 0; i < initialPass.length; i++) {
     if (initialPass.slice(i, i+8).
         map(_.first).
