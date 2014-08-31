@@ -828,9 +828,10 @@ function parseFull(tokenized) {
 module.exports = { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
                             },
-                  tokenize : tokenizer.tokenize
+                  tokenize : tokenizer.tokenize,
+                  parseFull : parseFull,
                  };
-var istr = fs.readFileSync('/dev/stdin').toString();
-var testParse = parseFull(tokenizer.tokenize(istr));
-console.log(testParse[1]);
-console.log(testParse[0].map(pprint.pprint));
+//var istr = fs.readFileSync('/dev/stdin').toString();
+//var testParse = parseFull(tokenizer.tokenize(istr));
+//console.log(testParse[1]);
+//console.log(testParse[0].map(pprint.pprint));
