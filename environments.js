@@ -27,16 +27,17 @@ function extend(env, values) {
 function makeEnv(name, values) {
   var env = {};
   env.name = name;
+  env.bindings = {};
   for (var i = 0; i < values.length; i++) {
-    name = values[i][0].val;
+    name = values[i][0];
     var val = values[i][1];
-    env[name] = val;
+    env.bindings[name] = val;
   }
   return env;
 }
 
 function lookup(name, env) {
-  var value = env[name];
+  var value = env.bindings[name];
   if (!value) {
     throw errors.UnboundError(name, env.name);
   }
@@ -45,5 +46,6 @@ function lookup(name, env) {
 
 module.exports = {
   lookup : lookup,
-  extend : extend
+  extend : extend,
+  makeEnv : makeEnv
 };
