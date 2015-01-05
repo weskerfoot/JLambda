@@ -7,7 +7,7 @@ var tokenizer = require("./tokenize.js");
 var desugarer = require("./desugar.js");
 var pprint = require("./pprint.js");
 var error = require("./errors.js");
-
+var closure = require("./closures.js");
 var print = console.log;
 
 function sourcePos(tokens, linenum, charnum) {
@@ -808,9 +808,11 @@ function parse(tokens) {
 function parseFull(tokenized) {
   var ast = [];
   var typeBindings = {};
+  var current;
   try {
     while (tokenized.length > 0) {
-      ast.push(desugarer.desugar(parse(tokenized), typeBindings));
+      current = closure.annotate_fvs(desugarer.desugar(parse(tokenized), typeBindings));
+      ast.push(current);
     }
     return [ast, typeBindings];
   } catch (e) {
@@ -828,9 +830,10 @@ function parseFull(tokenized) {
 module.exports = { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
                             },
-                  tokenize : tokenizer.tokenize
+                  tokenize : tokenizer.tokenize,
+                  parseFull : parseFull,
                  };
-var istr = fs.readFileSync('/dev/stdin').toString();
-var testParse = parseFull(tokenizer.tokenize(istr));
-console.log(testParse[1]);
-console.log(testParse[0].map(pprint.pprint));
+//var istr = fs.readFileSync('/dev/stdin').toString();
+//var testParse = parseFull(tokenizer.tokenize(istr));
+//console.log(testParse[1]);
+//console.log(testParse[0].map(pprint.pprint));
