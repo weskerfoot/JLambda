@@ -39,7 +39,7 @@ function makeEnv(name, values) {
 function lookup(name, env) {
   var value = env.bindings[name];
   if (!value) {
-    throw errors.UnboundError(name, env.name);
+    throw errors.JUnboundError(name, env.name);
   }
   return value;
 }
