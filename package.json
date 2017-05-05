@@ -1,26 +1,25 @@
 {
   "name": "JLambda",
-  "version": "0.0.0",
-  "description": "yet another static functional language implemented in JS",
+  "version": "1.0.0",
+  "description": "An experiment in parentheses-free programming",
   "scripts": {
     "test": "./test.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nisstyre56/JLambda.git"
-  },
+  "repository": "https://github.com/nisstyre56/JLambda.git",
   "keywords": [
     "static",
     "functional",
     "language"
   ],
-  "author": "nisstyre56",
-  "license": "ΩF:∅",
+  "author": "Wesley Kerfoot",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/nisstyre56/JLambda/issues"
   },
   "homepage": "https://github.com/nisstyre56/JLambda",
   "dependencies": {
-    "underscore": "^1.6.0"
-  }
+    "ramda": "^0.23.0",
+    "underscore": "^1.8.3"
+  },
+  "main": "parse.js"
 }

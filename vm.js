@@ -5,11 +5,11 @@ var parse = require("./parse.js");
 var tokenizer = require("./tokenize.js");
 var pprint = require("./pprint.js");
 var env = require("./environments.js");
+var fs = require("fs");
 
-
-//var istr = fs.readFileSync('/dev/stdin').toString();
+var istr = fs.readFileSync('/dev/stdin').toString();
 //var istr = "if true then (+ 6 (a+a*b)) else 1";
-var istr = "def (f a) (a + b)"
+//var istr = "def (f a) (a + b)"
 var ast = parse.parseFull(tokenizer.tokenize(istr));
 
 function apply(func, p) {
