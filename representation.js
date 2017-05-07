@@ -345,7 +345,7 @@ function DataType(name, params, type) {
 }
 
 
-//Applies the function ``name'' to the list of parameters
+/* Applies the function ``name'' to the list of parameters */
 function makeApp(name, parameters) {
   if (parameters) {
     return parameters.slice(1).reduce(function(f, ident) {

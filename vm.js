@@ -8,8 +8,6 @@ var env = require("./environments.js");
 var fs = require("fs");
 
 var istr = fs.readFileSync('/dev/stdin').toString();
-//var istr = "if true then (+ 6 (a+a*b)) else 1";
-//var istr = "def (f a) (a + b)"
 var ast = parse.parseFull(tokenizer.tokenize(istr));
 
 function apply(func, p) {
@@ -46,6 +44,7 @@ function evaluate(ast, environment) {
     }
   }
   else if (ast.exprType === "Definition") {
+    console.log("XXX");
     console.log(ast);
   }
   else {
@@ -59,8 +58,9 @@ var testenv = env.makeEnv("toplevel",
                        ["a", 2],
                        ["b", 3]]);
 
-var all = evaluate(ast[0][ast[0].length - 1], testenv);
-console.log(all);
+console.log(ast.types);
+//var all = evaluate(ast, testenv);
+//console.log(all);
 //console.log("%j", testenv);
 //console.log("%j", ast[0][ast[0].length - 1]);
 //console.log("%j", ast[0][ast[0].length - 1]);

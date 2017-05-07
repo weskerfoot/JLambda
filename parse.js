@@ -29,10 +29,12 @@ function addSrcPos(stx, tokens, linenum, charnum) {
   return stx;
 }
 
+/* Gets the first token from the right side of the stack */
 function fst(ts) {
   return ts[ts.length-1];
 }
 
+/* Gets the second token from the right side of the stack */
 function snd(ts) {
   return ts[ts.length-2];
 }
@@ -814,7 +816,10 @@ function parseFull(tokenized) {
       current = closure.annotate_fvs(desugarer.desugar(parse(tokenized), typeBindings));
       ast.push(current);
     }
-    return [ast, typeBindings];
+    return {
+      "ast" : ast,
+      "types" : typeBindings
+    };
   } catch (e) {
       if (e.stxerror !== undefined) {
         e.stxerror();
