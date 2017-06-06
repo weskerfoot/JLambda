@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/nisstyre56/JLambda",
   "dependencies": {
+    "express": "^4.15.3",
     "ramda": "^0.23.0",
     "underscore": "^1.8.3"
   },
