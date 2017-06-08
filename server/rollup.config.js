@@ -2,6 +2,7 @@ import riot from 'rollup-plugin-riot'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import buble from 'rollup-plugin-buble'
+import uglify from 'rollup-plugin-uglify'
 
 export default {
   entry: './tags/jlambda.js',
@@ -13,7 +14,8 @@ export default {
     commonjs({
       './vm.js' : ['evaluateString']
     }),
-    buble()
+    buble(),
+    uglify()
   ],
   format: 'iife'
 }

@@ -1,19 +1,25 @@
 <test>
-  <input
+  <textarea
     ref="input"
     type="text">
-  </input>
+  </textarea>
   <button
     onclick={evaluate}>
     Evaluate it
   </button>
+  <p>
+    {output}
+  </p>
 
 <script>
 import vm from '../vm.js';
 
+var self = this;
+self.output = "";
+
 evaluate() {
   var input = this.refs.input;
-  alert(vm.evaluateString(input.value));
+  self.update({"output" : JSON.stringify(vm.evaluateString(input.value))});
 }
 
 </script>

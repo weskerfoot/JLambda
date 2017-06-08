@@ -21,7 +21,7 @@ function desugarList(lst) {
   else {
     var x = desugar(lst.xs[0]);
     var rest = lst.xs.slice(1);
-    return new typ.App(new typ.App(new typ.Name("(:)"), x), desugarList(new typ.ListT(rest)));
+    return new typ.App(new typ.App(new typ.Name(":"), x), desugarList(new typ.ListT(rest)));
   }
 }
 
@@ -108,7 +108,7 @@ function desugar(stx, typeEnv) {
             return sugarTypeDecl(stx);
           }
 
-      if ((stx.func.ident === "-") &&
+      if ((stx.func.ident === "-" || stx.func.ident == "+") &&
           stx.p && isAtomicNumber(stx.p)) {
             console.log("Matched unary");
             console.log(stx);
