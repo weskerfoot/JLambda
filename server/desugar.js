@@ -8,6 +8,10 @@ var typ = require("./representation.js");
 var errors = require("./errors.js");
 var _ = require("underscore");
 
+function isAtomicNumber(stx) {
+  return stx.exprType == "Integer" || stx.exprType == "Float";
+}
+
 // Lists get desugared to nested function calls
 // i.e. (cons (cons (cons ...)))
 function desugarList(lst) {
@@ -69,7 +73,6 @@ function desugarDefType(stx, typeEnv) {
   return result;
 }
 
-
 function desugar(stx, typeEnv) {
  var typeExpTest;
 
@@ -105,9 +108,10 @@ function desugar(stx, typeEnv) {
             return sugarTypeDecl(stx);
           }
 
-      if ((stx.func.ident === "-" ||
-          stx.func.ident === "+") &&
-          stx.p) {
+      if ((stx.func.ident === "-") &&
+          stx.p && isAtomicNumber(stx.p)) {
+            console.log("Matched unary");
+            console.log(stx);
             return new typ.UnaryOp(desugar(stx.func, typeEnv), desugar(stx.p, typeEnv));
           }
       if (stx.p) {
@@ -137,5 +141,3 @@ module.exports = { desugar : desugar };
 //var test = typ.ListT([1,2,3]);
 
 //console.log(desugarList(test));
-
-

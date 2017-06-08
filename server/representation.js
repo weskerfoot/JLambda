@@ -368,7 +368,7 @@ function makeGensym() {
 
 var gensym = makeGensym();
 
-OPInfo = {
+var OPInfo = {
           "::" : [2, "Left"],
           "," : [1, "Left"],
           "->" : [1, "Right"]

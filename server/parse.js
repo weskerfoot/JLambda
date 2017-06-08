@@ -1,5 +1,3 @@
-#! /usr/bin/node
-var fs = require("fs");
 var typ = require("./representation.js");
 var $ = require("./tools.js");
 var _ = require("underscore");
@@ -220,8 +218,8 @@ function parseDefFunction(tokens, linenum, charnum) {
   return result;
 }
 
-validLet = makeChecker(["Definition", "FunctionDefinition"].map(formTypeCheck));
-letEnd = _.compose($.not, makeChecker(["right_brace"].map(tokTypeCheck)));
+var validLet = makeChecker(["Definition", "FunctionDefinition"].map(formTypeCheck));
+var letEnd = _.compose($.not, makeChecker(["right_brace"].map(tokTypeCheck)));
 
 function parseLetForm(tokens, linenum, charnum) {
   var result;
@@ -370,7 +368,7 @@ function parseDataType(tokens, linenum, charnum) {
                              "Expected a type operator in data type definition");
   }
   if (fst(tokens)[0] !== "right_paren") {
-    parameters = parseMany(parse,
+    var parameters = parseMany(parse,
                          validName,
                          validFormPar,
                          tokens,
@@ -378,7 +376,7 @@ function parseDataType(tokens, linenum, charnum) {
                          linenum);
   }
   else {
-    parameters = [];
+    var parameters = [];
   }
   if (!tokens || (fst(tokens)[0]) !== "right_paren") {
     throw error.JSyntaxError(_.last(parameters).linenum,
@@ -742,7 +740,7 @@ function parse(tokens) {
     toktype = fst(tokens)[0];
   }
   else {
-    process.exit(code=1);
+    console.error("Tokenization error");
   }
   var token = fst(tokens)[1];
   tokens.pop();
@@ -823,11 +821,10 @@ function parseFull(tokenized) {
   } catch (e) {
       if (e.stxerror !== undefined) {
         e.stxerror();
-        process.exit(1);
+        console.error("Tokenization error");
       }
       else {
         console.log(e.errormessage);
-        process.exit(1);
       }
   }
 }
@@ -838,7 +835,6 @@ module.exports = { parse : function(str) {
                   tokenize : tokenizer.tokenize,
                   parseFull : parseFull,
                  };
-//var istr = fs.readFileSync('/dev/stdin').toString();
 //var testParse = parseFull(tokenizer.tokenize(istr));
 //console.log(testParse[1]);
 //console.log(testParse[0].map(pprint.pprint));

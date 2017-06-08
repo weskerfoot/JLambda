@@ -12,6 +12,13 @@
     "express": "~4.15.2",
     "morgan": "~1.8.1",
     "pug": "~2.0.0-beta11",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-riot": "^1.1.0",
     "serve-favicon": "~2.4.2"
+  },
+  "devDependencies": {
+    "rollup-plugin-commonjs": "^8.0.2"
   }
 }

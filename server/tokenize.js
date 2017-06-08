@@ -1,11 +1,9 @@
-#!  /usr/bin/node
-
-var fs = require("fs");
 var rep = require("./representation.js");
 var $ = require("./tools.js");
 var error = require("./errors.js");
 var operators = Object.keys(rep.OPInfo);
 var _ = require("underscore");
+var prelude = require("./prelude.js");
 
 function isDigit(c) {
   if (!c)
@@ -409,7 +407,7 @@ function checkPattern(x, i) {
 }
 
 function tokenizeFull(input) {
-  var preludeSrc = fs.readFileSync("./prelude.jl");
+  var preludeSrc = prelude.src;
   var matchop;
   input = [preludeSrc, input].join("");
   var initialPass = tokenizeHelp(input, _.constant(false), true).reverse();

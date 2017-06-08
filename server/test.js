@@ -1,5 +1,3 @@
-#!  /usr/bin/node
-
 var parser = require("./parse.js");
 var cexps = require("./cexps.js");
 var closures = require("./closure_conversion.js");

@@ -1,25 +1,17 @@
-#! /usr/bin/node
-
 var typ = require("./representation.js");
 var parse = require("./parse.js");
 var tokenizer = require("./tokenize.js");
 var pprint = require("./pprint.js");
 var env = require("./environments.js");
-var fs = require("fs");
-
-var istr = fs.readFileSync('/dev/stdin').toString();
-var ast = parse.parseFull(tokenizer.tokenize(istr));
-
 
 var testenv = env.makeEnv("toplevel",
                       [
                        ["+", function(a) { return function(b) { return a + b; } }],
                        ["*", function(a) { return function(b) { return a * b; } }],
                        ["-", function(a) { return function(b) { return a - b; } }],
+                       ["/", function(a) { return function(b) { return a / b; } }],
                        ["a", 2],
                        ["b", 3]]);
-
-console.log(JSON.stringify(evaluate(ast.ast[ast.ast.length-1], testenv)));
 
 function lookup(ident, env) {
   var func = evaluate(env.bindings[ident], env);
@@ -27,9 +19,8 @@ function lookup(ident, env) {
 }
 
 function evaluateString(input) {
-  var parsed = parse.parseFull(tokenizer.tokenize(input)).ast;
-  var evaluated = evaluateAll(parsed, testenv);
-  return evaluated;
+  var ast = parse.parseFull(tokenizer.tokenize(input));
+  return evaluate(ast.ast[ast.ast.length-1], testenv);
 }
 
 function apply(func, p) {
@@ -74,7 +65,7 @@ function evaluate(ast, environment) {
   else if (ast.exprType === "Definition") {
     return; /* XXX */
   }
-  else if (ast.exprType === "Integer") {
+  else if (ast.exprType === "Integer" || ast.exprType == "Float") {
     return ast.val;
   }
   else {
@@ -83,5 +74,5 @@ function evaluate(ast, environment) {
 }
 
 module.exports = {
-  "evaluate" : evaluateString
+  evaluate : evaluateString
 };
