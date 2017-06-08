@@ -4,9 +4,9 @@
  * much simpler and easier to type-check, optimize, and evaluate
  */
 
-var typ = require("./representation.js");
-var errors = require("./errors.js");
-var _ = require("underscore");
+import typ from "./representation.js";
+import errors from "./errors.js";
+import _ from "underscore";
 
 function isAtomicNumber(stx) {
   return stx.exprType == "Integer" || stx.exprType == "Float";
@@ -137,7 +137,7 @@ function desugar(stx, typeEnv) {
   }
 }
 
-module.exports = { desugar : desugar };
+export default { desugar : desugar };
 //var test = typ.ListT([1,2,3]);
 
 //console.log(desugarList(test));

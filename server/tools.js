@@ -1,4 +1,4 @@
-var _ = require("underscore");
+import _ from "underscore";
 
 function empty(xs) {
   return _.size(xs) < 1;
@@ -93,7 +93,7 @@ function debugPrint(stx) {
 }
 
 
-module.exports = {
+export default {
   not  : not,
   groupOps : groupOps,
   opMatch : operatorMatch,

@@ -1,5 +1,5 @@
-var errors = require("./errors.js");
-var _ = require("underscore");
+import errors from "./errors.js";
+import _ from "underscore";
 
 var Expression = {
   display :
@@ -374,7 +374,7 @@ var OPInfo = {
           "->" : [1, "Right"]
          };
 
-module.exports =
+export default
    {
      IntT   : IntT,
      FloatT : FloatT,

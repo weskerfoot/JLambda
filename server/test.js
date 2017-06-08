@@ -1,17 +1,17 @@
-var parser = require("./parse.js");
-var cexps = require("./cexps.js");
-var closures = require("./closure_conversion.js");
-var desugar = require("./desugar.js");
-var environments = require("./environments.js");
-var errors = require("./errors.js");
-var tokens = require("./tokenize.js");
-var tools = require("./tools.js");
-var typecheck = require("./typecheck.js");
-var representation = require("./representation.js");
-var _ = require("underscore");
+import parser from "./parse.js";
+import cexps from "./cexps.js";
+import closures from "./closure_conversion.js";
+import desugar from "./desugar.js";
+import environments from "./environments.js";
+import errors from "./errors.js";
+import tokens from "./tokenize.js";
+import tools from "./tools.js";
+import typecheck from "./typecheck.js";
+import representation from "./representation.js";
+import _ from "underscore";
 
-var qc = require("quickcheck");
-var assert = require("assert");
+import qc from "quickcheck";
+import assert from "assert";
 
 
 /* my own generators */

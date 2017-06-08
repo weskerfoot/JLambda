@@ -31,7 +31,7 @@ function JInternalError(message) {
   return this;
 }
 
-module.exports =
+export default
   {JSyntaxError : JSyntaxError,
    JTypeError : JTypeError,
    JInternalError : JInternalError

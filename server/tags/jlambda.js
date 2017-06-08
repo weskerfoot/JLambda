@@ -1,3 +1,4 @@
-var vm = require("../vm.js");
+import riot from 'riot';
+import './test.tag';
 
-console.log(vm.evaluate("(+ 2 3)"));
+riot.mount("test");

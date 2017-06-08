@@ -1,9 +1,10 @@
-var rep = require("./representation.js");
-var $ = require("./tools.js");
-var error = require("./errors.js");
+import rep from "./representation.js";
+import $ from "./tools.js";
+import error from "./errors.js";
+import _ from "underscore";
+import prelude from "./prelude.js";
+
 var operators = Object.keys(rep.OPInfo);
-var _ = require("underscore");
-var prelude = require("./prelude.js");
 
 function isDigit(c) {
   if (!c)
@@ -426,5 +427,5 @@ function tokenizeFull(input) {
   return tokenizeHelp(input, matchop, true);
 }
 
-module.exports = {tokenize : tokenizeFull,
+export default {tokenize : tokenizeFull,
                   isIdentifier : isIdentifier};

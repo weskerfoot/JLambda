@@ -99,4 +99,4 @@ function pprint(expr) {
   }
 }
 
-module.exports = {pprint : pprint};
+export default {pprint : pprint};

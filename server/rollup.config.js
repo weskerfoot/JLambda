@@ -10,7 +10,9 @@ export default {
   plugins: [
     riot(),
     nodeResolve({ jsnext: true }),
-    commonjs(),
+    commonjs({
+      './vm.js' : ['evaluateString']
+    }),
     buble()
   ],
   format: 'iife'

@@ -118,6 +118,6 @@ defop 3 Left (a | b)
 defop 3 Left (a & b)
   (bitwiseAnd a b)`;
 
-module.exports = {
+export default {
   "src" : src
 };

@@ -18,11 +18,11 @@
  * The second phase will be done to the CPS language and closures will actually lambda-lifted out potentially.
  */
 
-var rep = require("./representation.js");
-var errors = require("./errors.js");
-var parser = require("./parse.js");
-var $ = require("./tools.js");
-var _ = require("underscore");
+import rep from "./representation.js";
+import errors from "./errors.js";
+import parser from "./parse.js";
+import $ from "./tools.js";
+import _ from "underscore";
 
 var notEmpty = _.compose($.not, _.partial(_.equal, []));
 
@@ -153,6 +153,6 @@ function test(src) {
 }
 
 //console.log(test("if something then if a then if b then c else d else rtrrt else some_other_thing"));
-module.exports = {
+export default {
   annotate_fvs : annotate_fvs_all
 };

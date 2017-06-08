@@ -3,8 +3,8 @@
  * with a few built-in (a standard Prelude environment)
  */
 
-var errors = require("./errors.js");
-var rep = require("./representation.js");
+import errors from "./errors.js";
+import rep from "./representation.js";
 
 // creates a new environment initialized with the pairs in values
 function makeEnv(name, values) {
@@ -27,7 +27,7 @@ function lookup(name, env) {
   return value;
 }
 
-module.exports = {
+export default {
   lookup : lookup,
   makeEnv : makeEnv
 };

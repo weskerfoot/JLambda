@@ -1,11 +1,11 @@
-var typ = require("./representation.js");
-var $ = require("./tools.js");
-var _ = require("underscore");
-var tokenizer = require("./tokenize.js");
-var desugarer = require("./desugar.js");
-var pprint = require("./pprint.js");
-var error = require("./errors.js");
-var closure = require("./closures.js");
+import typ from "./representation.js";
+import $ from "./tools.js";
+import _ from "underscore";
+import tokenizer from "./tokenize.js";
+import desugarer from "./desugar.js";
+import pprint from "./pprint.js";
+import error from "./errors.js";
+import closure from "./closures.js";
 var print = console.log;
 
 function sourcePos(tokens, linenum, charnum) {
@@ -829,7 +829,7 @@ function parseFull(tokenized) {
   }
 }
 
-module.exports = { parse : function(str) {
+export default { parse : function(str) {
                               return parseFull(tokenizer.tokenize(str));
                             },
                   tokenize : tokenizer.tokenize,

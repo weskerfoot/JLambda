@@ -10,8 +10,8 @@
  * to an environment mapping identifiers to types
  */
 
-var rep = require("./representation.js");
-var env = require("./environments.js");
+import rep from "./representation.js";
+import env from "./environments.js";
 
 /*
  * Map all bindings with explicit type annotations in the environment

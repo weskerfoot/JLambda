@@ -1,8 +1,8 @@
-var typ = require("./representation.js");
-var parse = require("./parse.js");
-var tokenizer = require("./tokenize.js");
-var pprint = require("./pprint.js");
-var env = require("./environments.js");
+import typ from "./representation.js";
+import parse from "./parse.js";
+import tokenizer from "./tokenize.js";
+import pprint from "./pprint.js";
+import env from "./environments.js";
 
 var testenv = env.makeEnv("toplevel",
                       [
@@ -73,6 +73,6 @@ function evaluate(ast, environment) {
   }
 }
 
-module.exports = {
-  evaluate : evaluateString
+export default {
+  evaluateString : evaluateString
 };

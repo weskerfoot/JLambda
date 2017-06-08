@@ -1,1 +1,1 @@
-var typ = require("representation.js");
+import typ from "representation.js";
