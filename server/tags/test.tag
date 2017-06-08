@@ -1,5 +1,7 @@
 <test>
   <textarea
+    cols=40
+    rows=12
     ref="input"
     type="text">
   </textarea>

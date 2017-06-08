@@ -651,6 +651,8 @@ function computeApp(tokens, charnum, linenum) {
   var next;
   var result;
   var parameters;
+  console.log("computing app");
+  console.log(tokens);
 
   if (fst(tokens)) {
     next = fst(tokens);
@@ -660,7 +662,9 @@ function computeApp(tokens, charnum, linenum) {
                              lhs.charnum,
                              "Unexpected end of source");
   }
+
   if (typ.OPInfo[next[1]]) {
+    console.log("matched infix");
     /* it's an infix expression */
     result = parseInfix(tokens, 1, lhs, lhs.linenum, lhs.charnum);
     if (!fst(tokens) || fst(tokens)[0] !== "right_paren") {
@@ -726,6 +730,11 @@ function parseInfix(tokens, minPrec, lhs, linenum, charnum) {
     tokens.pop();
     /*remove the operator token*/
     var rhs = parseInfix(tokens, nextMinPrec);
+    console.log("~~~~~~~~~~");
+    console.log(op);
+    console.log(lhs);
+    console.log(rhs);
+    console.log("~~~~~~~~~~");
     lhs = addSrcPos(typ.makeApp(op, [lhs, rhs]), tokens, rhs.linenum, rhs.charnum);
   }
   return lhs;

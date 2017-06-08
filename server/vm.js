@@ -28,6 +28,7 @@ var testenv = env.makeEnv("toplevel",
 function lookup(ident, env) {
   console.log(`trying to look up ${ident}`);
   var value = env.bindings[ident];
+  console.log(env);
   console.log(value);
   if (value.exprType !== undefined) {
     console.log("evaluting further");

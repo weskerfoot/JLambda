@@ -82,10 +82,11 @@ function desugar(stx, typeEnv) {
         return new typ.If(desugar(stx.condition, typeEnv), desugar(stx.thenexp, typeEnv), desugar(stx.elseexp, typeEnv));
       }
       return new typ.If(desugar(stx.condition, typeEnv), desugar(stx.thenexp, typeEnv));
-    case "FunctionDefinition":
-      return desugarDefFunc(stx);
-    case "Definition":
-      return new typ.Def(stx.ident, desugar(stx.val, typeEnv));
+    /* FIXME closures not yet working */
+    //case "FunctionDefinition":
+      //return desugarDefFunc(stx);
+    //case "Definition":
+      //return new typ.Def(stx.ident, desugar(stx.val, typeEnv));
     case "TypeDefinition":
       return desugarDefType(stx, typeEnv);
     case "Name":
@@ -108,7 +109,7 @@ function desugar(stx, typeEnv) {
             return sugarTypeDecl(stx);
           }
 
-      if ((stx.func.ident === "-" || stx.func.ident == "+") &&
+      if (false &&
           stx.p && isAtomicNumber(stx.p)) {
             console.log("Matched unary");
             console.log(stx);
