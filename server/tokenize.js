@@ -395,7 +395,6 @@ function tokenizeHelp(input, matchop, strip_whitespace) {
     });
   } catch (e) {
     console.log(e.stxerror());
-    process.exit(1);
   }
 }
 

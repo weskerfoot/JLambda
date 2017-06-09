@@ -26,6 +26,7 @@ function desugarList(lst) {
 }
 
 function desugarDefFunc(def) {
+  /* FIXME should do closure conversion here */
   return new typ.Def(def.ident,
                      curryFunc(def.params,
                                def.body));
@@ -85,8 +86,8 @@ function desugar(stx, typeEnv) {
     /* FIXME closures not yet working */
     //case "FunctionDefinition":
       //return desugarDefFunc(stx);
-    //case "Definition":
-      //return new typ.Def(stx.ident, desugar(stx.val, typeEnv));
+    case "Definition":
+      return new typ.Def(stx.ident, desugar(stx.val, typeEnv));
     case "TypeDefinition":
       return desugarDefType(stx, typeEnv);
     case "Name":
@@ -111,8 +112,6 @@ function desugar(stx, typeEnv) {
 
       if (false &&
           stx.p && isAtomicNumber(stx.p)) {
-            console.log("Matched unary");
-            console.log(stx);
             return new typ.UnaryOp(desugar(stx.func, typeEnv), desugar(stx.p, typeEnv));
           }
       if (stx.p) {

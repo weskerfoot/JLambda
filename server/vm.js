@@ -26,21 +26,16 @@ var testenv = env.makeEnv("toplevel",
                        ["b", 3]]);
 
 function lookup(ident, env) {
-  console.log(`trying to look up ${ident}`);
   var value = env.bindings[ident];
-  console.log(env);
-  console.log(value);
   if (value.exprType !== undefined) {
-    console.log("evaluting further");
-    return evaluate(value, env);
+    var result = evaluate(value, env);
+    return result;
   }
-  console.log("returning it without evaluting");
   return value;
 }
 
 function evaluateString(input) {
   var ast = parse.parseFull(tokenizer.tokenize(input));
-  console.log(ast.ast[ast.ast.length-1]);
   return evaluateAll(ast.ast, testenv);
 }
 
@@ -69,8 +64,6 @@ function extend(def, env) {
 }
 
 function evaluate(ast, environment) {
-  console.log("here");
-  console.log(JSON.stringify(ast));
   if (ast.exprType == "Application") {
     var func = evaluate(ast.func, environment);
     return apply(
@@ -97,9 +90,12 @@ function evaluate(ast, environment) {
   }
   else if (ast.exprType === "Definition") {
     extend(ast, environment);
-    return ast;
+    return;
   }
-  else if (ast.exprType === "Integer" || ast.exprType === "Float" || ast.exprType === "String") {
+  else if (ast.exprType === "Integer" ||
+           ast.exprType === "Float"   ||
+           ast.exprType === "String") {
+    /* Return an atom */
     return ast.val;
   }
   else if (ast.exprType === "Closure") {

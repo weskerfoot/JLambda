@@ -6,3 +6,11 @@ body {
 a {
   color: #00B7FF;
 }
+
+.evaluator {
+  width: 200px;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: solid 1px;
+}
