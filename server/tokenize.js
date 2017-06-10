@@ -384,18 +384,14 @@ function tokenize(tokstream, matchop) {
 }
 
 function tokenizeHelp(input, matchop, strip_whitespace) {
-  try {
-    return tokenize(input, matchop).reverse().filter(function(x) {
-      if (strip_whitespace) {
-        return x[0] !== "whitespace";
-      }
-      else {
-        return true;
-      }
-    });
-  } catch (e) {
-    console.log(e.stxerror());
-  }
+  return tokenize(input, matchop).reverse().filter(function(x) {
+    if (strip_whitespace) {
+      return x[0] !== "whitespace";
+    }
+    else {
+      return true;
+    }
+  });
 }
 
 var defop_pattern = ["defop", "integer", "constructor",

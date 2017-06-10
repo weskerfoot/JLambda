@@ -789,6 +789,11 @@ function parse(tokens) {
     return parseIf(tokens, linenum, charnum);
   }
   else if (toktype === "left_paren") {
+    if (tokens.length == 0) {
+      throw error.JSyntaxError(linenum,
+                               charnum,
+                               "Unexpected end of source");
+    }
     if (fst(tokens)[0] === "lambda") {
       tokens.pop();
       var parsed = parseLambda(tokens, linenum, charnum);
@@ -810,24 +815,14 @@ function parseFull(tokenized) {
   var ast = [];
   var typeBindings = {};
   var current;
-  try {
-    while (tokenized.length > 0) {
-      current = closure.annotate_fvs(desugarer.desugar(parse(tokenized), typeBindings));
-      ast.push(current);
-    }
-    return {
-      "ast" : ast,
-      "types" : typeBindings
-    };
-  } catch (e) {
-      if (e.stxerror !== undefined) {
-        e.stxerror();
-        console.error("Tokenization error");
-      }
-      else {
-        console.log(e.errormessage);
-      }
+  while (tokenized.length > 0) {
+    current = closure.annotate_fvs(desugarer.desugar(parse(tokenized), typeBindings));
+    ast.push(current);
   }
+  return {
+    "ast" : ast,
+    "types" : typeBindings
+  };
 }
 
 export default { parse : function(str) {

@@ -25,7 +25,17 @@ self.default = "";
 evaluate(ev) {
   ev.preventDefault();
   var input = self.refs.input;
-  self.outputs.push(JSON.stringify(vm.evaluateString(input.value)));
+  if (!input.value) {
+    return;
+  }
+  else {
+    try {
+      self.outputs.push(JSON.stringify(vm.evaluateString(input.value)));
+    }
+    catch (e) {
+      self.outputs.push(`Error: ${e.errormessage}`);
+    }
+  }
   self.refs.input.value = self.default;
   self.update();
 }

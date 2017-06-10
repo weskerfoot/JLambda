@@ -14,8 +14,7 @@ export default {
     commonjs({
       './vm.js' : ['evaluateString']
     }),
-    buble(),
-    uglify()
+    buble()
   ],
   format: 'iife'
 }
