@@ -24,8 +24,6 @@ Installation
 
 Usage
 -----
-
-Since the language is currently under heavy construction, the parser is the
-entry point for now:
-
-    cat example.jl | ./parse.js
+cd server
+yarn
+yarn repl
