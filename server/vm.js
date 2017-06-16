@@ -90,6 +90,9 @@ function evaluate(ast, environment) {
   else if (ast.exprType === "Name") {
     return lookup(ast.ident, environment);
   }
+  else if (ast.exprType === "Bool") {
+    return ast.val;
+  }
   else if (ast.exprType === "If") {
     if (evaluate(ast.condition, environment)) {
       return evaluate(ast.thenexp, environment);
@@ -117,5 +120,6 @@ function evaluate(ast, environment) {
 }
 
 export default {
-  evaluateString : evaluateString
+  evaluateString : evaluateString,
+  env : testenv
 };
