@@ -26,4 +26,5 @@ Usage
 -----
     cd server
     yarn
-    yarn repl
+    yarn repl # starts the local read-eval-print loop
+    yarn server # starts a web app with an interactive REPL
