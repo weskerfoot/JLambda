@@ -4937,7 +4937,7 @@ var $$1 = {
   debugPrint : debugPrint
 };
 
-var src = "\n;; This file declares the various types used by intrinsic/prelude definitions\n;; It is sort of special in that it doesn't care whether there are any associated definitions\n;; just that there are type definitions for that particular binding's name\n\n\n;; Type definitions\ndeftype String (Vector Char)\n\ndeftype (Int) Intrinsic\n\ndeftype (Float) Intrinsic\n\ndeftype (Char) Intrinsic\n\ndeftype (Byte) Intrinsic\n\ndeftype (Void) Intrinsic\n\ndeftype (IO a) Intrinsic\n\ndeftype (Vector a) Intrinsic\n\ndeftype (List a)\n  (Empty |\n   (Cons a (List a)))\n\ndeftype (Bottom)\n  Undefined\n\ndeftype (Maybe a)\n  (Nothing |\n   (Just a))\n\ndeftype (Either a b)\n  ((Left a) |\n   (Right b))\n\n;; List functions\n\n(: :: (a -> (List a) -> (List a)))\n\n(map :: ((a -> b) -> (List a) -> (List b)))\n\n(head :: ((List a) -> a))\n\n(tail :: ((List a) -> (List a)))\n\n(!! :: (Int -> (List a) -> a))\n\n(take :: (Int -> (List a) -> (Maybe (List a))))\n\n(drop :: (Int -> (List a) -> (Maybe (List a))))\n\n;; Optional functions\n\n(maybe :: (b -> (a -> b) -> (Maybe a) -> b))\n\n(either :: ((b -> c) -> (b -> c) -> (Either a b) -> c))\n\n;; I/O functions\n\n(print :: (String -> (IO Void)))\n\n;; Operator definitions\n\ndefop 1 Left (a + b)\n  (add a b)\n\ndefop 1 Left (a - b)\n  (minus a b)\n\ndefop 2 Left (a * b)\n  (mul a b)\n\ndefop 2 Left (a / b)\n  (div a b)\n\ndefop 2 Right (a ^ b)\n  (pow a b)\n\ndefop 3 Left (a ++ b)\n  (listConcat a b)\n\ndefop 3 Left (a == b)\n  (eq a b)\n\ndefop 3 Left (a > b)\n  (gt a b)\n\ndefop 3 Left (a >= b)\n  (gte a b)\n\ndefop 3 Left (a < b)\n  (lt a b)\n\ndefop 3 Left (a <= b)\n  (lte a b)\n\ndefop 3 Left (a && b)\n  (and a b)\n\ndefop 3 Left (a || b)\n  (or a b)\n\ndefop 4 Left (x : xs)\n  (cons x xs)\n\ndefop 5 Left (f $ x)\n  (fapply f x)\n\ndefop 5 Left (f . g)\n  (compose f g)\n\ndefop 3 Left (a | b)\n  (bitwiseOr a b)\n\ndefop 3 Left (a & b)\n  (bitwiseAnd a b)";
+var src = "\n;; This file declares the various types used by intrinsic/prelude definitions\n;; It is sort of special in that it doesn't care whether there are any associated definitions\n;; just that there are type definitions for that particular binding's name\n\n\n;; Type definitions\ndeftype String (Vector Char)\n\ndeftype (Int) Intrinsic\n\ndeftype (Float) Intrinsic\n\ndeftype (Char) Intrinsic\n\ndeftype (Byte) Intrinsic\n\ndeftype (Void) Intrinsic\n\ndeftype (IO a) Intrinsic\n\ndeftype (Vector a) Intrinsic\n\ndeftype (List a)\n  (Empty |\n   (Cons a (List a)))\n\ndeftype (Bottom)\n  Undefined\n\ndeftype (Maybe a)\n  (Nothing |\n   (Just a))\n\ndeftype (Either a b)\n  ((Left a) |\n   (Right b))\n\n;; List functions\n\n(: :: (a -> (List a) -> (List a)))\n\n(map :: ((a -> b) -> (List a) -> (List b)))\n\n(head :: ((List a) -> a))\n\n(tail :: ((List a) -> (List a)))\n\n(!! :: (Int -> (List a) -> a))\n\n(take :: (Int -> (List a) -> (Maybe (List a))))\n\n(drop :: (Int -> (List a) -> (Maybe (List a))))\n\n;; Optional functions\n\n(maybe :: (b -> (a -> b) -> (Maybe a) -> b))\n\n(either :: ((b -> c) -> (b -> c) -> (Either a b) -> c))\n\n;; I/O functions\n\n(print :: (String -> (IO Void)))\n\n;; Operator definitions\n\ndefop 1 Left (a + b)\n  (add a b)\n\ndefop 1 Left (a - b)\n  (minus a b)\n\ndefop 2 Left (a * b)\n  (mul a b)\n\ndefop 2 Left (a / b)\n  (div a b)\n\ndefop 2 Right (a ^ b)\n  (pow a b)\n\ndefop 3 Left (a ++ b)\n  (listConcat a b)\n\ndefop 3 Left (a == b)\n  (eq a b)\n\ndefop 3 Left (a > b)\n  (gt a b)\n\ndefop 3 Left (a >= b)\n  (gte a b)\n\ndefop 3 Left (a < b)\n  (lt a b)\n\ndefop 3 Left (a <= b)\n  (lte a b)\n\ndefop 3 Left (a && b)\n  (and a b)\n\ndefop 3 Left (a || b)\n  (or a b)\n\ndefop 4 Right (x : xs)\n  (cons x xs)\n\ndefop 5 Left (f $ x)\n  (fapply f x)\n\ndefop 5 Left (f . g)\n  (compose f g)\n\ndefop 3 Left (a | b)\n  (bitwiseOr a b)\n\ndefop 3 Left (a & b)\n  (bitwiseAnd a b)";
 
 var prelude = {
   "src" : src
@@ -6514,8 +6514,18 @@ function cons(x) {
   };
 }
 
+function car(xs) {
+  return xs[0];
+}
+
+function cdr(xs) {
+  return xs.slice(1);
+}
+
 var testenv = env.makeEnv("toplevel",
                       [
+                       ["car", car],
+                       ["cdr", cdr],
                        ["len", function(xs) { return xs.length; }],
                        ["+", function(a) { return function(b) { return a + b; } }],
                        ["*", function(a) { return function(b) { return a * b; } }],
@@ -6595,7 +6605,7 @@ function evaluate(ast, environment) {
   }
   else if (ast.exprType === "Closure") {
     /* return evaluateClosure(ast); */
-    return ast;
+    return "Closure";
   }
   else {
     return ast;

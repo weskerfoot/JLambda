@@ -122,6 +122,13 @@ function tokenizeIdent(tokstream,
   return [[n, ["identifier", identifier, charnum, linenum]]];
 }
 
+function tokenizeLetBinding(tokstream,
+                            matchop,
+                            charnum,
+                            linenum) {
+  return;
+}
+
 function tokenizeCtor(tokstream,
                       matchop,
                       charnum,

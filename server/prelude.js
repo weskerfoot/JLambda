@@ -103,7 +103,7 @@ defop 3 Left (a && b)
 defop 3 Left (a || b)
   (or a b)
 
-defop 4 Left (x : xs)
+defop 4 Right (x : xs)
   (cons x xs)
 
 defop 5 Left (f $ x)

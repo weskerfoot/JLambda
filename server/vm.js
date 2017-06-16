@@ -14,8 +14,18 @@ function cons(x) {
   };
 }
 
+function car(xs) {
+  return xs[0];
+}
+
+function cdr(xs) {
+  return xs.slice(1);
+}
+
 var testenv = env.makeEnv("toplevel",
                       [
+                       ["car", car],
+                       ["cdr", cdr],
                        ["len", function(xs) { return xs.length; }],
                        ["+", function(a) { return function(b) { return a + b; } }],
                        ["*", function(a) { return function(b) { return a * b; } }],
@@ -99,7 +109,6 @@ function evaluate(ast, environment) {
     return ast.val;
   }
   else if (ast.exprType === "Closure") {
-    /* return evaluateClosure(ast); */
     return ast;
   }
   else {
