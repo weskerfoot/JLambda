@@ -24,8 +24,6 @@ Installation
 
 Usage
 -----
-cd server
-
-yarn
-
-yarn repl
+    cd server
+    yarn
+    yarn repl
